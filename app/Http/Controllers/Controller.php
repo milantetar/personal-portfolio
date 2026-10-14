@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use Traits\Auth\ApiResponse;
+use App\Traits\Auth\ApiResponse;
 use Illuminate\Http\JsonResponse;
 
 abstract class Controller

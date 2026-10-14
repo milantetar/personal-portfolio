@@ -1,9 +1,26 @@
+import '../css/app.css';
+
+import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-void createInertiaApp({
+createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
+    resolve: (name): any => {
+        const pages = import.meta.glob('./pages/**/*.tsx', { eager: false });
+        const importer = pages[`./pages/${name}.tsx`];
+        
+        if (!importer) {
+            throw new Error(`Page not found: ${name}`);
+        }
+        
+        return importer();
+    },
+    setup({ el, App, props }) {
+        const root = createRoot(el);
+        root.render(<App {...props} />);
+    },
     progress: {
         color: '#4B5563',
     },

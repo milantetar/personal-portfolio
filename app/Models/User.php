@@ -42,6 +42,21 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'email' => 'encrypted',
+            'name' => 'encrypted',
         ];
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (User $user): void {
+            if ($user->isDirty('email')) {
+                // Generate a deterministic SHA-256 hash for secure database lookups
+                $user->email_hash = hash('sha256', strtolower(trim($user->email)));
+            }
+        });
     }
 }
