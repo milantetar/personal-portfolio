@@ -22,7 +22,7 @@ class AuthController extends Controller
     // Show Inertia Login Page
     public function create(): Response
     {
-        return Inertia::render('Auth/Login');
+        return Inertia::render('auth/login');
     }
 
     // Handle Web Login

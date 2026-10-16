@@ -18,7 +18,8 @@
         "spatie/laravel-data": "^4.23",
         "spatie/laravel-medialibrary": "*",
         "spatie/laravel-permission": "*",
-        "spatie/laravel-query-builder": "^7.3"
+        "spatie/laravel-query-builder": "^7.3",
+        "tightenco/ziggy": "^2.6"
     },
     "require-dev": {
         "laravel/pint": "^1.27",

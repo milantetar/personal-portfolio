@@ -20,6 +20,22 @@ class MakeRepository extends Command
             $name .= 'Repository';
         }
 
+        $segments = explode('/', $name);
+        $className = array_pop($segments);
+
+        $directory = implode('/', $segments);
+        $namespace = 'App\\Repositories';
+
+        if ($directory !== '') {
+            $namespace .= '\\' . str_replace('/', '\\', $directory);
+        }
+
+        $basePath = app_path('Repositories');
+
+        if ( $directory !== ''){
+            $basePath .= '/' . $directory;
+        }
+
         $path = app_path("Repositories/{$name}.php");
 
         if (File::exists($path)) {
@@ -27,9 +43,10 @@ class MakeRepository extends Command
             return;
         }
 
+        File::ensureDirectoryExists($basePath);
+
         $stub = "<?php\n\ndeclare(strict_types=1);\n\nnamespace App\Repositories;\n\nclass {$name}\n{\n    // Add database query logic here\n}\n";
 
-        File::ensureDirectoryExists(app_path('Repositories'));
         File::put($path, $stub);
 
         $this->info("Repository {$name} created successfully.");

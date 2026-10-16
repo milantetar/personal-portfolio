@@ -1,51 +1,153 @@
-import React from 'react';
-import { useForm } from '@inertiajs/react';
+import { SyntheticEvent, useState } from 'react';
+import { Head, useForm } from '@inertiajs/react';
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
+import { Navbar } from '@/components/navbar/navbar';
+import { cn } from '@/lib/utils';
 
 export default function Login() {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
+        remember: false,
     });
 
-    const submit = (e: React.FormEvent) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    const submit = (e: SyntheticEvent) => {
         e.preventDefault();
-        post('/login');
+        post('/login', { onFinish: () => reset('password') });
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-100">
-            <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-                <h2 className="mb-6 text-2xl font-bold text-gray-800">Login</h2>
-                <form onSubmit={submit}>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
-                        <input
-                            type="email"
-                            value={data.email}
-                            onChange={e => setData('email', e.target.value)}
-                            className="mt-1 w-full rounded border px-3 py-2"
-                        />
-                        {errors.email && <div className="text-sm text-red-500">{errors.email}</div>}
+        <>
+            <Head title="Log in" />
+
+            <div className="flex min-h-screen flex-col bg-background text-foreground transition-colors">
+                <Navbar />
+
+                <main className="flex flex-1 items-center justify-center px-4 py-12">
+                    <div className="w-full max-w-sm rounded-2xl border border-border bg-card/85 p-6 shadow-xl sm:p-8">
+                        <form onSubmit={submit} className="flex flex-col gap-5">
+                            {/* Email */}
+                            <Field label="Email address" htmlFor="email" error={errors.email}>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={data.email}
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    placeholder="you@example.com"
+                                    autoComplete="username"
+                                    autoFocus
+                                    required
+                                    invalid={!!errors.email}
+                                    describedBy={errors.email ? 'email-error' : undefined}
+                                />
+                            </Field>
+
+                            {/* Password */}
+                            <Field label="Password" htmlFor="password" error={errors.password}>
+                                <div className="relative">
+                                    <Input
+                                        id="password"
+                                        type={showPassword ? 'text' : 'password'}
+                                        value={data.password}
+                                        onChange={(e) => setData('password', e.target.value)}
+                                        placeholder="Enter your password"
+                                        autoComplete="current-password"
+                                        required
+                                        invalid={!!errors.password}
+                                        describedBy={errors.password ? 'password-error' : undefined}
+                                        className="pr-11"
+                                    />
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword((v) => !v)}
+                                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
+                            </Field>
+
+                            {/* Remember me */}
+                            <label htmlFor="remember" className="flex cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+                                <input
+                                    id="remember"
+                                    type="checkbox"
+                                    checked={data.remember}
+                                    onChange={(e) => setData('remember', e.target.checked)}
+                                    className="h-4 w-4 rounded border-input accent-primary focus-visible:ring-2 focus-visible:ring-ring"
+                                />
+                                Remember me
+                            </label>
+
+                            {/* Submit */}
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                                {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                                {processing ? 'Logging in...' : 'Log in'}
+                            </button>
+                        </form>
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700">Password</label>
-                        <input
-                            type="password"
-                            value={data.password}
-                            onChange={e => setData('password', e.target.value)}
-                            className="mt-1 w-full rounded border px-3 py-2"
-                        />
-                        {errors.password && <div className="text-sm text-red-500">{errors.password}</div>}
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        className="w-full rounded bg-blue-600 py-2 text-white hover:bg-blue-700"
-                    >
-                        Log In
-                    </button>
-                </form>
+                </main>
             </div>
+        </>
+    );
+}
+
+/* ---------------- helpers ---------------- */
+
+function Field({
+    label,
+    htmlFor,
+    error,
+    children,
+}: {
+    label: string;
+    htmlFor: string;
+    error?: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <div>
+            <label htmlFor={htmlFor} className="mb-2 block text-sm font-medium text-card-foreground">
+                {label}
+            </label>
+            {children}
+            {error && (
+                <p id={`${htmlFor}-error`} role="alert" className="mt-2 text-sm text-destructive">
+                    {error}
+                </p>
+            )}
         </div>
+    );
+}
+
+function Input({
+    invalid,
+    describedBy,
+    className,
+    ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+    invalid?: boolean;
+    describedBy?: string;
+}) {
+    return (
+        <input
+            {...props}
+            aria-invalid={invalid}
+            aria-describedby={describedBy}
+            className={cn(
+                'w-full rounded-lg border border-input bg-background px-3.5 py-2.5 text-sm text-foreground outline-none',
+                'placeholder:text-muted-foreground transition-shadow',
+                'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                className
+            )}
+        />
     );
 }

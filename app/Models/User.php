@@ -14,6 +14,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**
  * @property int $id
@@ -58,5 +59,15 @@ class User extends Authenticatable
                 $user->email_hash = hash('sha256', strtolower(trim($user->email)));
             }
         });
+    }
+
+    /**
+     * Get the user's initials.
+     */
+    protected function initials(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => strtoupper(substr($this->name, 0, 2)),
+        );
     }
 }
