@@ -10,11 +10,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('sidebar_items', function (Blueprint $table) {
+        Schema::create('sidebar_items', function (Blueprint $table): void {
             $table->id();
-            $table->string('label');                     
-            $table->string('icon')->nullable();          
-            $table->string('url');                       
+            $table->string('label');
+            $table->foreignId('icon_media_id')
+                  ->nullable()
+                  ->constrained('media')
+                  ->nullOnDelete(); // Links JPG/SVG from media library as an icon
+            $table->string('url');
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_visible')->default(true);
             $table->timestamps();

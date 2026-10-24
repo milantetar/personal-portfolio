@@ -1,5 +1,3 @@
-import { BackgroundImage } from "../dashboard/media";
-
 export interface NavbarItem {
     id: number;
     label: string;
@@ -14,11 +12,6 @@ export interface NavbarType {
     items: NavbarItem[];
 }
 
-export interface PageProps {
-    auth: {
-        user: any | null;
-    };
-    navBars?: NavbarType[];
-    backgroundImage?: BackgroundImage | null;
-    [key: string]: any;
-}
+import type { BackgroundImage } from '../media';
+import type { User } from '../auth';
+

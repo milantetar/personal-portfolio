@@ -19,4 +19,9 @@ class SideBarItemService
         $sidebarItem->update($data->toArray());
         return $sidebarItem;
     }
+
+    public function deleteSideBarItem(SidebarItem $sidebarItem) : void
+    {
+        $sidebarItem->delete();
+    }
 }

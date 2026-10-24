@@ -1,18 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Web\Dashboard;
 
 use App\Http\Controllers\Controller;
-use App\Models\Navbar;
+use App\Repositories\Dashboard\SidebarItemRepository;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        protected SidebarItemRepository $sidebarItemRepository,
+    ){}
+
     public function index ()
     {
-        $navbars = Navbar::with('items')->get();
+        Log::info('Web dashboard requested.', ['user_id' => auth()->id()]);
+        $sidebarItems = $this->sidebarItemRepository->getAllActiveSorted();
+
+        Log::info('Web dashboard loaded.', [
+            'user_id' => auth()->id(),
+            'sidebar_item_count' => $sidebarItems->count(),
+        ]);
 
         return inertia('admin/dashboard', [
-            'navbars' => $navbars,
+            'sidebarItems' => $sidebarItems,
         ]);
     }
     

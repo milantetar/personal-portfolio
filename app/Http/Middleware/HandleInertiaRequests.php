@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -41,6 +42,47 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'flash' => [
+                'success' => fn() => $request->session()->get('success'),
+                'error' => fn() => $request->session()->get('error'),
+            ],
+            'branding' => fn() => $this->branding(),
         ];
+    }
+
+    /** @return array<string, mixed> */
+    private function branding(): array
+    {
+        try {
+            $relations = ['logoMedia', 'backgroundMedia'];
+            if (\Illuminate\Support\Facades\Schema::hasColumn('site_settings', 'avatar_media_id')) {
+                $relations[] = 'avatarMedia';
+            }
+
+            $settings = SiteSetting::query()
+                ->with($relations)
+                ->first();
+
+            return [
+                'id' => $settings?->id,
+                'siteName' => $settings?->site_name ?? "Milan's Portfolio",
+                'logo' => $settings?->logoMedia?->only(['id', 'url', 'alt_text']),
+                'backgroundImage' => $settings?->backgroundMedia?->only(['id', 'url', 'alt_text']),
+                'avatar' => in_array('avatarMedia', $relations, true) ? $settings?->avatarMedia?->only(['id', 'url', 'alt_text']) : null,
+                'themePreset' => $settings?->theme_preset ?? 'instagram',
+                'glassBlur' => $settings?->glass_blur ?? 'xl',
+                'glassOpacity' => $settings?->glass_opacity ?? '75',
+            ];
+        } catch (\Throwable) {
+            return [
+                'siteName' => "Milan's Portfolio",
+                'logo' => null,
+                'backgroundImage' => null,
+                'avatar' => null,
+                'themePreset' => 'instagram',
+                'glassBlur' => 'xl',
+                'glassOpacity' => '75',
+            ];
+        }
     }
 }

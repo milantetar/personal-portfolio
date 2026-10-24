@@ -21,7 +21,7 @@ class MakeRepository extends Command
         }
 
         $segments = explode('/', $name);
-        $className = array_pop($segments);
+        array_pop($segments);
 
         $directory = implode('/', $segments);
         $namespace = 'App\\Repositories';

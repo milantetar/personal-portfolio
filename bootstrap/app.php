@@ -7,6 +7,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -33,6 +34,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // 1. Validation Exception
         $exceptions->render(function (ValidationException $e, Request $request) {
+            Log::warning('Request validation failed.', [
+                'method' => $request->method(),
+                'path' => $request->path(),
+                'user_id' => $request->user()?->id,
+                'errors' => $e->errors(),
+            ]);
+
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => false,

@@ -67,7 +67,7 @@ class User extends Authenticatable
     protected function initials(): Attribute
     {
         return Attribute::make(
-            get: fn () => strtoupper(substr($this->name, 0, 2)),
+            get: fn (): string => strtoupper(substr($this->name, 0, 2)),
         );
     }
 }

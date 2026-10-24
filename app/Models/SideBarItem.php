@@ -8,11 +8,12 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
  * @property string $label
- * @property string|null $icon
+ * @property int|null $icon_media_id
  * @property string $url
  * @property int $sort_order
  * @property bool $is_visible
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 #[Fillable([
     'label',
-    'icon',
+    'icon_media_id',
     'url',
     'sort_order',
     'is_visible',
@@ -30,16 +31,17 @@ class SidebarItem extends Model
 {
     use HasFactory;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
+            'icon_media_id' => 'integer',
             'sort_order' => 'integer',
             'is_visible' => 'boolean',
         ];
+    }
+
+    public function iconMedia(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'icon_media_id');
     }
 }

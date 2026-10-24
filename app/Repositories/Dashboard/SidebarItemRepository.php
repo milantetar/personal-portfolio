@@ -16,6 +16,7 @@ class SidebarItemRepository
     {
         return SidebarItem::query()
             ->where('is_visible', true)
+            ->with('iconMedia')
             ->orderBy('sort_order')
             ->get();
     }

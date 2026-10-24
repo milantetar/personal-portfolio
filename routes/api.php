@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Dashboard\SidebarItemController;
+use App\Http\Controllers\Api\Media\MediaController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function (): void {
@@ -15,8 +16,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/users', [AuthController::class, 'getAllUsers']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::prefix('dashboard')->group(function (): void {
+    Route::name('api.')->prefix('dashboard')->group(function (): void {
         Route::apiResource('sidebar-items', SidebarItemController::class);
+        Route::apiResource('media', MediaController::class);
     });
 
 });

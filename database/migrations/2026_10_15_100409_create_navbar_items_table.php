@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('navbar_items', function (Blueprint $table) {
+        Schema::create('navbar_items', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('navbar_id')->constrained('navbars')->onDelete('cascade');
             $table->string('label');

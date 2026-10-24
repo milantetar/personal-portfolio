@@ -3,6 +3,7 @@ import '../css/app.css';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from 'sonner';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -20,8 +21,9 @@ createInertiaApp({
     },
     setup({ el, App, props }) {
         createRoot(el).render(
-            <ThemeProvider defaultMode="system" defaultColorScheme="default">
+            <ThemeProvider defaultTheme="system">
                 <App {...props} />
+                <Toaster position="bottom-right" richColors /> 
             </ThemeProvider>
         );
     },

@@ -1,65 +1,74 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Web\Dashboard;
 
+use App\Data\Dashboard\SidebarItemData;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\SidebarItem;
+use App\Services\Dashboard\SidebarItemService;
+use App\Repositories\Dashboard\SidebarItemRepository;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class SidebarItemController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    public function __construct(
+        protected SidebarItemService $sidebarItemService,
+        protected SidebarItemRepository $sidebarItemRepository
+    ) {
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(SidebarItemData $data): RedirectResponse
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        Log::info('Web sidebar item creation started.', ['user_id' => auth()->id()]);
+        try{
+            $item = $this->sidebarItemService->createSideBarItem($data);
+            Log::info('Web sidebar item created.', ['user_id' => auth()->id(), 'sidebar_item_id' => $item->id]);
+            return redirect()->back()->with('success', 'Sidebar item created successfully.');
+        } catch (Exception $e) {
+            Log::error('Web sidebar item creation failed.', ['user_id' => auth()->id(), 'exception' => $e]);
+            return redirect()->back()->with('error', 'Failed to create sidebar item.');
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(SidebarItemData $data,SidebarItem $sidebarItem): RedirectResponse
     {
-        //
+        Log::info('Web sidebar item update started.', ['user_id' => auth()->id(), 'sidebar_item_id' => $sidebarItem->id]);
+        try{
+            $this->sidebarItemService->updateSidebarItem($sidebarItem, $data);
+
+            Log::info('Web sidebar item updated.', ['user_id' => auth()->id(), 'sidebar_item_id' => $sidebarItem->id]);
+
+            return redirect()->back()->with('success', 'Sidebar item updated successfully.');
+        } catch (Exception $e) {
+            Log::error('Web sidebar item update failed.', ['user_id' => auth()->id(), 'sidebar_item_id' => $sidebarItem->id, 'exception' => $e]);
+            return redirect()->back()->with('error', 'Failed to update sidebar item.');
+        }
+
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(SidebarItem $sidebarItem): RedirectResponse
     {
-        //
+        Log::info('Web sidebar item deletion started.', ['user_id' => auth()->id(), 'sidebar_item_id' => $sidebarItem->id]);
+        try{
+            $this->sidebarItemService->deleteSidebarItem($sidebarItem); 
+            Log::info('Web sidebar item deleted.', ['user_id' => auth()->id(), 'sidebar_item_id' => $sidebarItem->id]);
+            return redirect()->back()->with('success', 'Sidebar item deleted successfully.');
+        } catch (Exception $e) {
+            Log::error('Web sidebar item deletion failed.', ['user_id' => auth()->id(), 'sidebar_item_id' => $sidebarItem->id, 'exception' => $e]);
+            return redirect()->back()->with('error', 'Failed to delete sidebar item.');
+        }
     }
 }

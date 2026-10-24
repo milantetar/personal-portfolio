@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Storage;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read string $url
+ * @method static Builder|self filter(array $filters)
  */
 #[Fillable([
     'disk',
@@ -40,11 +42,8 @@ class Media extends Model
 {
     use HasFactory;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $appends = ['url'];
+    
     protected function casts(): array
     {
         return [
@@ -53,9 +52,6 @@ class Media extends Model
         ];
     }
 
-    /**
-     * Accessor to get the full public URL of the file (appended automatically to JSON/React responses).
-     */
     protected function url(): Attribute
     {
         return Attribute::make(
@@ -63,11 +59,36 @@ class Media extends Model
         )->shouldCache();
     }
 
-    /**
-     * Relationship: The user who uploaded the file.
-     */
     public function uploader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');
+    }
+
+    /**
+     * Scope to filter media by search, mime_type, and size.
+     * Note: Pagination is handled in the Repository, not here.
+     */
+    public function scopeFilter(Builder $query, array $filters): Builder
+    {
+        return $query
+            ->when(
+                !empty($filters['search']),
+                fn (Builder $q) => $q->where(function (Builder $sub) use ($filters): void {
+                    $sub->where('title', 'like', '%' . $filters['search'] . '%')
+                        ->orWhere('original_name', 'like', '%' . $filters['search'] . '%');
+                })
+            )
+            ->when(
+                !empty($filters['mime_type']),
+                fn (Builder $q) => $q->where('mime_type', 'like', '%' . $filters['mime_type'] . '%')
+            )
+            ->when(
+                isset($filters['min_size']),
+                fn (Builder $q) => $q->where('size', '>=', $filters['min_size'])
+            )
+            ->when(
+                isset($filters['max_size']),
+                fn (Builder $q) => $q->where('size', '<=', $filters['max_size'])
+            );
     }
 }
