@@ -23,9 +23,7 @@ export function ThemeToggle() {
                         size="icon"
                         aria-label="Change theme"
                         className={cn(
-                            'rounded-full border border-border',
-                            'bg-card/80 text-foreground',
-                            'backdrop-blur-md backdrop-saturate-150',
+                            'rounded-md border border-border bg-card text-foreground',
                             'hover:bg-accent hover:text-accent-foreground'
                         )}
                     >
@@ -39,9 +37,7 @@ export function ThemeToggle() {
                 align="end"
                 sideOffset={14}
                 className={cn(
-                    'w-48 border-border',
-                    'bg-popover/95 text-popover-foreground',
-                    'backdrop-blur-none shadow-lg',
+                    'w-48 border-border bg-popover text-popover-foreground shadow-sm',
                 )}
             >
                 {THEMES.map((t) => (
@@ -56,9 +52,7 @@ export function ThemeToggle() {
                         <span
                             className="inline-block h-4 w-4 shrink-0 rounded-full ring-1 ring-border"
                             style={{
-                                background: t.swatchSecondary
-                                    ? `linear-gradient(0deg, ${t.swatch}, ${t.swatchSecondary})`
-                                    : t.swatch,
+                                background: t.swatch,
                             }}
                         />
 

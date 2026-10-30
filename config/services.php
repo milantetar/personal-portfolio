@@ -37,4 +37,20 @@ return [
         ],
     ],
 
+    'github' => [
+        'token' => env('GITHUB_TOKEN'),
+        'username' => env('GITHUB_USERNAME', 'milantetar'),
+        'ca_bundle' => env('GITHUB_CA_BUNDLE'),
+    ],
+
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-3.5-flash-lite'),
+        'fallback_model' => env('GEMINI_FALLBACK_MODEL', 'gemini-3.6-flash'),
+        'timeout' => env('GEMINI_TIMEOUT_SECONDS', 12),
+        'ca_bundle' => env('GEMINI_CA_BUNDLE'),
+        'per_minute_limit' => env('PORTFOLIO_ASSISTANT_PER_MINUTE_LIMIT', 10),
+        'daily_limit' => env('PORTFOLIO_ASSISTANT_DAILY_LIMIT', 60),
+    ],
+
 ];

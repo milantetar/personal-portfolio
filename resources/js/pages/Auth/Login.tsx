@@ -22,11 +22,14 @@ export default function Login() {
         <>
             <Head title="Log in" />
 
-            <div className="flex min-h-screen flex-col bg-background text-foreground transition-colors">
+            <div className="flex min-h-dvh flex-col bg-background text-foreground">
                 <Navbar />
 
                 <main className="flex flex-1 items-center justify-center px-4 py-12">
-                    <div className="w-full max-w-sm rounded-2xl border border-border bg-card/85 p-6 shadow-xl sm:p-8">
+                    <div className="w-full max-w-sm border border-border bg-card p-6 sm:p-8">
+                        <p className="eyebrow mb-3">Portfolio / Admin</p>
+                        <h1 className="font-display text-3xl font-medium tracking-tight">Sign in</h1>
+                        <p className="mt-2 mb-7 text-sm leading-6 text-muted-foreground">Use your administrator account to manage portfolio content.</p>
                         <form onSubmit={submit} className="flex flex-col gap-5">
                             {/* Email */}
                             <Field label="Email address" htmlFor="email" error={errors.email}>
@@ -87,7 +90,7 @@ export default function Login() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+                                className="mt-1 flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                 {processing ? 'Logging in...' : 'Log in'}
@@ -143,7 +146,7 @@ function Input({
             aria-invalid={invalid}
             aria-describedby={describedBy}
             className={cn(
-                'w-full rounded-lg border border-input bg-background px-3.5 py-2.5 text-sm text-foreground outline-none',
+                'h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none',
                 'placeholder:text-muted-foreground transition-shadow',
                 'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                 className

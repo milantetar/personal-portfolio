@@ -39,13 +39,13 @@ import type { Branding, Media, MediaFilters, PaginatedMedia } from '@/types';
 interface MediaEditFormData {
     alt_text: string;
     title: string;
-    usage: 'none' | 'logo' | 'background' | 'avatar';
+    usage: 'none' | 'logo' | 'background' | 'avatar' | 'resume';
 }
 
 interface MediaCreateFormData {
     alt_text: string;
     title: string;
-    usage: 'none' | 'logo' | 'background' | 'avatar';
+    usage: 'none' | 'logo' | 'background' | 'avatar' | 'resume';
 }
 
 interface MediaDataTableProps {
@@ -60,6 +60,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
     const [editItem, setEditItem] = useState<Media | null>(null);
     const [previewItem, setPreviewItem] = useState<Media | null>(null);
     const [isAddOpen, setIsAddOpen] = useState(false);
+    const [isBulkUploading, setIsBulkUploading] = useState(false);
 
     // Multi-selection state
     const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -210,8 +211,42 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
         });
     };
 
-    const handleQuickAssign = (media: Media, slot: 'logo' | 'background' | 'avatar') => {
-        const slotTitle = slot === 'logo' ? 'Navbar Logo' : slot === 'background' ? 'Backdrop Wallpaper' : 'Profile Avatar';
+    const handleAddFiles = async (files: File[]) => {
+        setIsBulkUploading(true);
+        toast.loading(`Uploading ${files.length} media files...`, { id: 'media-bulk-upload' });
+        const formData = new FormData();
+        files.forEach((file) => formData.append('files[]', file));
+        if (createData.title) formData.append('title', createData.title);
+        if (createData.alt_text) formData.append('alt_text', createData.alt_text);
+
+        try {
+            const response = await fetch('/dashboard/media/bulk-store', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '',
+                },
+                body: formData,
+            });
+            const result = (await response.json()) as { success: boolean; message: string; errors?: Record<string, string[]> };
+            if (!response.ok || !result.success) throw new Error(result.errors ? Object.values(result.errors).flat().join(' ') : result.message);
+
+            toast.success(`${files.length} media files uploaded.`, { id: 'media-bulk-upload' });
+            setIsAddOpen(false);
+            resetCreateData();
+            router.reload({ only: ['mediaItems', 'branding'] });
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Bulk upload failed.';
+            toast.error(/failed to upload|upload failed|did not receive/i.test(message)
+                ? 'The server could not receive this file. Check that it is a supported type and smaller than 20 MB.'
+                : message, { id: 'media-bulk-upload' });
+        } finally {
+            setIsBulkUploading(false);
+        }
+    };
+
+    const handleQuickAssign = (media: Media, slot: 'logo' | 'background' | 'avatar' | 'resume') => {
+        const slotTitle = slot === 'logo' ? 'Navbar Logo' : slot === 'background' ? 'Backdrop Wallpaper' : slot === 'avatar' ? 'Profile Avatar' : 'Resume CV';
         toast.loading(`Activating ${slotTitle}...`, { id: `quick-assign-${media.id}` });
 
         router.post(
@@ -242,7 +277,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                 <div className="flex items-center justify-center">
                     <input
                         type="checkbox"
-                        className="size-4 rounded border-white/25 bg-black/40 text-white accent-white cursor-pointer"
+                        className="size-4 cursor-pointer accent-primary"
                         checked={table.getIsAllPageRowsSelected()}
                         ref={(input) => {
                             if (input) {
@@ -258,7 +293,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                 <div className="flex items-center justify-center">
                     <input
                         type="checkbox"
-                        className="size-4 rounded border-white/25 bg-black/40 text-white accent-white cursor-pointer"
+                        className="size-4 cursor-pointer accent-primary"
                         checked={row.getIsSelected()}
                         disabled={!row.getCanSelect()}
                         onChange={row.getToggleSelectedHandler()}
@@ -278,21 +313,21 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                 return (
                     <Button
                         aria-label={`Preview ${row.original.original_name}`}
-                        className="group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-lg border border-white/10 bg-black/30 p-1 backdrop-blur-md shadow-sm hover:border-white/40 hover:bg-white/10"
+                        className="group relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-md border border-border bg-background p-1 transition-colors hover:border-primary/60 hover:bg-accent"
                         onClick={() => setPreviewItem(row.original)}
                         size="icon"
                         type="button"
                         variant="ghost"
                     >
                         {isPdf ? (
-                            <FileText className="h-6 w-6 text-red-300" />
+                            <FileText className="h-6 w-6 text-destructive" />
                         ) : row.original.url ? (
                             <img alt={row.original.alt_text || row.original.original_name} className="max-h-full max-w-full object-contain" src={row.original.url} />
                         ) : (
-                            <ImageIcon className="h-5 w-5 text-white/40" />
+                            <ImageIcon className="h-5 w-5 text-foreground" />
                         )}
-                        <span className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
-                            <Eye className="h-4 w-4 text-white" />
+                        <span className="absolute inset-0 flex items-center justify-center bg-card opacity-0 transition-opacity group-hover:opacity-100">
+                            <Eye className="h-4 w-4 text-foreground" />
                         </span>
                     </Button>
                 );
@@ -308,7 +343,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
 
                 return (
                     <div className="space-y-1">
-                        <div className="font-medium text-white text-sm">
+                        <div className="font-medium text-foreground text-sm">
                             {row.original.original_name}
                         </div>
                         <div className="flex flex-wrap gap-1.5">
@@ -336,7 +371,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
             accessorKey: 'mime_type',
             header: 'Type',
             cell: ({ row }) => (
-                <span className="rounded border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] uppercase text-white/70 font-mono">
+                <span className="rounded border border-border bg-muted/40 px-2 py-0.5 text-[11px] uppercase text-foreground font-mono">
                     {row.original.mime_type.split('/')[1] || row.original.mime_type}
                 </span>
             ),
@@ -345,7 +380,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
             accessorKey: 'size',
             header: 'Size',
             cell: ({ row }) => (
-                <span className="text-white/60 text-xs font-mono">
+                <span className="text-foreground text-xs font-mono">
                     {(row.original.size / 1024).toFixed(1)} KB
                 </span>
             ),
@@ -367,23 +402,19 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
     return (
         <div className="space-y-4">
             {/* Minimal Glass Toolbar */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                     <Button
                         onClick={() => setIsAddOpen(true)}
-                        className="
-                            border border-white/15 bg-white/10 text-white
-                            hover:bg-white/20 backdrop-blur-md transition-all
-                            font-medium text-sm
-                        "
+                        className="font-medium"
                     >
                         <span className="mr-1 text-base leading-none">+</span> Add Media
                     </Button>
 
-                    <div className="relative w-64">
-                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-white/40" />
+                    <div className="relative w-full sm:max-w-64">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
-                            className="border-white/15 bg-black/25 pl-9 text-white placeholder:text-white/40 backdrop-blur-md"
+                            className="pl-9 placeholder:text-muted-foreground"
                             onChange={(event) => setSearch(event.target.value)}
                             placeholder="Search files..."
                             value={search}
@@ -391,11 +422,11 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                     </div>
 
                     <Select onValueChange={(value) => updateFilter('mime_type', value)} value={filters.mime_type || 'all'}>
-                        <SelectTrigger className="w-32.5 border-white/15 bg-black/25 text-white backdrop-blur-md">
-                            <Filter className="mr-2 h-3.5 w-3.5 text-white/50" />
+                        <SelectTrigger className="w-32.5">
+                            <Filter className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
                             <SelectValue placeholder="Type" />
                         </SelectTrigger>
-                        <SelectContent className="border-white/15 bg-black/85 text-white backdrop-blur-xl">
+                        <SelectContent>
                             <SelectItem value="all">All Types</SelectItem>
                             <SelectItem value="image">Images</SelectItem>
                             <SelectItem value="svg">SVGs</SelectItem>
@@ -404,24 +435,24 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                     </Select>
 
                     <Select onValueChange={(value) => updateFilter('sort', value)} value={filters.sort || 'latest'}>
-                        <SelectTrigger className="w-32.5 border-white/15 bg-black/25 text-white backdrop-blur-md">
+                        <SelectTrigger className="w-32.5">
                             <SelectValue placeholder="Sort by" />
                         </SelectTrigger>
-                        <SelectContent className="border-white/15 bg-black/85 text-white backdrop-blur-xl">
+                        <SelectContent>
                             <SelectItem value="latest">Newest First</SelectItem>
                             <SelectItem value="oldest">Oldest First</SelectItem>
                             <SelectItem value="largest">Largest Size</SelectItem>
                         </SelectContent>
                     </Select>
-                </div>
+            </div>
 
-                <div className="flex items-center gap-2 text-sm text-white/70">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <span>Show</span>
                     <Select onValueChange={(value) => updateFilter('per_page', value)} value={filters.per_page.toString()}>
-                        <SelectTrigger className="w-18 border-white/15 bg-black/25 text-white backdrop-blur-md">
+                        <SelectTrigger className="w-18">
                             <SelectValue />
                         </SelectTrigger>
-                        <SelectContent className="border-white/15 bg-black/85 text-white backdrop-blur-xl">
+                        <SelectContent>
                             <SelectItem value="10">10</SelectItem>
                             <SelectItem value="25">25</SelectItem>
                             <SelectItem value="50">50</SelectItem>
@@ -433,16 +464,16 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
 
             {/* Minimal Glass Bulk Action Bar (Visible when rows are selected) */}
             {selectedIds.length > 0 && (
-                <div className="flex items-center justify-between rounded-xl border border-white/15 bg-black/40 px-4 py-2.5 backdrop-blur-xl transition-all">
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2.5">
                     <div className="flex items-center gap-3">
-                        <span className="text-xs font-medium text-white">
+                        <span className="text-xs font-medium text-foreground">
                             {selectedIds.length} {selectedIds.length === 1 ? 'file' : 'files'} selected
                         </span>
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setRowSelection({})}
-                            className="h-7 text-xs text-white/60 hover:text-white hover:bg-white/10"
+                            className="h-7 text-xs text-foreground hover:text-foreground hover:bg-muted/40"
                         >
                             Deselect all
                         </Button>
@@ -456,7 +487,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                                 });
                                 setRowSelection(allSelected);
                             }}
-                            className="h-7 text-xs text-white/60 hover:text-white hover:bg-white/10"
+                            className="h-7 text-xs text-foreground hover:text-foreground hover:bg-muted/40"
                         >
                             Select all on page ({mediaItems.data.length})
                         </Button>
@@ -465,7 +496,8 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                     <Button
                         size="sm"
                         onClick={() => setIsBulkDeleteOpen(true)}
-                        className="h-8 border border-red-500/30 bg-red-500/15 text-red-300 hover:bg-red-500/25 hover:text-red-200 text-xs font-medium backdrop-blur-md"
+                        className="h-8 text-xs font-medium"
+                        variant="destructive"
                     >
                         <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                         Delete Selected ({selectedIds.length})
@@ -474,38 +506,39 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
             )}
 
             {/* Pure Minimal Glass Data Table */}
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-black/25 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
-                <table className="w-full text-left text-sm">
-                    <thead className="border-b border-white/10 bg-black/30 text-white/70 backdrop-blur-sm">
+            <div className="overflow-hidden rounded-lg border border-border bg-card">
+                <div className="overflow-x-auto">
+                    <table className="w-full min-w-[46rem] text-left text-sm">
+                    <thead className="sticky top-0 z-10 border-b border-border bg-muted text-muted-foreground">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <tr key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => (
-                                    <th className="px-3.5 py-3.5 font-medium" key={header.id}>
+                                    <th className="px-3 py-3 font-mono text-[10px] font-medium uppercase tracking-wider" key={header.id}>
                                         {flexRender(header.column.columnDef.header, header.getContext())}
                                     </th>
                                 ))}
-                                <th className="px-3.5 py-3.5 text-right font-medium">Actions</th>
+                                <th className="px-3 py-3 text-right font-mono text-[10px] font-medium uppercase tracking-wider">Actions</th>
                             </tr>
                         ))}
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-border/70">
                         {table.getRowModel().rows.length > 0 ? (
                             table.getRowModel().rows.map((row) => (
                                 <tr
                                     className={cn(
                                         "transition-colors",
                                         row.getIsSelected()
-                                            ? "bg-white/8"
-                                            : "hover:bg-white/4"
+                                            ? "bg-accent/70"
+                                            : "hover:bg-accent/45"
                                     )}
                                     key={row.id}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <td className="px-3.5 py-3" key={cell.id}>
+                                        <td className="px-3 py-3" key={cell.id}>
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </td>
                                     ))}
-                                    <td className="px-3.5 py-3">
+                                    <td className="px-3 py-3">
                                         <div className="flex justify-end items-center gap-1">
                                             {/* Quick Slot Assign Dropdown */}
                                             <DropdownMenu>
@@ -514,53 +547,53 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10 rounded-lg"
+                                                            className="h-8 w-8 text-foreground hover:text-foreground hover:bg-muted/40 rounded-lg"
                                                             title="Slot Actions"
                                                         >
                                                             <MoreHorizontal className="h-4 w-4" />
                                                         </Button>
                                                     }
                                                 />
-                                                <DropdownMenuContent align="end" className="w-52 border-white/15 bg-black/90 text-white backdrop-blur-2xl shadow-2xl">
-                                                    <DropdownMenuLabel className="text-xs font-semibold text-white/50">Assign Slot</DropdownMenuLabel>
+                                                <DropdownMenuContent align="end" className="w-52 border-border bg-card text-foreground backdrop-blur-none shadow-none">
+                                                    <DropdownMenuLabel className="text-xs font-semibold text-foreground">Assign Slot</DropdownMenuLabel>
                                                     <DropdownMenuItem
-                                                        className="cursor-pointer gap-2 hover:bg-white/10"
+                                                        className="cursor-pointer gap-2 hover:bg-muted/40"
                                                         onClick={() => handleQuickAssign(row.original, 'logo')}
                                                     >
                                                         <Crown className="h-3.5 w-3.5 text-amber-300" />
                                                         Set as Logo
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
-                                                        className="cursor-pointer gap-2 hover:bg-white/10"
+                                                        className="cursor-pointer gap-2 hover:bg-muted/40"
                                                         onClick={() => handleQuickAssign(row.original, 'background')}
                                                     >
                                                         <Wallpaper className="h-3.5 w-3.5 text-sky-300" />
                                                         Set as Backdrop
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
-                                                        className="cursor-pointer gap-2 hover:bg-white/10"
+                                                        className="cursor-pointer gap-2 hover:bg-muted/40"
                                                         onClick={() => handleQuickAssign(row.original, 'avatar')}
                                                     >
                                                         <User className="h-3.5 w-3.5 text-purple-300" />
                                                         Set as Avatar
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuSeparator className="bg-white/10" />
+                                                    <DropdownMenuSeparator className="bg-muted/40" />
                                                     <DropdownMenuItem
-                                                        className="cursor-pointer gap-2 hover:bg-white/10"
+                                                        className="cursor-pointer gap-2 hover:bg-muted/40"
                                                         onClick={() => handleCopyUrl(row.original.url)}
                                                     >
-                                                        <Copy className="h-3.5 w-3.5 text-white/50" />
+                                                        <Copy className="h-3.5 w-3.5 text-foreground" />
                                                         Copy Direct URL
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
-                                                        className="cursor-pointer gap-2 hover:bg-white/10"
+                                                        className="cursor-pointer gap-2 hover:bg-muted/40"
                                                         onClick={() => setEditItem(row.original)}
                                                     >
-                                                        <Pencil className="h-3.5 w-3.5 text-blue-300" />
+                                                        <Pencil className="h-3.5 w-3.5 text-primary" />
                                                         Edit Details
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
-                                                        className="cursor-pointer gap-2 text-red-400 hover:bg-red-500/20 focus:text-red-300"
+                                                        className="cursor-pointer gap-2 text-destructive hover:bg-red-500/20 focus:text-destructive"
                                                         onClick={() => setDeleteItem(row.original)}
                                                     >
                                                         <Trash2 className="h-3.5 w-3.5" />
@@ -571,7 +604,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
 
                                             <Button
                                                 aria-label="Edit media"
-                                                className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10 rounded-lg"
+                                                className="h-8 w-8 text-foreground hover:text-foreground hover:bg-muted/40 rounded-lg"
                                                 onClick={() => setEditItem(row.original)}
                                                 size="icon"
                                                 variant="ghost"
@@ -581,7 +614,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
 
                                             <Button
                                                 aria-label="Delete media"
-                                                className="h-8 w-8 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg"
+                                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-red-500/20 rounded-lg"
                                                 onClick={() => setDeleteItem(row.original)}
                                                 size="icon"
                                                 variant="ghost"
@@ -594,19 +627,20 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                             ))
                         ) : (
                             <tr>
-                                <td className="px-4 py-8 text-center text-white/50" colSpan={columns.length + 1}>
-                                    No media found.
+                                <td className="px-4 py-12 text-center text-sm text-muted-foreground" colSpan={columns.length + 1}>
+                                    No files match this search or filter.
                                 </td>
                             </tr>
                         )}
                     </tbody>
-                </table>
+                    </table>
+                </div>
             </div>
 
             {/* Pagination Controls */}
-            <div className="flex items-center justify-between text-sm text-white/70">
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
                 <p>
-                    Showing <span className="font-medium text-white">{mediaItems.meta.from || 0}</span> to <span className="font-medium text-white">{mediaItems.meta.to || 0}</span> of <span className="font-medium text-white">{mediaItems.meta.total}</span> entries
+                    Showing <span className="font-medium text-foreground">{mediaItems.meta.from || 0}</span> to <span className="font-medium text-foreground">{mediaItems.meta.to || 0}</span> of <span className="font-medium text-foreground">{mediaItems.meta.total}</span> entries
                 </p>
                 <div className="flex gap-2">
                     <Button
@@ -614,7 +648,6 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                         onClick={() => router.get('/dashboard/media', { ...filters, page: mediaItems.meta.current_page - 1 }, { preserveState: true, preserveScroll: true })}
                         size="sm"
                         variant="outline"
-                        className="border-white/15 bg-black/25 text-white hover:bg-white/10 backdrop-blur-md disabled:opacity-30"
                     >
                         Previous
                     </Button>
@@ -623,7 +656,6 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                         onClick={() => router.get('/dashboard/media', { ...filters, page: mediaItems.meta.current_page + 1 }, { preserveState: true, preserveScroll: true })}
                         size="sm"
                         variant="outline"
-                        className="border-white/15 bg-black/25 text-white hover:bg-white/10 backdrop-blur-md disabled:opacity-30"
                     >
                         Next
                     </Button>
@@ -632,11 +664,11 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
 
             {/* Single Delete Confirmation Modal */}
             <Dialog onOpenChange={(open) => !open && setDeleteItem(null)} open={deleteItem !== null}>
-                <DialogContent className="border-white/15 bg-black/85 text-white backdrop-blur-2xl shadow-2xl">
+                <DialogContent className="border-border bg-card text-foreground backdrop-blur-none shadow-none">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Delete Media File</DialogTitle>
-                        <DialogDescription className="text-white/60">
-                            Are you sure you want to permanently delete <strong className="text-white">{deleteItem?.original_name}</strong>? Any branding slot using it will be cleared.
+                        <DialogTitle className="text-foreground">Delete Media File</DialogTitle>
+                        <DialogDescription className="text-foreground">
+                            Are you sure you want to permanently delete <strong className="text-foreground">{deleteItem?.original_name}</strong>? Any branding slot using it will be cleared.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -644,7 +676,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                             onClick={() => setDeleteItem(null)}
                             type="button"
                             variant="outline"
-                            className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+                            className="border-border bg-muted/40 text-foreground hover:bg-muted/40"
                         >
                             Cancel
                         </Button>
@@ -652,7 +684,6 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                             onClick={handleDelete}
                             type="button"
                             variant="destructive"
-                            className="bg-red-500/80 hover:bg-red-500 text-white"
                         >
                             Delete Permanently
                         </Button>
@@ -662,12 +693,12 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
 
             {/* Media preview lightbox */}
             <Dialog onOpenChange={(open) => !open && setPreviewItem(null)} open={previewItem !== null}>
-                <DialogContent className="max-w-5xl border-white/15 bg-black/90 text-white backdrop-blur-2xl">
+                <DialogContent className="max-w-5xl border-border bg-card text-foreground backdrop-blur-none">
                     <DialogHeader>
-                        <DialogTitle className="text-white">{previewItem?.title || previewItem?.original_name}</DialogTitle>
-                        <DialogDescription className="text-white/60">{previewItem?.mime_type}</DialogDescription>
+                        <DialogTitle className="text-foreground">{previewItem?.title || previewItem?.original_name}</DialogTitle>
+                        <DialogDescription className="text-foreground">{previewItem?.mime_type}</DialogDescription>
                     </DialogHeader>
-                    <div className="flex min-h-80 max-h-[70vh] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/50">
+                    <div className="flex min-h-80 max-h-[70vh] items-center justify-center overflow-hidden rounded-lg border border-border bg-card">
                         {previewItem?.mime_type === 'application/pdf' || previewItem?.url.toLowerCase().includes('.pdf') ? (
                             <iframe
                                 className="h-[70vh] w-full"
@@ -682,15 +713,15 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                             />
                         ) : previewItem ? (
                             <div className="flex flex-col items-center gap-4 p-10 text-center">
-                                <FileText className="h-16 w-16 text-white/50" />
-                                <p className="text-sm text-white/70">This file type cannot be previewed in the browser.</p>
+                                <FileText className="h-16 w-16 text-foreground" />
+                                <p className="text-sm text-foreground">This file type cannot be previewed in the browser.</p>
                             </div>
                         ) : null}
                     </div>
                     {previewItem && (
                         <DialogFooter>
                             <a
-                                className="inline-flex h-8 items-center justify-center rounded-lg border border-white/15 bg-white/10 px-2.5 text-sm font-medium text-white transition-colors hover:bg-white/20"
+                                className="inline-flex h-8 items-center justify-center rounded-lg border border-border bg-muted/40 px-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/40"
                                 href={previewItem.url}
                                 rel="noreferrer"
                                 target="_blank"
@@ -704,11 +735,11 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
 
             {/* Bulk Delete Confirmation Modal */}
             <Dialog onOpenChange={(open) => !open && setIsBulkDeleteOpen(false)} open={isBulkDeleteOpen}>
-                <DialogContent className="border-white/15 bg-black/85 text-white backdrop-blur-2xl shadow-2xl">
+                <DialogContent className="border-border bg-card text-foreground backdrop-blur-none shadow-none">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Delete Selected Media</DialogTitle>
-                        <DialogDescription className="text-white/60">
-                            Are you sure you want to permanently delete <strong className="text-white">{selectedIds.length}</strong> selected media {selectedIds.length === 1 ? 'file' : 'files'}? Any branding slot using them will be cleared.
+                        <DialogTitle className="text-foreground">Delete Selected Media</DialogTitle>
+                        <DialogDescription className="text-foreground">
+                            Are you sure you want to permanently delete <strong className="text-foreground">{selectedIds.length}</strong> selected media {selectedIds.length === 1 ? 'file' : 'files'}? Any branding slot using them will be cleared.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -716,7 +747,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                             onClick={() => setIsBulkDeleteOpen(false)}
                             type="button"
                             variant="outline"
-                            className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+                            className="border-border bg-muted/40 text-foreground hover:bg-muted/40"
                         >
                             Cancel
                         </Button>
@@ -725,7 +756,6 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                             type="button"
                             variant="destructive"
                             disabled={isBulkDeleting}
-                            className="bg-red-500/80 hover:bg-red-500 text-white"
                         >
                             {isBulkDeleting ? 'Deleting...' : `Delete ${selectedIds.length} ${selectedIds.length === 1 ? 'File' : 'Files'}`}
                         </Button>
@@ -735,50 +765,51 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
 
             {/* Edit Metadata & Slot Modal */}
             <Dialog onOpenChange={(open) => !open && setEditItem(null)} open={editItem !== null}>
-                <DialogContent className="border-white/15 bg-black/85 text-white backdrop-blur-2xl shadow-2xl">
+                <DialogContent className="border-border bg-card text-foreground backdrop-blur-none shadow-none">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Edit Media Details</DialogTitle>
-                        <DialogDescription className="text-white/60">
-                            Update metadata and theme slot assignment for <strong className="text-white">{editItem?.original_name}</strong>.
+                        <DialogTitle className="text-foreground">Edit Media Details</DialogTitle>
+                        <DialogDescription className="text-foreground">
+                            Update metadata and theme slot assignment for <strong className="text-foreground">{editItem?.original_name}</strong>.
                         </DialogDescription>
                     </DialogHeader>
                     <form className="space-y-4 py-4" onSubmit={handleEditSubmit}>
                         <div className="space-y-2">
-                            <Label htmlFor="media-title" className="text-white/80">Title</Label>
+                            <Label htmlFor="media-title" className="text-foreground">Title</Label>
                             <Input
                                 id="media-title"
                                 onChange={(event) => setData('title', event.target.value)}
                                 placeholder="Image title"
                                 value={data.title}
-                                className="border-white/15 bg-black/40 text-white placeholder:text-white/40"
+                                className="border-border bg-card text-foreground placeholder:text-foreground"
                             />
-                            {errors.title && <p className="text-xs text-red-400">{errors.title}</p>}
+                            {errors.title && <p className="text-xs text-destructive">{errors.title}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="media-alt-text" className="text-white/80">Alt text</Label>
+                            <Label htmlFor="media-alt-text" className="text-foreground">Alt text</Label>
                             <Input
                                 id="media-alt-text"
                                 onChange={(event) => setData('alt_text', event.target.value)}
                                 placeholder="Describe this file"
                                 value={data.alt_text}
-                                className="border-white/15 bg-black/40 text-white placeholder:text-white/40"
+                                className="border-border bg-card text-foreground placeholder:text-foreground"
                             />
-                            {errors.alt_text && <p className="text-xs text-red-400">{errors.alt_text}</p>}
+                            {errors.alt_text && <p className="text-xs text-destructive">{errors.alt_text}</p>}
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="media-usage" className="text-white/80">Theme Slot Assignment</Label>
+                            <Label htmlFor="media-usage" className="text-foreground">Theme Slot Assignment</Label>
                             <Select
                                 onValueChange={(value) => value && setData('usage', value as MediaEditFormData['usage'])}
                                 value={data.usage}
                             >
-                                <SelectTrigger id="media-usage" className="border-white/15 bg-black/40 text-white">
+                                <SelectTrigger id="media-usage" className="border-border bg-card text-foreground">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-white/15 bg-black/90 text-white backdrop-blur-xl">
+                                <SelectContent className="border-border bg-card text-foreground backdrop-blur-none">
                                     <SelectItem value="none">Regular media only (No slot)</SelectItem>
                                     <SelectItem value="logo">Navbar Logo (Header)</SelectItem>
                                     <SelectItem value="background">Backdrop Wallpaper (Full View)</SelectItem>
                                     <SelectItem value="avatar">Profile Avatar (Personal Image)</SelectItem>
+                                    <SelectItem value="resume">Resume / CV (Download)</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -787,14 +818,14 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                                 onClick={() => setEditItem(null)}
                                 type="button"
                                 variant="outline"
-                                className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+                                className="border-border bg-muted/40 text-foreground hover:bg-muted/40"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 disabled={processing}
                                 type="submit"
-                                className="border border-white/20 bg-white/20 text-white hover:bg-white/30"
+                                className="border border-border bg-muted text-foreground hover:bg-accent"
                             >
                                 {processing ? 'Saving...' : 'Save Changes'}
                             </Button>
@@ -814,65 +845,68 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                 }}
                 open={isAddOpen}
             >
-                <DialogContent className="border-white/15 bg-black/85 text-white backdrop-blur-2xl shadow-2xl">
+                <DialogContent className="border-border bg-card text-foreground backdrop-blur-none shadow-none">
                     <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2 text-white">
-                            <FolderPlus className="h-5 w-5 text-white/80" /> Add New Media
+                        <DialogTitle className="flex items-center gap-2 text-foreground">
+                            <FolderPlus className="h-5 w-5 text-foreground" /> Add New Media
                         </DialogTitle>
-                        <DialogDescription className="text-white/60">
+                        <DialogDescription className="text-foreground">
                             Upload a file to your portfolio and optionally assign it directly to a theme slot.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                            <Label htmlFor="new-media-title" className="text-white/80">Title</Label>
+                            <Label htmlFor="new-media-title" className="text-foreground">Title</Label>
                             <Input
                                 id="new-media-title"
                                 onChange={(event) => setCreateData('title', event.target.value)}
                                 placeholder="Optional title"
                                 value={createData.title}
-                                className="border-white/15 bg-black/40 text-white placeholder:text-white/40"
+                                className="border-border bg-card text-foreground placeholder:text-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="new-media-alt" className="text-white/80">Alt text</Label>
+                            <Label htmlFor="new-media-alt" className="text-foreground">Alt text</Label>
                             <Input
                                 id="new-media-alt"
                                 onChange={(event) => setCreateData('alt_text', event.target.value)}
                                 placeholder="Describe the image"
                                 value={createData.alt_text}
-                                className="border-white/15 bg-black/40 text-white placeholder:text-white/40"
+                                className="border-border bg-card text-foreground placeholder:text-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="new-media-slot" className="text-white/80">Assign Immediately To Slot</Label>
+                            <Label htmlFor="new-media-slot" className="text-foreground">Assign Immediately To Slot</Label>
                             <Select
                                 onValueChange={(value) => value && setCreateData('usage', value as MediaCreateFormData['usage'])}
                                 value={createData.usage}
                             >
-                                <SelectTrigger id="new-media-slot" className="border-white/15 bg-black/40 text-white">
+                                <SelectTrigger id="new-media-slot" className="border-border bg-card text-foreground">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="border-white/15 bg-black/90 text-white backdrop-blur-xl">
+                                <SelectContent className="border-border bg-card text-foreground backdrop-blur-none">
                                     <SelectItem value="none">General Media Only</SelectItem>
                                     <SelectItem value="logo">Navbar Logo</SelectItem>
                                     <SelectItem value="background">Backdrop Wallpaper</SelectItem>
                                     <SelectItem value="avatar">Profile Avatar</SelectItem>
+                                    <SelectItem value="resume">Resume / CV</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                         {createPreviewUrl && (
                             <img
                                 alt="Upload preview"
-                                className="max-h-40 w-full rounded-lg border border-white/10 bg-black/40 object-contain p-2"
+                                className="max-h-40 w-full rounded-lg border border-border bg-card object-contain p-2"
                                 src={createPreviewUrl}
                             />
                         )}
                         <MediaUploadZone
                             error={uploadError}
                             id="new-media-file-upload"
-                            isUploading={isUploading}
+                            isUploading={isUploading || isBulkUploading}
+                            multiple
                             onFileSelected={handleAddFile}
+                            onFilesSelected={handleAddFiles}
                         />
                     </div>
                     <DialogFooter>
@@ -880,7 +914,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                             onClick={() => setIsAddOpen(false)}
                             type="button"
                             variant="outline"
-                            className="border-white/15 bg-white/5 text-white hover:bg-white/10"
+                            className="border-border bg-muted/40 text-foreground hover:bg-muted/40"
                         >
                             Cancel
                         </Button>

@@ -1,7 +1,9 @@
 import { Head, usePage } from '@inertiajs/react';
 import { AdminLayout } from '@/components/admin/admin-layout';
+import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { MediaDataTable } from '@/components/admin/media-data-table';
 import { PolymorphicThemeHub } from '@/components/admin/polymorphic-theme-hub';
+import { Images } from 'lucide-react';
 import type { MediaFilters, PageProps, PaginatedMedia } from '@/types';
 
 interface MediaPageProps extends PageProps {
@@ -19,7 +21,9 @@ export default function MediaLibrary() {
             <AdminLayout
                 sidebarItems={sidebarItems || []}
                 backgroundUrl={branding?.backgroundImage?.url || backgroundImage?.url}
+                branding={branding}
             >
+                <AdminPageHeader icon={<Images className="size-4" />} title="Media library" description="Upload, organize, preview, and assign the assets used by your portfolio." />
                 {/* Minimalist Brief Branding Bar */}
                 <PolymorphicThemeHub
                     branding={branding}

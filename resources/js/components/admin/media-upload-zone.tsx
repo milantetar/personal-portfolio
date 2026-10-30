@@ -9,12 +9,15 @@ interface MediaUploadZoneProps {
     error?: string | null;
     isUploading: boolean;
     onFileSelected: (file: File) => void;
+    multiple?: boolean;
+    onFilesSelected?: (files: File[]) => void;
 }
 
-export function MediaUploadZone({ error, id = 'file-upload', isUploading, onFileSelected }: MediaUploadZoneProps) {
+export function MediaUploadZone({ error, id = 'file-upload', isUploading, multiple = false, onFileSelected, onFilesSelected }: MediaUploadZoneProps) {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) onFileSelected(file);
+        const files = Array.from(event.target.files ?? []);
+        if (multiple && files.length > 0 && onFilesSelected) onFilesSelected(files);
+        else if (files[0]) onFileSelected(files[0]);
         event.target.value = '';
     };
 
@@ -22,16 +25,17 @@ export function MediaUploadZone({ error, id = 'file-upload', isUploading, onFile
         <div className="space-y-1">
             <div className="flex items-center gap-3">
                 <Input
-                    accept="image/svg+xml,image/jpeg,image/png,image/gif,image/webp,image/avif"
-                    className="hidden"
+                    accept="image/svg+xml,image/jpeg,image/png,image/gif,image/webp,image/avif,application/pdf,audio/mpeg"
+                    className="peer sr-only"
                     disabled={isUploading}
                     id={id}
+                    multiple={multiple}
                     onChange={handleChange}
                     type="file"
                 />
                 <Label
                     className={cn(
-                        'flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-dashed border-muted-foreground/25 px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary hover:bg-primary/5 hover:text-primary',
+                        'flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-border px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/60 hover:bg-accent/40 hover:text-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring',
                         isUploading && 'pointer-events-none opacity-50',
                     )}
                     htmlFor={id}
@@ -39,7 +43,7 @@ export function MediaUploadZone({ error, id = 'file-upload', isUploading, onFile
                     {isUploading ? (
                         <><LoaderCircle className="h-4 w-4 animate-spin" /> Uploading...</>
                     ) : (
-                        <><UploadCloud className="h-4 w-4" /> Upload new image</>
+                        <><UploadCloud className="h-4 w-4" /> {multiple ? 'Upload multiple files' : 'Upload new image'}</>
                     )}
                 </Label>
             </div>

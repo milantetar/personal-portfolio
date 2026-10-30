@@ -12,7 +12,7 @@
         --popover: 0 0% 100%;
         --popover-foreground: 222 47% 11%;
 
-        --primary: 243 75% 59%;
+        --primary: 158 34% 38%;
         --primary-foreground: 0 0% 100%;
 
         --secondary: 214 32% 94%;
@@ -21,15 +21,15 @@
         --muted: 214 32% 94%;
         --muted-foreground: 215 16% 42%;
 
-        --accent: 226 100% 97%;
-        --accent-foreground: 243 75% 45%;
+        --accent: 158 20% 94%;
+        --accent-foreground: 158 34% 28%;
 
         --destructive: 0 72% 51%;
         --destructive-foreground: 0 0% 100%;
 
         --border: 214 25% 88%;
         --input: 214 25% 88%;
-        --ring: 243 75% 59%;
+        --ring: 158 34% 45%;
 
         --radius: 0.75rem;
 
@@ -49,8 +49,8 @@
         --popover: 222 40% 10%;
         --popover-foreground: 214 32% 91%;
 
-        --primary: 239 84% 75%;
-        --primary-foreground: 222 47% 11%;
+        --primary: 155 34% 62%;
+        --primary-foreground: 222 47% 8%;
 
         --secondary: 218 32% 18%;
         --secondary-foreground: 214 32% 91%;
@@ -58,15 +58,15 @@
         --muted: 218 32% 18%;
         --muted-foreground: 215 20% 66%;
 
-        --accent: 238 35% 20%;
-        --accent-foreground: 226 100% 88%;
+        --accent: 155 18% 18%;
+        --accent-foreground: 155 35% 82%;
 
         --destructive: 0 63% 40%;
         --destructive-foreground: 0 0% 100%;
 
         --border: 218 28% 22%;
         --input: 218 28% 22%;
-        --ring: 239 84% 75%;
+        --ring: 155 34% 62%;
 
         --glass-bg: 222 40% 12%;
         --glass-bg-opacity: 0.72;
@@ -120,15 +120,6 @@
     --glass-bg-opacity: 0.75;
     --glass-border: 336 85% 65%;
     --glass-border-opacity: 0.22;
-}
-
-.bg-instagram-gradient {
-    background-image: linear-gradient(
-        45deg,
-        #f9ce34 0%,
-        #ee2a7b 50%,
-        #6228d7 100%
-    );
 }
 
 [data-theme="discord"] {
@@ -201,6 +192,58 @@
     --glass-border-opacity: 0.2;
 }
 
+/* The public portfolio uses an Apple-inspired system palette independently of
+   the dashboard's selected theme. The user's uploaded backdrop remains visible
+   through the translucent page surfaces. */
+.portfolio-site {
+    --background: 222 24% 8%;
+    --foreground: 210 20% 98%;
+    --card: 220 22% 14%;
+    --card-foreground: 210 20% 98%;
+    --popover: 220 22% 12%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 211 100% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 18% 22%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 220 18% 20%;
+    --muted-foreground: 215 18% 88%;
+    --accent: 211 35% 24%;
+    --accent-foreground: 210 30% 98%;
+    --border: 220 16% 32%;
+    --input: 220 16% 38%;
+    --ring: 211 100% 60%;
+    --radius: 1rem;
+    --portfolio-system-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", sans-serif;
+    --font-sans: var(--portfolio-system-font);
+    --font-display: var(--portfolio-system-font);
+}
+
+.portfolio-site .font-display,
+.portfolio-site .eyebrow {
+    font-family: var(--portfolio-system-font);
+}
+
+:root:not(.dark) .portfolio-site {
+    --background: 220 22% 96%;
+    --foreground: 222 20% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 20% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 20% 10%;
+    --primary: 211 100% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 18% 91%;
+    --secondary-foreground: 222 20% 14%;
+    --muted: 220 18% 92%;
+    --muted-foreground: 220 12% 28%;
+    --accent: 211 70% 94%;
+    --accent-foreground: 211 80% 30%;
+    --border: 220 12% 74%;
+    --input: 220 12% 68%;
+    --ring: 211 100% 45%;
+}
+
 @theme inline {
     --color-background: hsl(var(--background));
     --color-foreground: hsl(var(--foreground));
@@ -238,10 +281,299 @@
 @layer base {
     * {
         border-color: hsl(var(--border));
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    *::-webkit-scrollbar {
+        display: none;
+        width: 0;
+        height: 0;
     }
 
     body {
         background-color: hsl(var(--background));
         color: hsl(var(--foreground));
+        font-family: var(--font-sans);
+        font-feature-settings: "ss01" on, "cv11" on;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
     }
+
+    button,
+    input,
+    select,
+    textarea {
+        font: inherit;
+    }
+
+    :focus-visible {
+        outline: 2px solid hsl(var(--ring));
+        outline-offset: 3px;
+    }
+
+    ::selection {
+        background: hsl(var(--primary) / 0.28);
+        color: hsl(var(--foreground));
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
+
+@theme inline {
+    --font-sans: "Geist Variable", Geist, ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Newsreader Variable", Newsreader, Georgia, serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer components {
+    .portfolio-wrap {
+        width: min(100% - 2rem, 76rem);
+        margin-inline: auto;
+    }
+
+    .portfolio-panel {
+        border: 1px solid hsl(var(--border) / 0.78);
+        border-radius: 0.75rem;
+        background: hsl(var(--background) / var(--portfolio-opacity, 0.72));
+    }
+
+    .portfolio-glass {
+        border: 1px solid hsl(var(--foreground) / 0.18);
+        border-radius: 0.875rem;
+        background: hsl(var(--card) / var(--portfolio-glass-opacity, 0.84));
+    }
+
+    .portfolio-section {
+        position: relative;
+        border: 1px solid hsl(var(--foreground) / 0.18);
+        border-radius: 0.875rem;
+        background: hsl(var(--card) / var(--portfolio-glass-opacity, 0.84));
+        transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .portfolio-section:not(.portfolio-section--hero):not(.portfolio-section--assistant)::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 28%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.56), transparent);
+        content: "";
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-120%);
+        transition: opacity 180ms ease, transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .portfolio-section:not(.portfolio-section--hero):not(.portfolio-section--assistant):hover {
+        border-color: hsl(var(--primary) / 0.32);
+        background: hsl(var(--card) / min(0.92, var(--portfolio-glass-opacity, 0.84) + 0.025));
+        box-shadow: 0 12px 32px hsl(0 0% 0% / 0.14);
+        transform: translateY(-2px);
+    }
+
+    .portfolio-section:not(.portfolio-section--hero):not(.portfolio-section--assistant):hover::after {
+        opacity: 0.9;
+        transform: translateX(380%);
+    }
+
+    .portfolio-section--assistant {
+        border-color: transparent;
+        background: transparent;
+        box-shadow: none;
+        transition: none;
+    }
+
+    .portfolio-assistant-shell {
+        position: relative;
+        border: 1px solid hsl(var(--foreground) / 0.18);
+        border-radius: 1rem;
+        background: hsl(var(--card) / min(0.9, var(--portfolio-glass-opacity, 0.78)));
+        box-shadow: 0 16px 42px hsl(0 0% 0% / 0.12);
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .portfolio-assistant-shell::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 30%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.58), transparent);
+        content: "";
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(-120%);
+        transition: opacity 180ms ease, transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    .portfolio-assistant-shell:hover,
+    .portfolio-assistant-shell:focus-within {
+        border-color: hsl(var(--primary) / 0.4);
+        box-shadow: 0 18px 42px hsl(0 0% 0% / 0.18);
+        transform: translateY(-2px);
+    }
+
+    .portfolio-assistant-shell:hover::after,
+    .portfolio-assistant-shell:focus-within::after {
+        opacity: 0.9;
+        transform: translateX(360%);
+    }
+
+    .portfolio-assistant-composer textarea {
+        field-sizing: content;
+        min-height: 2.5rem;
+    }
+
+    .portfolio-section-stream {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .portfolio-editorial-section {
+        scroll-margin-top: 5rem;
+    }
+
+    .portfolio-hero {
+        min-height: calc(100svh - 4rem);
+        justify-content: center;
+    }
+
+    .portfolio-section-inner {
+        width: min(100%, 68rem);
+        margin-inline: auto;
+    }
+
+    .portfolio-section--hero {
+        display: flex;
+        align-items: center;
+        border-color: transparent;
+        background: transparent;
+    }
+
+    .portfolio-section--hero .portfolio-section-inner {
+        display: grid;
+        width: min(100%, 68rem);
+        grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
+        align-items: end;
+        gap: clamp(2rem, 5vw, 5rem);
+        padding: clamp(1.5rem, 5vw, 4rem);
+        border: 1px solid hsl(var(--foreground) / 0.24);
+        border-radius: 1rem;
+        border-left: 2px solid hsl(var(--primary) / 0.72);
+        background: hsl(var(--background) / 0.84);
+    }
+
+    .portfolio-hero-content {
+        width: 100%;
+        max-width: 54rem;
+    }
+
+    .portfolio-nav-glass {
+        border-bottom: 1px solid hsl(var(--foreground) / 0.14);
+        background: hsl(var(--background) / 0.96);
+    }
+
+    .portfolio-mobile-navigation,
+    .portfolio-footer {
+        background: hsl(var(--background) / 0.86);
+    }
+
+    .portfolio-backdrop-scrim {
+        background: hsl(var(--background) / var(--portfolio-scrim-opacity, 0.52));
+    }
+
+    .admin-panel {
+        border: 1px solid hsl(var(--border) / 0.78);
+        border-radius: 0.625rem;
+        background: hsl(var(--card) / 0.9);
+    }
+
+    .admin-ui > header {
+        border-color: hsl(var(--border) / 0.8);
+        background: hsl(var(--background) / 0.88);
+    }
+
+    .admin-ui aside {
+        background: hsl(var(--card) / 0.9);
+    }
+
+    .admin-ui [data-slot="table-container"] {
+        border: 1px solid hsl(var(--border) / 0.8);
+        border-radius: 0.75rem;
+        background: hsl(var(--card) / 0.9);
+    }
+
+    .admin-ui [data-slot="table-header"] {
+        background: hsl(var(--muted) / 0.78);
+    }
+
+    .admin-ui [data-slot="table-row"]:hover {
+        background: hsl(var(--accent) / 0.34);
+    }
+
+    .admin-ui [data-slot="input"],
+    .admin-ui textarea,
+    .admin-ui select {
+        background-color: hsl(var(--background) / 0.58);
+    }
+
+    .admin-ui [data-slot="card"] {
+        box-shadow: 0 1px 2px hsl(0 0% 0% / 0.08);
+    }
+
+    .dashboard-link-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+    }
+
+    .dashboard-link-grid > a:only-child {
+        max-width: 52rem;
+    }
+
+    .eyebrow {
+        color: hsl(var(--muted-foreground));
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.12em;
+        line-height: 1.5;
+        text-transform: uppercase;
+    }
+}
+
+.admin-ui .font-display {
+    font-family: var(--font-sans);
+}
+
+@media (max-width: 639px) {
+    .portfolio-section {
+        border-radius: 0.75rem;
+    }
+
+    .portfolio-hero {
+        min-height: calc(100svh - 4rem);
+        padding-block: 3rem;
+    }
+
+    .portfolio-section--hero .portfolio-section-inner {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
+        gap: 1.5rem;
+    }
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
 }

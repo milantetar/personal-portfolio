@@ -37,7 +37,7 @@ return new class extends Migration
                 ['theme_preset', 'glass_blur', 'glass_opacity'],
                 fn (string $col) => Schema::hasColumn('site_settings', $col)
             );
-            if (! empty($columnsToDrop)) {
+            if ($columnsToDrop !== []) {
                 $table->dropColumn($columnsToDrop);
             }
         });

@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\SiteSetting;
+use App\Models\Navbar;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -46,7 +47,8 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn() => $request->session()->get('success'),
                 'error' => fn() => $request->session()->get('error'),
             ],
-            'branding' => fn() => $this->branding(),
+            'branding' => fn(): array => $this->branding(),
+            'navBars' => fn() => Navbar::query()->with('items')->orderBy('id')->get(),
         ];
     }
 

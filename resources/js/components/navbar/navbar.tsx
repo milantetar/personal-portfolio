@@ -1,104 +1,78 @@
 import { Link, usePage } from '@inertiajs/react';
+import { ArrowUpRight, Home as HomeIcon, LogOut } from 'lucide-react';
 import { route } from 'ziggy-js';
-import type { NavbarType, PageProps } from '../../types/index';
+
+import type { PageProps } from '@/types';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export function Navbar() {
     const { auth, branding, navBars = [] } = usePage<PageProps>().props;
 
-    const headerNavbar = navBars.find((n) => n.name === 'Header Navbar');
-    const items = headerNavbar ? headerNavbar.items : [];
+    const isDashboard = typeof window !== 'undefined' && window.location.pathname.startsWith('/dashboard');
+    const activeNavbar = navBars.find((navbar) => navbar.name === (isDashboard ? 'Dashboard Navbar' : 'Homepage Navbar'));
+    const items = activeNavbar?.items ?? [];
+    const hasHomeItem = items.some((item) => item.label.toLowerCase() === 'home');
+    const visibleItems = isDashboard ? [] : items;
 
     return (
-        <nav className="sticky top-0 z-50 w-full px-6 py-3 border-b border-white/10 bg-black/25 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.15)]">
-            {/* Logo */}
-            <div className="mx-auto flex w-full max-w-auto items-center justify-between">
-                <div className="text-lg font-bold text-white">
-                    <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
+        <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/90">
+            <div className="flex h-14 w-full items-center justify-between gap-4 px-4 sm:px-6">
+                <div className="flex min-w-0 items-center gap-6">
+                    <Link href="/" className="flex shrink-0 items-center gap-2 transition-opacity hover:opacity-75">
                         {branding?.logo ? (
                             <img
-                                alt={branding.logo.alt_text || branding.siteName}
-                                className="h-8 w-8 object-contain drop-shadow"
+                                alt={branding.logo.alt_text || branding.siteName || "Portfolio"}
+                                className="h-6 w-6 object-contain"
                                 src={branding.logo.url}
                             />
                         ) : null}
-                        <span className="tracking-tight">{branding?.siteName || "Milan's Portfolio"}</span>
+                        <span className="font-display text-lg font-semibold tracking-tight">
+                            {branding?.siteName || "Portfolio"}
+                        </span>
                     </Link>
-                </div>
-
-                {/* Dynamic nav links */}
-                <div className="hidden md:flex space-x-1">
-                    {items.map((item) => (
-                        <Link
-                            key={item.id}
-                            href={item.url}
-                            className="
-                                px-3.5 py-1.5 rounded-full text-sm font-medium
-                                text-white/80 hover:text-white
-                                hover:bg-white/10
-                                transition-colors
-                            "
-                        >
-                            {item.label}
-                        </Link>
-                    ))}
-                </div>
-
-                {/* Theme toggle + Auth */}
-                <div className="flex items-center gap-3">
-                    <ThemeToggle />
-
-                    {auth.user ? (
-                        <div className="flex items-center gap-3">
-                            {branding?.avatar?.url ? (
-                                <div
-                                    className="h-8 w-8 rounded-full border border-white/20 overflow-hidden shadow-sm"
-                                    title="Active Portfolio Avatar"
-                                >
-                                    <img
-                                        src={branding.avatar.url}
-                                        alt={branding.avatar.alt_text || "Milan"}
-                                        className="h-full w-full object-cover"
-                                    />
-                                </div>
-                            ) : null}
+                    <nav className="hidden md:flex items-center gap-6">
+                        {visibleItems.map((item) => (
                             <Link
-                                href={route('home')}
-                                className="
-                                    rounded-full border border-white/15 px-4 py-1.5 text-sm font-medium
-                                    text-white/90 bg-white/5 backdrop-blur-md transition-colors
-                                    hover:bg-white/15 hover:text-white
-                                "
+                                key={item.id}
+                                href={item.url}
+                                className="whitespace-nowrap text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
                             >
-                                Home
+                                {item.label}
                             </Link>
+                        ))}
+                    </nav>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-2">
+                    <ThemeToggle />
+                    {auth.user ? (
+                        <>
+                            {isDashboard ? (
+                                <Link href={route('home')} className="inline-flex h-9 items-center gap-2 rounded-md border border-border px-3 text-xs font-medium text-foreground transition-colors hover:bg-accent">
+                                    <HomeIcon className="size-3.5" /> <span className="hidden sm:inline">Home</span><ArrowUpRight className="hidden size-3 sm:inline" />
+                                </Link>
+                            ) : null}
+                            {!hasHomeItem && !isDashboard && (
+                                <Link href={route('home')} className="text-xs text-muted-foreground transition-colors hover:text-foreground">
+                                    Home
+                                </Link>
+                            )}
                             <Link
                                 href={route('logout')}
                                 method="post"
                                 as="button"
-                                className="
-                                    rounded-full border border-white/15 px-4 py-1.5 text-sm font-medium
-                                    text-white bg-white/10 backdrop-blur-md transition-all
-                                    hover:bg-white/20
-                                "
+                                className="inline-flex h-9 items-center gap-2 rounded-md bg-foreground px-3 text-xs font-semibold text-background transition-opacity hover:opacity-85"
                             >
-                                Log Out
+                                <LogOut className="size-3.5" /><span className="hidden sm:inline">Log out</span>
                             </Link>
-                        </div>
-                    ) : (
-                        <Link
-                            href={route('home')}
-                            className="
-                                rounded-full border border-white/15 px-4 py-1.5 text-sm font-medium
-                                text-white/90 bg-white/5 backdrop-blur-md transition-colors
-                                hover:bg-white/15 hover:text-white
-                            "
-                        >
+                        </>
+                    ) : !hasHomeItem && !isDashboard ? (
+                        <Link href={route('home')} className="text-xs text-muted-foreground transition-colors hover:text-foreground">
                             Home
                         </Link>
-                    )}
+                    ) : null}
                 </div>
             </div>
-        </nav>
+        </header>
     );
 }

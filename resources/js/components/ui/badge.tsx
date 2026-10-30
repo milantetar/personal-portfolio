@@ -3,28 +3,28 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 transition-colors focus:outline-none [&>svg]:size-3 gap-1 backdrop-blur-md",
+  "inline-flex w-fit shrink-0 items-center justify-center gap-1 whitespace-nowrap border px-2 py-0.5 text-[11px] font-medium transition-colors focus:outline-none [&>svg]:size-3",
   {
     variants: {
       variant: {
         default:
-          "border-white/15 bg-white/10 text-white",
+          "border-border bg-muted text-foreground",
         secondary:
-          "border-white/10 bg-white/5 text-white/80",
+          "border-border bg-transparent text-muted-foreground",
         destructive:
-          "border-red-500/30 bg-red-500/15 text-red-300",
+          "border-destructive/30 bg-destructive/10 text-destructive",
         outline:
-          "border-white/20 text-white bg-transparent",
+          "border-border text-muted-foreground",
         glass:
-          "border-white/15 bg-white/5 text-white/90",
+          "border-border bg-card text-foreground",
         amber:
-          "border-amber-400/25 bg-amber-400/10 text-amber-300",
+          "border-primary/25 bg-primary/10 text-primary",
         blue:
-          "border-sky-400/25 bg-sky-400/10 text-sky-300",
+          "border-primary/25 bg-primary/10 text-primary",
         purple:
-          "border-purple-400/25 bg-purple-400/10 text-purple-300",
+          "border-primary/25 bg-primary/10 text-primary",
         emerald:
-          "border-emerald-400/25 bg-emerald-400/10 text-emerald-300",
+          "border-primary/25 bg-primary/10 text-primary",
       },
     },
     defaultVariants: {

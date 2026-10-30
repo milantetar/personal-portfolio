@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'logo_media_id',
     'background_media_id',
     'avatar_media_id',
+    'resume_media_id',
     'theme_preset',
     'glass_blur',
     'glass_opacity',
@@ -45,6 +46,7 @@ class SiteSetting extends Model
             'logo_media_id' => 'integer',
             'background_media_id' => 'integer',
             'avatar_media_id' => 'integer',
+            'resume_media_id' => 'integer',
             'is_available' => 'boolean',
         ];
     }
@@ -62,5 +64,10 @@ class SiteSetting extends Model
     public function avatarMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'avatar_media_id');
+    }
+
+    public function resumeMedia(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'resume_media_id');
     }
 }

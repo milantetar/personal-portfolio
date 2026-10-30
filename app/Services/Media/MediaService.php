@@ -48,7 +48,7 @@ class MediaService
         ];
 
         // If a new file is uploaded, delete the old file from storage and store the new one
-        if ($data->file) {
+        if ($data->file instanceof \Illuminate\Http\UploadedFile) {
             Storage::disk($media->disk)->delete($media->path);
 
             $file = $data->file;
@@ -87,8 +87,11 @@ class MediaService
             if (Schema::hasColumn('site_settings', 'avatar_media_id') && $settings->avatar_media_id === $media->id) {
                 $updates['avatar_media_id'] = null;
             }
+            if (Schema::hasColumn('site_settings', 'resume_media_id') && $settings->resume_media_id === $media->id) {
+                $updates['resume_media_id'] = null;
+            }
 
-            if (! empty($updates)) {
+            if ($updates !== []) {
                 $settings->update($updates);
             }
 
@@ -109,6 +112,7 @@ class MediaService
             'logo' => 'logo_media_id',
             'background' => 'background_media_id',
             'avatar' => 'avatar_media_id',
+            'resume' => 'resume_media_id',
         ];
 
         if (isset($columnMap[$slot])) {
@@ -132,6 +136,7 @@ class MediaService
             'logo' => 'logo_media_id',
             'background' => 'background_media_id',
             'avatar' => 'avatar_media_id',
+            'resume' => 'resume_media_id',
         ];
 
         if (isset($columnMap[$slot])) {
@@ -154,7 +159,7 @@ class MediaService
         $valid = [];
         foreach ([
             'theme_preset', 'glass_blur', 'glass_opacity',
-            'logo_media_id', 'background_media_id', 'avatar_media_id',
+            'logo_media_id', 'background_media_id', 'avatar_media_id', 'resume_media_id',
             'hero_title', 'hero_subtitle', 'hero_description',
             'about_title', 'about_description', 'skills_content',
             'projects_content', 'experience_content', 'contact_content',
@@ -174,7 +179,7 @@ class MediaService
             }
         }
 
-        if (! empty($valid)) {
+        if ($valid !== []) {
             $settings->update($valid);
         }
 

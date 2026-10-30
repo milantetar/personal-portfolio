@@ -11,13 +11,15 @@ interface SpotlightCardProps extends HTMLMotionProps<"div"> {
 export function SpotlightCard({
   children,
   className,
+  spotlightColor,
   ...props
 }: SpotlightCardProps) {
+  void spotlightColor;
   return (
     <motion.div
-      whileHover={{ y: -2, transition: { duration: 0.15 } }}
+      whileHover={{ y: -1, transition: { duration: 0.18 } }}
       className={cn(
-        "relative overflow-hidden rounded-2xl border border-white/10 bg-black/30 p-5 text-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] backdrop-blur-xl transition-colors hover:border-white/20 hover:bg-black/40",
+        "relative overflow-hidden rounded-md border border-border bg-card p-5 text-card-foreground transition-colors hover:border-primary/40 hover:bg-accent/40",
         className
       )}
       {...props}

@@ -4,6 +4,8 @@ export type * from './media';
 export type * from './navbar/navbar';
 export type * from './sidebar';
 export type * from './site-settings';
+export type * from './portfolio-section';
+export type * from './github-project';
 
 import type { Auth } from './auth';
 import type { BackgroundImage, Branding } from './media';

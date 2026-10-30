@@ -64,7 +64,7 @@ export function useMediaUpload({ endpoint = '/dashboard/media' }: UseMediaUpload
                     ? Object.values(result.errors).flat().join(' ')
                     : null;
 
-                throw new Error(validationMessage || result.message || 'Upload failed.');
+                throw new Error(humanizeUploadError(validationMessage || result.message || 'Upload failed.'));
             }
 
             URL.revokeObjectURL(temporaryPreviewUrl);
@@ -73,7 +73,7 @@ export function useMediaUpload({ endpoint = '/dashboard/media' }: UseMediaUpload
 
             return result.data;
         } catch (caughtError: unknown) {
-            const message = caughtError instanceof Error ? caughtError.message : 'Upload failed.';
+            const message = caughtError instanceof Error ? humanizeUploadError(caughtError.message) : 'Upload failed.';
             URL.revokeObjectURL(temporaryPreviewUrl);
             previewUrlRef.current = null;
             setPreviewUrl(null);
@@ -92,4 +92,12 @@ export function useMediaUpload({ endpoint = '/dashboard/media' }: UseMediaUpload
     }, []);
 
     return { error, isUploading, previewUrl, upload, clearPreview };
+}
+
+function humanizeUploadError(message: string): string {
+    if (/failed to upload|upload failed|did not receive/i.test(message)) {
+        return 'The server could not receive this file. Check that it is a supported type and smaller than 20 MB. If it still fails, PHP upload limits may need to be increased.';
+    }
+
+    return message;
 }

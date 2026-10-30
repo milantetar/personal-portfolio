@@ -17,6 +17,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 class MediaController extends Controller
@@ -81,6 +83,61 @@ class MediaController extends Controller
             Log::error('Web media upload failed.', ['user_id' => $request->user()?->id, 'exception' => $exception]);
 
             return $this->serverErrorResponse('Failed to upload media file.');
+        }
+    }
+
+    public function bulkStore(Request $request): JsonResponse
+    {
+        Log::info('Web bulk media upload started.', ['user_id' => $request->user()?->id, 'file_count' => count((array) $request->file('files', []))]);
+        $validator = Validator::make($request->all(), [
+            'files' => ['required', 'array', 'min:1', 'max:50'],
+            'files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp,avif,svg,pdf,mp3', 'max:20480'],
+            'alt_text' => ['nullable', 'string', 'max:255'],
+            'title' => ['nullable', 'string', 'max:255'],
+        ], [
+            'files.required' => 'Select at least one file to upload.',
+            'files.array' => 'The uploaded files have an invalid format.',
+            'files.*.file' => 'The server did not receive this file correctly. Check your PHP upload limits and try again.',
+            'files.*.mimes' => 'Unsupported file type. Use JPG, JPEG, PNG, GIF, WEBP, AVIF, SVG, PDF, or MP3.',
+            'files.*.max' => 'This file is too large. The maximum allowed size is 20 MB.',
+        ]);
+
+        if ($validator->fails()) {
+            Log::warning('Web bulk media upload validation failed.', [
+                'user_id' => $request->user()?->id,
+                'errors' => $validator->errors()->toArray(),
+            ]);
+
+            return $this->validationErrorResponse('Media upload validation failed.', $validator->errors()->toArray());
+        }
+
+        $validated = $validator->validated();
+
+        try {
+            $mediaItems = DB::transaction(function () use ($validated, $request): array {
+                $created = [];
+                foreach ($validated['files'] as $file) {
+                    $data = MediaData::from([
+                        'file' => $file,
+                        'title' => ($validated['title'] ?? null) ?: $file->getClientOriginalName(),
+                        'alt_text' => ($validated['alt_text'] ?? null) ?: $file->getClientOriginalName(),
+                        'usage' => 'none',
+                    ]);
+                    $created[] = $this->mediaService->createMedia($data, $request->user());
+                }
+
+                return $created;
+            });
+
+            Log::info('Web bulk media upload completed.', ['user_id' => $request->user()?->id, 'created_count' => count($mediaItems)]);
+
+            return $this->createdResponse('Media files uploaded successfully.', [
+                'media' => collect($mediaItems)->map(fn (Media $media): array => ['id' => $media->id, 'url' => $media->url])->values()->all(),
+            ]);
+        } catch (Throwable $exception) {
+            Log::error('Web bulk media upload failed.', ['user_id' => $request->user()?->id, 'exception' => $exception]);
+
+            return $this->serverErrorResponse('Media upload failed while saving the file. Check the file format, size, PHP upload limits, and storage permissions.');
         }
     }
 
@@ -149,7 +206,7 @@ class MediaController extends Controller
     {
         Log::info('Web media slot assignment started.', ['user_id' => $request->user()?->id, 'media_id' => $media->id, 'slot' => $request->input('slot')]);
         $validated = $request->validate([
-            'slot' => 'required|string|in:logo,background,avatar',
+            'slot' => 'required|string|in:logo,background,avatar,resume',
         ]);
 
         $this->mediaService->assignMediaToSlot($media, $validated['slot']);
@@ -167,7 +224,7 @@ class MediaController extends Controller
     {
         Log::info('Web media slot clearing started.', ['user_id' => $request->user()?->id, 'slot' => $request->input('slot')]);
         $validated = $request->validate([
-            'slot' => 'required|string|in:logo,background,avatar',
+            'slot' => 'required|string|in:logo,background,avatar,resume',
         ]);
 
         $this->mediaService->clearMediaSlot($validated['slot']);

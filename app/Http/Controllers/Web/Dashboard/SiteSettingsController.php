@@ -22,7 +22,7 @@ class SiteSettingsController extends Controller
 
     public function index()
     {
-        $settings = SiteSetting::query()->with(['logoMedia', 'backgroundMedia', 'avatarMedia'])->first();
+        $settings = SiteSetting::query()->with(['logoMedia', 'backgroundMedia', 'avatarMedia', 'resumeMedia'])->first();
         $settings ??= SiteSetting::query()->create(['site_name' => "Milan's Portfolio"]);
         $settingsSidebarItem = SidebarItem::query()->whereIn('url', ['/dashboard/settings', 'dashboard/settings'])->first();
         if (! $settingsSidebarItem) {

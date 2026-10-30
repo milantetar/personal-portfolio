@@ -26,23 +26,11 @@ export interface SiteSettings {
     logo_media?: Media | null;
     background_media?: Media | null;
     avatar_media?: Media | null;
+    resume_media?: Media | null;
 }
 
 export interface SiteSettingsForm {
     site_name: string;
-    hero_title: string;
-    hero_subtitle: string;
-    hero_description: string;
-    about_title: string;
-    about_description: string;
-    skills_content: string;
-    projects_content: string;
-    experience_content: string;
-    contact_content: string;
-    primary_cta_label: string;
-    primary_cta_url: string;
-    secondary_cta_label: string;
-    secondary_cta_url: string;
     email: string;
     github_url: string;
     linkedin_url: string;
@@ -51,4 +39,5 @@ export interface SiteSettingsForm {
     glass_blur: string;
     glass_opacity: string;
     settings_icon_media_id: number | null;
+    resume_media_id: number | null;
 }

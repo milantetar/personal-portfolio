@@ -55,36 +55,36 @@ export function SidebarItemFormModal({ isOpen, item = null, onClose }: SidebarIt
 
     return (
         <Dialog onOpenChange={(open) => !open && onClose()} open={isOpen}>
-            <DialogContent className="max-h-[90vh] overflow-y-auto p-0 sm:max-w-2xl">
-                <DialogHeader className="border-b bg-muted/30 px-6 py-5">
+            <DialogContent className="max-h-[90vh] overflow-y-auto p-0 sm:max-w-xl">
+                <DialogHeader className="border-b border-border bg-card px-5 py-4 sm:px-6">
                     <DialogTitle className="text-lg">{isEditing ? 'Edit Sidebar Item' : 'Add New Sidebar Item'}</DialogTitle>
                     <DialogDescription>
                         Configure the label, destination, and optional icon for this navigation item.
                     </DialogDescription>
                 </DialogHeader>
 
-                <form className="space-y-6 px-6 py-5" onSubmit={handleSubmit}>
+                <form className="space-y-5 px-5 py-4 sm:px-6" onSubmit={handleSubmit}>
                     <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-1.5">
                             <Label htmlFor="label">Label</Label>
                             <Input id="label" onChange={(event) => setData('label', event.target.value)} placeholder="e.g., Projects" value={data.label} />
-                            {errors.label && <p className="text-xs text-red-500">{errors.label}</p>}
+                            {errors.label && <p className="text-xs text-destructive">{errors.label}</p>}
                         </div>
                         <div className="space-y-1.5">
                             <Label htmlFor="url">URL</Label>
                             <Input id="url" onChange={(event) => setData('url', event.target.value)} placeholder="e.g., /projects" value={data.url} />
-                            {errors.url && <p className="text-xs text-red-500">{errors.url}</p>}
+                            {errors.url && <p className="text-xs text-destructive">{errors.url}</p>}
                         </div>
                     </div>
 
-                    <div className="space-y-4 rounded-xl border bg-muted/20 p-4">
+                    <div className="space-y-4 rounded-md border border-border bg-muted/30 p-4">
                         <div>
                             <Label className="text-sm">Icon image</Label>
                             <p className="mt-1 text-xs text-muted-foreground">Upload an SVG or PNG. The preview will appear in the sidebar after saving.</p>
                         </div>
                         {selectedPreviewUrl ? (
-                            <div className="flex items-center gap-3 rounded-lg border bg-background p-3 shadow-sm">
-                                <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border bg-background">
+                            <div className="flex items-center gap-3 rounded-md border border-border bg-background p-3">
+                                <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-border bg-background">
                                     <img alt="Selected icon preview" className="max-h-full max-w-full object-contain p-1" src={selectedPreviewUrl} />
                                 </div>
                                 <p className="flex-1 text-sm font-medium">Image selected</p>
@@ -101,7 +101,7 @@ export function SidebarItemFormModal({ isOpen, item = null, onClose }: SidebarIt
                         <MediaUploadZone error={uploadError} isUploading={isUploading} onFileSelected={handleFileSelected} />
                     </div>
 
-                    <DialogFooter className="-mx-6 -mb-5 rounded-none border-t bg-muted/30 px-6 py-4">
+                    <DialogFooter className="-mx-5 -mb-4 rounded-none border-t border-border bg-muted/30 px-5 py-4 sm:-mx-6 sm:px-6">
                         <Button onClick={onClose} type="button" variant="outline">Cancel</Button>
                         <Button disabled={processing || isUploading} type="submit">
                             {processing ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Item'}

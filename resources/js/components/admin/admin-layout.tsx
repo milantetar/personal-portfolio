@@ -1,6 +1,7 @@
 import { Navbar } from '@/components/navbar/navbar';
+import { FALLBACK_BACKDROP } from '@/config/theme';
 import { useFlash } from '@/hooks/use-flash';
-import type { SidebarItem } from '@/types';
+import type { Branding, SidebarItem } from '@/types';
 
 import { Sidebar } from './sidebar';
 
@@ -8,32 +9,30 @@ interface AdminLayoutProps {
     children: React.ReactNode;
     sidebarItems?: SidebarItem[];
     backgroundUrl?: string | null;
+    branding?: Branding;
 }
 
-const FALLBACK_BG = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1920&q=80';
-
-export function AdminLayout({ children, sidebarItems = [], backgroundUrl }: AdminLayoutProps) {
+export function AdminLayout({ children, sidebarItems = [], backgroundUrl, branding }: AdminLayoutProps) {
     useFlash();
 
+    const bgUrl = backgroundUrl || branding?.backgroundImage?.url || FALLBACK_BACKDROP;
+
     return (
-        <div className="relative min-h-screen w-full overflow-hidden">
+        <div className="admin-ui relative isolate flex h-dvh min-h-0 flex-col overflow-hidden bg-transparent text-foreground">
             <div
-                className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: `url(${backgroundUrl || FALLBACK_BG})` }}
+                className="pointer-events-none fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url("${bgUrl}")` }}
                 aria-hidden="true"
             />
-            <div className="absolute inset-0 bg-black/40 dark:bg-black/60" aria-hidden="true" />
-
-            <div className="relative z-10 flex h-screen flex-col">
-                <Navbar />
-                <div className="flex flex-1 overflow-hidden">
-                    <Sidebar items={sidebarItems} />
-                    <main className="flex-1 overflow-y-auto p-6 md:p-8">
-                        <div className="mx-auto max-w-6xl">
-                            {children}
-                        </div>
-                    </main>
-                </div>
+            <div className="pointer-events-none fixed inset-0 -z-10 bg-background/80" aria-hidden="true" />
+            <Navbar />
+            <div className="flex min-h-0 flex-1 flex-col md:flex-row">
+                <Sidebar items={sidebarItems} />
+                <main className="min-w-0 flex-1 overflow-y-auto overscroll-contain">
+                    <div className="min-h-full px-4 py-6 sm:px-6 lg:px-9 lg:py-8">
+                        {children}
+                    </div>
+                </main>
             </div>
         </div>
     );

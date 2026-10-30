@@ -64,7 +64,7 @@ export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
                  <Input
                     type="file"
                     id="library-upload"
-                    className="hidden"
+                    className="peer sr-only"
                     accept="image/svg+xml, image/jpeg, image/png"
                     onChange={handleUpload}
                     disabled={isUploading}
@@ -72,7 +72,7 @@ export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
                 <Label
                     htmlFor="library-upload"
                     className={cn(
-                        "flex cursor-pointer items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90",
+                        "flex min-h-9 cursor-pointer items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 peer-focus-visible:ring-2 peer-focus-visible:ring-ring",
                         isUploading && "pointer-events-none opacity-50"
                     )}
                 >
@@ -83,25 +83,25 @@ export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
 
             {/* Grid */}
             {items.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-border/50 rounded-xl bg-card/30 backdrop-blur-sm">
+                <div className="rounded-md border border-dashed border-border px-4 py-12 text-center">
                     <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                     <h3 className="text-lg font-medium text-foreground">No media found</h3>
                     <p className="text-sm text-muted-foreground mt-1">Upload some files to get started.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                     {items.map((item) => (
-                        <div key={item.id} className="group relative aspect-square rounded-xl border border-border bg-card/50 backdrop-blur-sm overflow-hidden hover:ring-2 hover:ring-primary/50 transition-all">
+                        <div key={item.id} className="group relative aspect-square overflow-hidden rounded-md border border-border bg-card transition-colors hover:border-primary/50">
                             <div className="absolute inset-0 flex items-center justify-center p-4">
                                 {item.url ? (
-                                    <img src={item.url} alt={item.original_name} className="max-h-full max-w-full object-contain" />
+                                    <img src={item.url} alt={item.original_name} loading="lazy" width="240" height="240" className="max-h-full max-w-full object-contain" />
                                 ) : (
                                     <ImageIcon className="h-8 w-8 text-muted-foreground" />
                                 )}
                             </div>
                             
                             {/* Overlay for actions */}
-                            <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-3">
+                            <div className="absolute inset-0 flex flex-col justify-between bg-card p-3 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                                 <div className="flex justify-end">
                                     <Button 
                                         variant="destructive" 
@@ -112,11 +112,11 @@ export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>
-                                <div className="text-white">
+                                <div className="text-foreground">
                                     <p className="text-xs font-medium truncate" title={item.original_name}>
                                         {item.original_name}
                                     </p>
-                                    <p className="text-[10px] text-white/70">
+                                    <p className="text-[10px] text-foreground">
                                         {(item.size / 1024).toFixed(1)} KB
                                     </p>
                                 </div>

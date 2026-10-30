@@ -133,7 +133,7 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
     };
 
     return (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 backdrop-blur-md">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-card px-4 py-2.5 backdrop-blur-none">
             {/* Hidden file inputs */}
             <input
                 ref={logoInputRef}
@@ -171,13 +171,13 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
 
             {/* Left: Brand Name */}
             <div className="flex items-center gap-2.5">
-                <span className="text-xs font-medium text-white/40 uppercase tracking-wider">Brand</span>
+                <span className="text-xs font-medium text-foreground uppercase tracking-wider">Brand</span>
                 {isEditingTitle ? (
                     <form onSubmit={handleSaveTitle} className="flex items-center gap-1.5">
                         <Input
                             value={siteTitle}
                             onChange={(e) => setSiteTitle(e.target.value)}
-                            className="h-7 w-44 border-white/20 bg-black/40 text-xs text-white placeholder:text-white/40"
+                            className="h-7 w-44 border-border bg-card text-xs text-foreground placeholder:text-foreground"
                             placeholder="Site name..."
                             autoFocus
                         />
@@ -185,7 +185,7 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                             size="xs"
                             type="submit"
                             disabled={isSavingTitle}
-                            className="h-7 border border-white/20 bg-white/15 px-2 text-xs text-white hover:bg-white/25"
+                            className="h-7 border border-border bg-muted/40 px-2 text-xs text-foreground bg-accent/40"
                         >
                             Save
                         </Button>
@@ -193,7 +193,7 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                             size="xs"
                             type="button"
                             variant="ghost"
-                            className="h-7 px-2 text-xs text-white/60 hover:text-white"
+                            className="h-7 px-2 text-xs text-foreground hover:text-foreground"
                             onClick={() => {
                                 setSiteTitle(branding?.siteName || "Milan's Portfolio");
                                 setIsEditingTitle(false);
@@ -205,45 +205,45 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                 ) : (
                     <button
                         onClick={() => setIsEditingTitle(true)}
-                        className="group flex items-center gap-1.5 rounded px-2 py-1 text-sm font-medium text-white hover:bg-white/5 transition-colors"
+                        className="group flex items-center gap-1.5 rounded px-2 py-1 text-sm font-medium text-foreground hover:bg-muted/40 transition-colors"
                         title="Click to rename"
                     >
                         <span>{branding?.siteName || "Milan's Portfolio"}</span>
-                        <Pencil className="size-3 text-white/30 group-hover:text-white/70 transition-colors" />
+                        <Pencil className="size-3 text-foreground/30 group-hover:text-foreground transition-colors" />
                     </button>
                 )}
             </div>
 
             {/* Right: The 3 Minimal Media Slots */}
-            <div className="flex items-center gap-4 text-xs text-white/60">
+            <div className="flex items-center gap-4 text-xs text-foreground">
                 {/* Slot 1: Logo */}
                 <div className="flex items-center gap-2">
-                    <span className="text-white/40">Logo</span>
+                    <span className="text-foreground">Logo</span>
                     <div
-                        className="relative group size-8 rounded-lg border border-white/15 bg-white/5 flex items-center justify-center overflow-hidden hover:border-white/30 transition-colors cursor-pointer"
+                        className="relative group size-8 rounded-lg border border-border bg-muted/40 flex items-center justify-center overflow-hidden hover:border-border transition-colors cursor-pointer"
                         title={branding?.logo ? 'Click to change logo' : 'Upload logo'}
                     >
                         {branding?.logo?.url ? (
                             <>
                                 <img src={branding.logo.url} alt="Logo" className="size-full object-contain p-1" />
-                                <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
+                                <div className="absolute inset-0 bg-card opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
                                     <button
                                         onClick={() => logoInputRef.current?.click()}
-                                        className="p-1 text-white/80 hover:text-white"
+                                        className="p-1 text-foreground hover:text-foreground"
                                         title="Upload new"
                                     >
                                         <Upload className="size-3" />
                                     </button>
                                     <button
                                         onClick={() => setActivePickerSlot('logo')}
-                                        className="p-1 text-white/80 hover:text-white"
+                                        className="p-1 text-foreground hover:text-foreground"
                                         title="Choose from library"
                                     >
                                         <FolderOpen className="size-3" />
                                     </button>
                                     <button
                                         onClick={() => handleClearSlot('logo')}
-                                        className="p-1 text-red-400 hover:text-red-300"
+                                        className="p-1 text-destructive hover:text-destructive"
                                         title="Remove"
                                     >
                                         <Trash2 className="size-3" />
@@ -253,7 +253,7 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                         ) : (
                             <button
                                 onClick={() => logoInputRef.current?.click()}
-                                className="size-full flex items-center justify-center text-white/40 hover:text-white"
+                                className="size-full flex items-center justify-center text-foreground hover:text-foreground"
                             >
                                 <Plus className="size-3.5" />
                             </button>
@@ -261,36 +261,36 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                     </div>
                 </div>
 
-                <div className="h-3.5 w-px bg-white/10" />
+                <div className="h-3.5 w-px bg-muted/40" />
 
                 {/* Slot 2: Backdrop */}
                 <div className="flex items-center gap-2">
-                    <span className="text-white/40">Backdrop</span>
+                    <span className="text-foreground">Backdrop</span>
                     <div
-                        className="relative group w-12 h-8 rounded-lg border border-white/15 bg-white/5 flex items-center justify-center overflow-hidden hover:border-white/30 transition-colors cursor-pointer"
+                        className="relative group w-12 h-8 rounded-lg border border-border bg-muted/40 flex items-center justify-center overflow-hidden hover:border-border transition-colors cursor-pointer"
                         title={branding?.backgroundImage ? 'Click to change backdrop' : 'Upload backdrop'}
                     >
                         {branding?.backgroundImage?.url ? (
                             <>
                                 <img src={branding.backgroundImage.url} alt="Backdrop" className="size-full object-cover" />
-                                <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
+                                <div className="absolute inset-0 bg-card opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
                                     <button
                                         onClick={() => bgInputRef.current?.click()}
-                                        className="p-1 text-white/80 hover:text-white"
+                                        className="p-1 text-foreground hover:text-foreground"
                                         title="Upload new"
                                     >
                                         <Upload className="size-3" />
                                     </button>
                                     <button
                                         onClick={() => setActivePickerSlot('background')}
-                                        className="p-1 text-white/80 hover:text-white"
+                                        className="p-1 text-foreground hover:text-foreground"
                                         title="Choose from library"
                                     >
                                         <FolderOpen className="size-3" />
                                     </button>
                                     <button
                                         onClick={() => handleClearSlot('background')}
-                                        className="p-1 text-red-400 hover:text-red-300"
+                                        className="p-1 text-destructive hover:text-destructive"
                                         title="Reset"
                                     >
                                         <Trash2 className="size-3" />
@@ -300,7 +300,7 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                         ) : (
                             <button
                                 onClick={() => bgInputRef.current?.click()}
-                                className="size-full flex items-center justify-center text-white/40 hover:text-white"
+                                className="size-full flex items-center justify-center text-foreground hover:text-foreground"
                             >
                                 <Plus className="size-3.5" />
                             </button>
@@ -308,36 +308,36 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                     </div>
                 </div>
 
-                <div className="h-3.5 w-px bg-white/10" />
+                <div className="h-3.5 w-px bg-muted/40" />
 
                 {/* Slot 3: Avatar */}
                 <div className="flex items-center gap-2">
-                    <span className="text-white/40">Avatar</span>
+                    <span className="text-foreground">Avatar</span>
                     <div
-                        className="relative group size-8 rounded-full border border-white/15 bg-white/5 flex items-center justify-center overflow-hidden hover:border-white/30 transition-colors cursor-pointer"
+                        className="relative group size-8 rounded-full border border-border bg-muted/40 flex items-center justify-center overflow-hidden hover:border-border transition-colors cursor-pointer"
                         title={branding?.avatar ? 'Click to change avatar' : 'Upload avatar'}
                     >
                         {branding?.avatar?.url ? (
                             <>
                                 <img src={branding.avatar.url} alt="Avatar" className="size-full object-cover" />
-                                <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
+                                <div className="absolute inset-0 bg-card opacity-0 group-hover:opacity-100 flex items-center justify-center gap-1 transition-opacity">
                                     <button
                                         onClick={() => avatarInputRef.current?.click()}
-                                        className="p-1 text-white/80 hover:text-white"
+                                        className="p-1 text-foreground hover:text-foreground"
                                         title="Upload new"
                                     >
                                         <Upload className="size-3" />
                                     </button>
                                     <button
                                         onClick={() => setActivePickerSlot('avatar')}
-                                        className="p-1 text-white/80 hover:text-white"
+                                        className="p-1 text-foreground hover:text-foreground"
                                         title="Choose from library"
                                     >
                                         <FolderOpen className="size-3" />
                                     </button>
                                     <button
                                         onClick={() => handleClearSlot('avatar')}
-                                        className="p-1 text-red-400 hover:text-red-300"
+                                        className="p-1 text-destructive hover:text-destructive"
                                         title="Remove"
                                     >
                                         <Trash2 className="size-3" />
@@ -347,7 +347,7 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                         ) : (
                             <button
                                 onClick={() => avatarInputRef.current?.click()}
-                                className="size-full flex items-center justify-center text-white/40 hover:text-white"
+                                className="size-full flex items-center justify-center text-foreground hover:text-foreground"
                             >
                                 <Plus className="size-3.5" />
                             </button>
@@ -366,19 +366,19 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                     }
                 }}
             >
-                <DialogContent className="max-w-xl border border-white/15 bg-black/85 text-white backdrop-blur-2xl shadow-2xl">
+                <DialogContent className="max-w-xl border border-border bg-card text-foreground backdrop-blur-none shadow-none">
                     <DialogHeader>
-                        <DialogTitle className="text-white">
+                        <DialogTitle className="text-foreground">
                             Select {activePickerSlot === 'logo' ? 'Logo' : activePickerSlot === 'background' ? 'Backdrop' : 'Avatar'}
                         </DialogTitle>
-                        <DialogDescription className="text-white/60">
+                        <DialogDescription className="text-foreground">
                             Choose an existing file from your media library.
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="max-h-80 overflow-y-auto py-2">
                         {allMedia.length === 0 ? (
-                            <p className="py-8 text-center text-xs text-white/40">
+                            <p className="py-8 text-center text-xs text-foreground">
                                 No images found in library.
                             </p>
                         ) : (
@@ -398,24 +398,24 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                                             className={`
                                                 group relative flex flex-col overflow-hidden rounded-lg border p-1.5 text-left transition-all
                                                 ${isSelected
-                                                    ? 'border-white/50 bg-white/15 ring-1 ring-white/30'
-                                                    : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                                                    ? 'border-border bg-muted/40 ring-1 ring-primary/30'
+                                                    : 'border-border bg-muted/40 hover:border-border hover:bg-muted/40'
                                                 }
                                             `}
                                         >
-                                            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded bg-black/40">
+                                            <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded bg-card">
                                                 <img
                                                     src={item.url}
                                                     alt={item.alt_text || item.original_name}
                                                     className="h-full w-full object-contain"
                                                 />
                                             </div>
-                                            <p className="mt-1 truncate text-[11px] text-white/80">
+                                            <p className="mt-1 truncate text-[11px] text-foreground">
                                                 {item.original_name}
                                             </p>
 
                                             {isCurrentSlot && (
-                                                <span className="absolute right-1.5 top-1.5 rounded-full border border-white/20 bg-black/70 p-0.5 text-emerald-300">
+                                                <span className="absolute right-1.5 top-1.5 rounded-full border border-border bg-card p-0.5 text-emerald-300">
                                                     <Check className="size-2.5" />
                                                 </span>
                                             )}
@@ -430,7 +430,7 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                         <Button
                             variant="outline"
                             size="sm"
-                            className="border-white/15 bg-white/5 text-white hover:bg-white/10 text-xs"
+                            className="border-border bg-muted/40 text-foreground hover:bg-muted/40 text-xs"
                             onClick={() => {
                                 setActivePickerSlot(null);
                                 setSelectedMediaId(null);
@@ -442,7 +442,7 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                             size="sm"
                             onClick={handleAssignSlot}
                             disabled={!selectedMediaId || isSavingSlot}
-                            className="border border-white/20 bg-white/20 text-white hover:bg-white/30 text-xs"
+                            className="border border-border bg-muted/40 text-foreground bg-accent/40 text-xs"
                         >
                             {isSavingSlot ? 'Saving...' : 'Apply'}
                         </Button>
