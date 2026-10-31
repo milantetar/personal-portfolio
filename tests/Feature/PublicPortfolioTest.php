@@ -95,6 +95,7 @@ it('only shares visible certificates, projects, and published posts', function (
 
 it('publishes a sitemap for the homepage, visible sections, and published posts', function (): void {
     makePortfolioSection();
+    makePortfolioSection(['slug' => 'about', 'type' => 'about', 'is_visible' => true]);
     makePortfolioSection(['slug' => 'hidden', 'type' => 'custom', 'is_visible' => false]);
 
     Post::query()->create([
@@ -116,7 +117,8 @@ it('publishes a sitemap for the homepage, visible sections, and published posts'
     $response->assertOk()
         ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
         ->assertSee(route('home'), false)
-        ->assertSee(route('portfolio.section', 'hero'), false)
+        ->assertSee(route('portfolio.section', 'about'), false)
+        ->assertDontSee(route('portfolio.section', 'hero'), false)
         ->assertSee(route('blog.show', 'published-post'), false)
         ->assertDontSee(route('portfolio.section', 'hidden'), false)
         ->assertDontSee(route('blog.show', 'draft-post'), false);
