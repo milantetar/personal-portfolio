@@ -1582,7 +1582,9 @@ html {
         justify-content: flex-end;
     }
 
-    .admin-navigation-card [data-slot='table-cell']:nth-child(4) button[aria-label^='Drag'] {
+    .admin-navigation-card
+        [data-slot='table-cell']:nth-child(4)
+        button[aria-label^='Drag'] {
         display: none;
     }
 }

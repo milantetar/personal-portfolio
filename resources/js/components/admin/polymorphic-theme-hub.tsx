@@ -1,6 +1,14 @@
 import React, { useRef, useState } from 'react';
 import { router } from '@inertiajs/react';
-import { AppWindow, Check, FolderOpen, Pencil, Plus, Trash2, Upload } from 'lucide-react';
+import {
+    AppWindow,
+    Check,
+    FolderOpen,
+    Pencil,
+    Plus,
+    Trash2,
+    Upload,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -494,7 +502,11 @@ export function PolymorphicThemeHub({
                     <span className="text-foreground">Favicon</span>
                     <div
                         className="group relative flex size-8 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40"
-                        title={branding?.favicon ? 'Change favicon' : 'Upload favicon'}
+                        title={
+                            branding?.favicon
+                                ? 'Change favicon'
+                                : 'Upload favicon'
+                        }
                     >
                         {branding?.favicon?.url ? (
                             <>
@@ -503,10 +515,12 @@ export function PolymorphicThemeHub({
                                     alt="Site favicon"
                                     className="size-5 object-contain"
                                 />
-                                <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-card opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                                <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-card opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
                                     <button
                                         type="button"
-                                        onClick={() => faviconInputRef.current?.click()}
+                                        onClick={() =>
+                                            faviconInputRef.current?.click()
+                                        }
                                         className="p-1 text-foreground"
                                         aria-label="Upload a new favicon"
                                     >
@@ -514,7 +528,9 @@ export function PolymorphicThemeHub({
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => setActivePickerSlot('favicon')}
+                                        onClick={() =>
+                                            setActivePickerSlot('favicon')
+                                        }
                                         className="p-1 text-foreground"
                                         aria-label="Choose favicon from media library"
                                     >
@@ -522,7 +538,9 @@ export function PolymorphicThemeHub({
                                     </button>
                                     <button
                                         type="button"
-                                        onClick={() => handleClearSlot('favicon')}
+                                        onClick={() =>
+                                            handleClearSlot('favicon')
+                                        }
                                         className="p-1 text-destructive"
                                         aria-label="Remove favicon"
                                     >
@@ -606,12 +624,16 @@ export function PolymorphicThemeHub({
                                             } `}
                                         >
                                             <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded bg-card">
-                                                {item.mime_type === 'image/x-icon' ? (
+                                                {item.mime_type ===
+                                                'image/x-icon' ? (
                                                     <AppWindow className="size-8 text-muted-foreground" />
                                                 ) : (
                                                     <img
                                                         src={item.url}
-                                                        alt={item.alt_text || item.original_name}
+                                                        alt={
+                                                            item.alt_text ||
+                                                            item.original_name
+                                                        }
                                                         className="h-full w-full object-contain"
                                                     />
                                                 )}

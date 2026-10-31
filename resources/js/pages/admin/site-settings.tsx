@@ -445,7 +445,8 @@ export default function SiteSettingsPage() {
                                             </h2>
                                             <p className="text-sm text-muted-foreground">
                                                 Logo, backdrop, avatar, favicon,
-                                                and resume are assigned from Media Library.
+                                                and resume are assigned from
+                                                Media Library.
                                             </p>
                                         </div>
                                     </div>
@@ -501,7 +502,8 @@ export default function SiteSettingsPage() {
                                     <p className="mt-4 text-xs text-muted-foreground">
                                         Use Media Library to assign or replace
                                         these files. The favicon appears in the
-                                        browser tab; the active resume is downloadable from the homepage.
+                                        browser tab; the active resume is
+                                        downloadable from the homepage.
                                     </p>
                                 </section>
 

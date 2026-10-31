@@ -754,7 +754,11 @@ export function MediaDataTable({
                                                         </DropdownMenuItem>
                                                         <DropdownMenuItem
                                                             className="cursor-pointer gap-2 hover:bg-muted/40"
-                                                            disabled={!row.original.mime_type.startsWith('image/')}
+                                                            disabled={
+                                                                !row.original.mime_type.startsWith(
+                                                                    'image/',
+                                                                )
+                                                            }
                                                             onClick={() =>
                                                                 handleQuickAssign(
                                                                     row.original,
