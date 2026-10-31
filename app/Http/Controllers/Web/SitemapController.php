@@ -24,7 +24,7 @@ class SitemapController extends Controller
             ->where('type', '!=', 'hero')
             ->whereNotIn('slug', ['hero', 'assistant', 'blog'])
             ->get(['slug', 'updated_at'])
-            ->each(function (PortfolioSection $section) use (&$urls): void {
+            ->each(function (PortfolioSection $section) use (&$urls, $siteUrl): void {
                 $urls[] = [
                     'loc' => $siteUrl.route('portfolio.section', $section->slug, false),
                     'lastmod' => $section->updated_at?->toAtomString(),
@@ -44,7 +44,7 @@ class SitemapController extends Controller
             ->published()
             ->latest('published_at')
             ->get(['slug', 'updated_at'])
-            ->each(function (Post $post) use (&$urls): void {
+            ->each(function (Post $post) use (&$urls, $siteUrl): void {
                 $urls[] = [
                     'loc' => $siteUrl.route('blog.show', $post->slug, false),
                     'lastmod' => $post->updated_at?->toAtomString(),
