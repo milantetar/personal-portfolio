@@ -23,6 +23,7 @@ export default function MediaLibrary() {
                 backgroundUrl={branding?.backgroundImage?.url || backgroundImage?.url}
                 branding={branding}
             >
+                <div className="admin-page admin-media-page mx-auto flex w-full max-w-7xl flex-col gap-5">
                 <AdminPageHeader icon={<Images className="size-4" />} title="Media library" description="Upload, organize, preview, and assign the assets used by your portfolio." />
                 {/* Minimalist Brief Branding Bar */}
                 <PolymorphicThemeHub
@@ -36,6 +37,7 @@ export default function MediaLibrary() {
                     filters={filters}
                     branding={branding}
                 />
+                </div>
             </AdminLayout>
         </>
     );

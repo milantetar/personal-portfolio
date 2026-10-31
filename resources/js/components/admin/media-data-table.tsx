@@ -400,9 +400,8 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
     });
 
     return (
-        <div className="space-y-4">
-            {/* Minimal Glass Toolbar */}
-            <div className="flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="admin-media-table space-y-4">
+            <div className="admin-media-toolbar flex flex-col gap-3 border-b border-border p-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                     <Button
                         onClick={() => setIsAddOpen(true)}
@@ -416,6 +415,7 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                         <Input
                             className="pl-9 placeholder:text-muted-foreground"
                             onChange={(event) => setSearch(event.target.value)}
+                            aria-label="Search media files"
                             placeholder="Search files..."
                             value={search}
                         />
@@ -462,9 +462,8 @@ export function MediaDataTable({ filters, mediaItems, branding }: MediaDataTable
                 </div>
             </div>
 
-            {/* Minimal Glass Bulk Action Bar (Visible when rows are selected) */}
             {selectedIds.length > 0 && (
-                <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2.5">
+                <div className="admin-bulk-toolbar flex flex-wrap items-center justify-between gap-3 rounded-md border border-border bg-card px-3 py-2.5">
                     <div className="flex items-center gap-3">
                         <span className="text-xs font-medium text-foreground">
                             {selectedIds.length} {selectedIds.length === 1 ? 'file' : 'files'} selected

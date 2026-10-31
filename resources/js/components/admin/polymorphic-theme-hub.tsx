@@ -133,7 +133,7 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
     };
 
     return (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-card px-4 py-2.5 backdrop-blur-none">
+        <section aria-label="Portfolio brand assets" className="admin-branding-hub mb-6 rounded-lg border border-border bg-card p-4">
             {/* Hidden file inputs */}
             <input
                 ref={logoInputRef}
@@ -169,8 +169,13 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                 }}
             />
 
-            {/* Left: Brand Name */}
-            <div className="flex items-center gap-2.5">
+            <header className="admin-branding-hub-header">
+                <div>
+                    <p className="eyebrow">Media assignments</p>
+                    <h2 className="mt-1 text-sm font-semibold">Portfolio identity</h2>
+                    <p className="mt-1 text-xs text-muted-foreground">Set the public logo, backdrop, and avatar from your media library.</p>
+                </div>
+                <div className="flex items-center gap-2.5">
                 <span className="text-xs font-medium text-foreground uppercase tracking-wider">Brand</span>
                 {isEditingTitle ? (
                     <form onSubmit={handleSaveTitle} className="flex items-center gap-1.5">
@@ -212,10 +217,10 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                         <Pencil className="size-3 text-foreground/30 group-hover:text-foreground transition-colors" />
                     </button>
                 )}
-            </div>
+                </div>
+            </header>
 
-            {/* Right: The 3 Minimal Media Slots */}
-            <div className="flex items-center gap-4 text-xs text-foreground">
+            <div className="admin-branding-slots text-xs text-foreground">
                 {/* Slot 1: Logo */}
                 <div className="flex items-center gap-2">
                     <span className="text-foreground">Logo</span>
@@ -449,6 +454,6 @@ export function PolymorphicThemeHub({ branding, allMedia }: PolymorphicThemeHubP
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
+        </section>
     );
 }

@@ -1,16 +1,19 @@
 import { useState, type FormEvent, type ReactNode } from 'react';
-import { useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { motion } from 'motion/react';
-import { ArrowUpRight, ExternalLink, FileText, Mail, Star } from 'lucide-react';
+import { ArrowUpRight, CircleAlert, CircleCheck, ExternalLink, FileText, Mail, Star } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { GitHubIcon, LinkedInIcon } from '@/components/portfolio/brand-icons';
+import { TechnologyBrandIcon } from '@/components/portfolio/technology-brand-icon';
+import { isInternalPortfolioHref, portfolioHref } from '@/lib/portfolio-routing';
 import type { Certificate, GitHubProject, PortfolioSection, SiteSettings } from '@/types';
 
 interface PortfolioSectionRendererProps {
     section: PortfolioSection;
+    sections: PortfolioSection[];
     site: SiteSettings;
     certificates: Certificate[];
     projects: GitHubProject[];
@@ -82,10 +85,11 @@ function SectionFrame({ section, children, reduceMotion, hero = false }: { secti
     const frameClassName = hero
         ? 'portfolio-section portfolio-section--hero portfolio-hero px-4 py-12 sm:px-8 sm:py-16 lg:px-12'
         : `portfolio-section portfolio-section--${section.type} portfolio-editorial-section px-5 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12`;
+    const innerClassName = `portfolio-section-inner ${hero ? 'portfolio-hero-layout' : section.type === 'projects' || section.type === 'certifications' ? 'portfolio-projects-layout flex flex-col gap-6 sm:gap-8' : 'flex flex-col gap-6 sm:gap-8'}`;
 
     return (
         <section id={section.slug} aria-labelledby={`${section.slug}-heading`} className={`scroll-mt-24 ${frameClassName}`}>
-            <Reveal reduceMotion={reduceMotion} className={`portfolio-section-inner ${hero ? 'portfolio-hero-layout' : 'flex flex-col gap-6 sm:gap-8'}`}>
+            <Reveal reduceMotion={reduceMotion} className={innerClassName}>
                 <div className="portfolio-section-heading">
                     <SectionIntro section={section} hero={hero} />
                 </div>
@@ -121,7 +125,16 @@ function ContactForm({ success, failure }: { success?: string; failure?: string 
 
     const submit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        post('/contact', { preserveScroll: true, onSuccess: () => reset() });
+        post('/contact', {
+            preserveScroll: true,
+            onSuccess: (page) => {
+                const props = page.props as typeof page.props & { flash?: { success?: string; error?: string } };
+
+                if (props.flash?.success) {
+                    reset();
+                }
+            },
+        });
     };
 
     return (
@@ -158,7 +171,19 @@ function ContactForm({ success, failure }: { success?: string; failure?: string 
                 <input id="contact-website" tabIndex={-1} autoComplete="off" value={data.website} onChange={(event) => setData('website', event.target.value)} />
             </div>
             <div className="flex flex-col items-start gap-3 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-                <p aria-live="polite" className="text-sm text-muted-foreground">{success || failure || 'Your message goes directly to my inbox.'}</p>
+                {success ? (
+                    <p role="status" aria-live="polite" className="flex items-start gap-2 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-2 text-sm font-medium text-emerald-200">
+                        <CircleCheck className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                        <span>{success}</span>
+                    </p>
+                ) : failure ? (
+                    <p role="alert" aria-live="assertive" className="flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
+                        <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                        <span>{failure}</span>
+                    </p>
+                ) : (
+                    <p className="text-sm text-muted-foreground">Your message goes directly to my inbox.</p>
+                )}
                 <Button type="submit" disabled={processing}>
                     {processing ? 'Sending…' : 'Send message'}
                     {!processing ? <ArrowUpRight className="size-4" aria-hidden="true" /> : null}
@@ -168,7 +193,7 @@ function ContactForm({ success, failure }: { success?: string; failure?: string 
     );
 }
 
-export function PortfolioSectionRenderer({ section, site, certificates, projects, githubUrl, resumeUrl, reduceMotion, contactSuccess, contactError }: PortfolioSectionRendererProps) {
+export function PortfolioSectionRenderer({ section, sections, site, certificates, projects, githubUrl, resumeUrl, reduceMotion, contactSuccess, contactError }: PortfolioSectionRendererProps) {
     const content = section.content as Record<string, unknown> | null;
     const title = section.title || '';
     const profileUrl = githubUrl || site.github_url;
@@ -176,17 +201,18 @@ export function PortfolioSectionRenderer({ section, site, certificates, projects
     if (section.type === 'hero') {
         const description = stringValue(content, 'description', site.hero_description || '');
         const primaryLabel = stringValue(content, 'primary_cta_label', site.primary_cta_label || 'View projects');
-        const primaryUrl = stringValue(content, 'primary_cta_url', site.primary_cta_url || '#projects');
+        const primaryUrl = portfolioHref(stringValue(content, 'primary_cta_url', site.primary_cta_url || '#projects'), sections);
         const secondaryLabel = stringValue(content, 'secondary_cta_label', site.secondary_cta_label || 'Contact');
-        const secondaryUrl = stringValue(content, 'secondary_cta_url', site.secondary_cta_url || '#contact');
+        const secondaryUrl = portfolioHref(stringValue(content, 'secondary_cta_url', site.secondary_cta_url || '#contact'), sections);
 
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion} hero>
                 <div className="portfolio-hero-content">
+                    {site.hero_subtitle ? <p className="portfolio-hero-role">{site.hero_subtitle}</p> : null}
                     {description ? <p className="max-w-2xl whitespace-pre-line text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">{description}</p> : null}
                     <div className="mt-6 flex flex-wrap items-center gap-3">
-                            {primaryUrl && primaryLabel ? <Button asChild size="default"><a href={primaryUrl}>{primaryLabel}<ArrowUpRight className="size-4" /></a></Button> : null}
-                            {resumeUrl ? <Button variant="outline" asChild><a href={resumeUrl} download>Download résumé<ArrowUpRight className="size-4" /></a></Button> : secondaryUrl && secondaryLabel ? <Button variant="outline" asChild><a href={secondaryUrl}>{secondaryLabel}</a></Button> : null}
+                            {primaryUrl && primaryLabel ? <Button asChild size="default">{isInternalPortfolioHref(primaryUrl) ? <Link href={primaryUrl} prefetch="hover">{primaryLabel}<ArrowUpRight className="size-4" /></Link> : <a href={primaryUrl}>{primaryLabel}<ArrowUpRight className="size-4" /></a>}</Button> : null}
+                            {resumeUrl ? <Button variant="outline" asChild><a href={resumeUrl} download>Download résumé<ArrowUpRight className="size-4" /></a></Button> : secondaryUrl && secondaryLabel ? <Button variant="outline" asChild>{isInternalPortfolioHref(secondaryUrl) ? <Link href={secondaryUrl} prefetch="hover">{secondaryLabel}</Link> : <a href={secondaryUrl}>{secondaryLabel}</a>}</Button> : null}
                     </div>
                     {site.is_available ? <p className="mt-2 inline-flex items-center gap-2 text-xs font-medium text-muted-foreground"><span className="size-2 rounded-full bg-primary ring-4 ring-primary/15" />Available for work</p> : null}
                 </div>
@@ -197,38 +223,53 @@ export function PortfolioSectionRenderer({ section, site, certificates, projects
     if (section.type === 'about') {
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion}>
-                <LinkifiedText value={stringValue(content, 'description', site.about_description || '')} className="block max-w-3xl whitespace-pre-line text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8" />
+                <div className="portfolio-copy-card">
+                    <LinkifiedText value={stringValue(content, 'description', site.about_description || '')} className="block max-w-3xl whitespace-pre-line text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8" />
+                </div>
             </SectionFrame>
         );
     }
 
     if (section.type === 'skills') {
-        const skillGroups = blocks(stringValue(content, 'body', site.skills_content || ''));
-        const parseSkill = (item: string) => item
-            .replace(/\s*[-:]\s*\d{1,3}%?$/, '')
-            .replace(/\s+\(\d{1,3}%\)$/, '')
-            .trim();
+        const storedSkillGroups = content?.skills;
+        const groupEntries: unknown[] = Array.isArray(storedSkillGroups) ? storedSkillGroups : [];
+        const structuredSkillGroups = groupEntries.flatMap((group): { name: string; technologies: { name: string; iconUrl: string | null }[] }[] => {
+            if (!group || typeof group !== 'object') return [];
+            const value = group as { name?: unknown; technologies?: unknown };
+            if (typeof value.name !== 'string' || !Array.isArray(value.technologies)) return [];
+
+            const technologyEntries = value.technologies as unknown[];
+            return [{
+                name: value.name,
+                technologies: technologyEntries.flatMap((technology): { name: string; iconUrl: string | null }[] => {
+                    if (!technology || typeof technology !== 'object') return [];
+                    const entry = technology as { name?: unknown; icon_url?: unknown };
+                    return typeof entry.name === 'string' ? [{ name: entry.name, iconUrl: typeof entry.icon_url === 'string' ? entry.icon_url : null }] : [];
+                }),
+            }];
+        });
+        const legacySkillGroups = blocks(stringValue(content, 'body', site.skills_content || '')).map((group) => {
+            const [name = '', ...items] = lines(group);
+            return { name, technologies: items.map((item) => ({ name: item.replace(/\s*[-:]\s*\d{1,3}%?$/, '').replace(/\s+\(\d{1,3}%\)$/, '').trim(), iconUrl: null })) };
+        });
+        const skillGroups = structuredSkillGroups.length ? structuredSkillGroups : legacySkillGroups;
 
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion}>
-                <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="portfolio-skill-groups">
                     {skillGroups.map((group) => {
-                        const items = lines(group);
-                        if (items.length === 1) {
-                            return <p key={group} className="col-span-full border-t border-border pt-3 text-xs leading-5 text-muted-foreground">{items[0]}</p>;
-                        }
-
                         return (
-                            <div key={group} className="border-t border-border pt-3">
-                                <h3 className="mb-4 text-sm font-semibold">{items[0]}</h3>
-                                <ul className="flex flex-wrap gap-2">
-                                    {items.slice(1).map(parseSkill).filter(Boolean).map((skill) => (
-                                        <li key={skill} className="rounded-md border border-border/80 bg-background/35 px-2.5 py-1.5 text-xs font-medium text-foreground/90">
-                                            {skill}
+                            <section key={group.name} className="portfolio-skill-group">
+                                <h3>{group.name}</h3>
+                                <ul>
+                                    {group.technologies.filter((technology) => technology.name).map((technology) => (
+                                        <li key={technology.name} className="portfolio-skill-chip">
+                                            <TechnologyBrandIcon name={technology.name} iconUrl={technology.iconUrl} className="portfolio-skill-icon" />
+                                            <span>{technology.name}</span>
                                         </li>
                                     ))}
                                 </ul>
-                            </div>
+                            </section>
                         );
                     })}
                 </div>
@@ -241,7 +282,7 @@ export function PortfolioSectionRenderer({ section, site, certificates, projects
 
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion}>
-                <ol className="max-w-3xl space-y-0">
+                <ol className="portfolio-copy-card portfolio-experience-timeline max-w-3xl space-y-0">
                     {experienceItems.map((item, index) => {
                         const isRole = /\b(?:trainee|engineer|developer|intern)\b/i.test(item);
 
@@ -261,48 +302,46 @@ export function PortfolioSectionRenderer({ section, site, certificates, projects
         const configuredProjects = blocks(stringValue(content, 'body', site.projects_content || ''));
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion}>
-                <div className="min-w-0">
+                <div className="portfolio-projects-content min-w-0">
                     {configuredProjects.length ? (
-                        <>
+                        <section aria-label="Featured projects">
                             <h3 className="eyebrow mb-3">Featured projects</h3>
-                            <div className="divide-y divide-border/80 border-y border-border/80">
+                            <div className="portfolio-project-grid portfolio-project-grid--featured">
                                 {configuredProjects.map((project) => {
                                     const [projectTitle, ...details] = project.split('\n');
 
                                     return (
-                                        <article key={project} className="py-4 sm:py-5">
-                                            <h4 className="font-semibold text-foreground">{projectTitle}</h4>
-                                            {details.length ? <LinkifiedText value={details.join('\n')} className="mt-2 block whitespace-pre-line text-sm leading-7 text-muted-foreground" /> : null}
+                                        <article key={project} className="portfolio-project-card">
+                                            <h4>{projectTitle}</h4>
+                                            {details.length ? <LinkifiedText value={details.join('\n')} className="portfolio-project-description" /> : null}
                                         </article>
                                     );
                                 })}
                             </div>
-                        </>
+                        </section>
                     ) : null}
                     {projects.length ? (
-                        <div className="mt-7">
+                        <section className="portfolio-github-projects">
                             {configuredProjects.length ? <h3 className="eyebrow mb-3">Public GitHub repositories</h3> : null}
-                            <div className="divide-y divide-border/80 border-y border-border/80">
+                            <div className="portfolio-project-grid portfolio-project-grid--github">
                             {projects.map((project) => (
-                                <article key={project.id} className="grid gap-2 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start sm:gap-4">
-                                    <div className="min-w-0">
-                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                            <h3 className="font-semibold">{project.name}</h3>
-                                            {project.language ? <span className="font-mono text-[11px] text-muted-foreground">{project.language}</span> : null}
-                                        </div>
-                                        {project.description ? <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{project.description}</p> : null}
-                                        {project.topics.length ? <ul className="mt-3 flex flex-wrap gap-x-3 gap-y-1">{project.topics.slice(0, 4).map((topic) => <li key={topic} className="font-mono text-[10px] text-muted-foreground">{topic}</li>)}</ul> : null}
+                                <article key={project.id} className="portfolio-project-card portfolio-github-card">
+                                    <div className="portfolio-project-card-heading">
+                                        <h3>{project.name}</h3>
+                                        {project.language ? <span>{project.language}</span> : null}
                                     </div>
-                                    <div className="flex items-center gap-4 pl-10 text-xs text-muted-foreground sm:pl-0">
-                                        <span className="inline-flex items-center gap-1"><Star className="size-3" />{project.stargazers_count}</span>
-                                        <a href={project.homepage || project.html_url} target="_blank" rel="noreferrer" aria-label={`Open ${project.name}`} className="inline-flex items-center gap-1 text-foreground transition-colors hover:text-primary">Open<ArrowUpRight className="size-3.5" /></a>
-                                    </div>
+                                    <p className="portfolio-project-description">{project.description || 'Public repository on GitHub.'}</p>
+                                    {project.topics.length ? <ul className="portfolio-project-topics">{project.topics.slice(0, 5).map((topic) => <li key={topic}>{topic}</li>)}</ul> : null}
+                                    <footer>
+                                        <span className="portfolio-project-stars"><Star className="size-3.5" aria-hidden="true" />{project.stargazers_count}</span>
+                                        <a href={project.homepage || project.html_url} target="_blank" rel="noreferrer" aria-label={`Open ${project.name}`} className="portfolio-project-open">View project<ArrowUpRight className="size-3.5" /></a>
+                                    </footer>
                                 </article>
                             ))}
                             </div>
-                        </div>
+                        </section>
                     ) : null}
-                    {profileUrl ? <a href={profileUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">All repositories<ExternalLink className="size-3.5" /></a> : null}
+                    {profileUrl ? <a href={profileUrl} target="_blank" rel="noreferrer" className="portfolio-all-repositories">All repositories<ExternalLink className="size-3.5" /></a> : null}
                 </div>
             </SectionFrame>
         );
@@ -312,16 +351,16 @@ export function PortfolioSectionRenderer({ section, site, certificates, projects
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion}>
                 {certificates.length ? (
-                    <div className="divide-y divide-border/80 border-y border-border/80">
+                    <div className="portfolio-certificate-grid">
                         {certificates.map((certificate) => (
-                            <article key={certificate.id} className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 py-4 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:gap-4">
+                            <article key={certificate.id} className="portfolio-project-card portfolio-certificate-card">
                                 <CertificateMedia certificate={certificate} />
                                 <div className="min-w-0">
                                     <h3 className="text-sm font-semibold">{certificate.title}</h3>
                                     <p className="mt-1 text-xs text-muted-foreground">{certificate.issuer}{certificate.issued_at ? ` · ${certificate.issued_at}` : ''}</p>
                                     {certificate.description ? <LinkifiedText value={certificate.description} className="mt-2 block text-xs leading-5 text-muted-foreground" /> : null}
                                 </div>
-                                <div className="col-start-3 flex flex-wrap gap-3 text-xs sm:col-start-auto">
+                                <div className="portfolio-certificate-actions flex flex-wrap gap-3 text-xs">
                                     {certificate.media?.url ? <a href={certificate.media.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">View file<ArrowUpRight className="size-3" /></a> : null}
                                     {certificate.credential_url ? <a href={certificate.credential_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground">Credential<ArrowUpRight className="size-3" /></a> : null}
                                 </div>
@@ -336,7 +375,7 @@ export function PortfolioSectionRenderer({ section, site, certificates, projects
     if (section.type === 'contact') {
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion}>
-                <div className="max-w-3xl">
+                <div className="portfolio-copy-card max-w-3xl">
                     {stringValue(content, 'body', site.contact_content || '') ? <p className="max-w-2xl text-base leading-7 text-muted-foreground">{stringValue(content, 'body', site.contact_content || '')}</p> : null}
                     <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm">
                         {site.email ? <a href={`mailto:${site.email}`} className="inline-flex items-center gap-2 transition-colors hover:text-primary"><Mail className="size-4" aria-hidden="true" />{site.email}</a> : null}
@@ -351,7 +390,9 @@ export function PortfolioSectionRenderer({ section, site, certificates, projects
 
     return (
         <SectionFrame section={section} reduceMotion={reduceMotion}>
-            <LinkifiedText value={stringValue(content, 'body')} className="block max-w-3xl whitespace-pre-line text-sm leading-7 text-muted-foreground" />
+            <div className="portfolio-copy-card">
+                <LinkifiedText value={stringValue(content, 'body')} className="block max-w-3xl whitespace-pre-line text-sm leading-7 text-muted-foreground" />
+            </div>
         </SectionFrame>
     );
 }

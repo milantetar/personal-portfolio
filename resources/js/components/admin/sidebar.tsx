@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
     Activity, Award, ChevronLeft, ChevronRight, FolderOpen, Gauge,
-    LayoutTemplate, MoreVertical, PanelLeft, Pencil, Plus, Settings2, Trash2,
+    LayoutTemplate, Menu, MoreVertical, PanelLeft, Pencil, Plus, Settings2, Trash2,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ interface NavigationGroup {
 
 const corePaths = new Set([
     '/dashboard', '/dashboard/', '/dashboard/analytics', '/dashboard/sections',
-    '/dashboard/certificates', '/dashboard/media', '/dashboard/settings',
+    '/dashboard/certificates', '/dashboard/media', '/dashboard/settings', '/dashboard/navigation',
 ]);
 
 function normalizePath(path: string): string {
@@ -81,7 +81,10 @@ export function Sidebar({ items }: SidebarProps) {
         },
         {
             label: 'Configuration',
-            entries: [{ label: 'Site settings', href: '/dashboard/settings', icon: Settings2 }],
+            entries: [
+                { label: 'Site settings', href: '/dashboard/settings', icon: Settings2 },
+                { label: 'Navigation', href: '/dashboard/navigation', icon: Menu },
+            ],
         },
         ...(customItems.length ? [{
             label: 'Navigation links',
@@ -135,7 +138,7 @@ export function Sidebar({ items }: SidebarProps) {
                                         active && 'bg-accent text-foreground',
                                         isCollapsed ? 'md:justify-center' : 'md:justify-between',
                                     )}>
-                                        <Link href={href} title={isCollapsed ? label : undefined} aria-current={active ? 'page' : undefined} className={cn('flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-2.5 py-2 text-xs font-medium', isCollapsed && 'md:justify-center md:px-0')}>
+                                        <Link href={href} prefetch="hover" title={isCollapsed ? label : undefined} aria-current={active ? 'page' : undefined} className={cn('flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-2.5 py-2 text-xs font-medium transition-[color,background-color,transform] duration-150 hover:translate-x-0.5 motion-reduce:transform-none', isCollapsed && 'md:justify-center md:px-0')}>
                                             {item?.icon_media?.url ? (
                                                 <img src={item.icon_media.url} alt="" className="size-4 shrink-0 object-contain" />
                                             ) : <Icon className="size-4 shrink-0" aria-hidden="true" />}

@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\Dashboard\SiteSettingsController;
 use App\Http\Controllers\Web\Dashboard\CertificateController;
 use App\Http\Controllers\Web\Dashboard\PortfolioSectionController;
 use App\Http\Controllers\Web\Dashboard\AnalyticsController;
+use App\Http\Controllers\Web\Dashboard\NavigationController;
 use App\Http\Middleware\TrackPortfolioVisit;
 
 // 1. PUBLIC ROUTE (Anyone can view your portfolio)
@@ -22,6 +23,7 @@ Route::post('/contact', [ContactController::class, 'store'])->middleware('thrott
 Route::post('/portfolio-assistant', [PortfolioAssistantController::class, 'store'])
     ->middleware('throttle:portfolio-assistant')
     ->name('portfolio-assistant.store');
+Route::get('/assistant', [HomeController::class, 'section'])->defaults('slug', 'assistant')->middleware(TrackPortfolioVisit::class)->name('portfolio.assistant');
 
 // 2. GUEST ROUTES (Only for visitors who are NOT logged in)
 Route::middleware('guest')->group(function (): void {
@@ -40,6 +42,13 @@ Route::middleware('auth')->group(function (): void {
 
         Route::get('/settings', [SiteSettingsController::class, 'index'])->name('site-settings.index');
         Route::put('/settings', [SiteSettingsController::class, 'update'])->name('site-settings.update');
+
+        Route::get('/navigation', [NavigationController::class, 'index'])->name('navigation.index');
+        Route::post('/navigation/items', [NavigationController::class, 'store'])->name('navigation.items.store');
+        Route::put('/navigation/{navbar}/brand', [NavigationController::class, 'updateBrand'])->name('navigation.brand.update');
+        Route::put('/navigation/reorder', [NavigationController::class, 'reorder'])->name('navigation.reorder');
+        Route::put('/navigation/items/{navbarItem}', [NavigationController::class, 'update'])->name('navigation.items.update');
+        Route::delete('/navigation/items/{navbarItem}', [NavigationController::class, 'destroy'])->name('navigation.items.destroy');
 
         Route::post('/certificates/bulk-store', [CertificateController::class, 'bulkStore'])
             ->name('certificates.bulk-store');
@@ -82,3 +91,8 @@ Route::middleware('auth')->group(function (): void {
     });
     Route::post('logout', [AuthController::class, 'destroy'])->name('logout');
 });
+
+Route::get('/{slug}', [HomeController::class, 'section'])
+    ->where('slug', '[a-z0-9-]+')
+    ->middleware(TrackPortfolioVisit::class)
+    ->name('portfolio.section');

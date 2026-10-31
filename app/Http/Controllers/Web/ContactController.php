@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreContactMessageRequest;
+use App\Models\ContactMessage;
 use App\Models\SiteSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Mail\Message;
@@ -24,34 +25,42 @@ class ContactController extends Controller
             return back()->with('success', 'Thanks for reaching out. Your message has been sent.');
         }
 
-        $recipient = SiteSetting::query()->value('email');
-
-        if (! is_string($recipient) || $recipient === '') {
-            return back()->with('error', 'The site owner has not configured a contact email yet.');
-        }
-
-        $body = implode("\n\n", [
-            'From: ' . $data['name'],
-            'Reply email: ' . $data['email'],
-            'Subject: ' . $data['subject'],
-            'Message:',
-            $data['message'],
+        // Persist message to database so it is never lost
+        $contactMessage = ContactMessage::query()->create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'subject' => $data['subject'],
+            'message' => $data['message'],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'is_read' => false,
         ]);
 
-        try {
-            Mail::raw($body, function (Message $mail) use ($data, $recipient): void {
-                $mail->to($recipient)
-                    ->replyTo($data['email'], $data['name'])
-                    ->subject('Portfolio enquiry: ' . $data['subject']);
-            });
-        } catch (Throwable $exception) {
-            Log::error('Portfolio contact email could not be sent.', [
-                'exception' => $exception->getMessage(),
+        $recipient = SiteSetting::query()->value('email');
+
+        if (is_string($recipient) && $recipient !== '') {
+            $body = implode("\n\n", [
+                'From: ' . $data['name'],
+                'Reply email: ' . $data['email'],
+                'Subject: ' . $data['subject'],
+                'Message:',
+                $data['message'],
             ]);
 
-            return back()->with('error', 'We could not send your message right now. Please try again or use the email link.');
+            try {
+                Mail::raw($body, function (Message $mail) use ($data, $recipient): void {
+                    $mail->to($recipient)
+                        ->replyTo($data['email'], $data['name'])
+                        ->subject('Portfolio enquiry: ' . $data['subject']);
+                });
+            } catch (Throwable $exception) {
+                Log::warning('Portfolio contact email notification could not be sent, but message was saved.', [
+                    'message_id' => $contactMessage->id,
+                    'exception' => $exception->getMessage(),
+                ]);
+            }
         }
 
-        return back()->with('success', 'Thanks for reaching out. Your message has been sent.');
+        return back()->with('success', 'Thanks for reaching out. Your message has been received.');
     }
 }

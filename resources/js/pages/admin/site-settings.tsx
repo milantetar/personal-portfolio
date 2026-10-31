@@ -65,7 +65,7 @@ export default function SiteSettingsPage() {
                 backgroundUrl={branding?.backgroundImage?.url || settings.background_media?.url}
                 branding={branding}
             >
-                <div className="space-y-6">
+                <div className="admin-page admin-site-settings-page mx-auto w-full max-w-7xl space-y-6">
                     <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex items-start gap-3">
                             <div className="rounded-lg bg-primary/15 p-2 text-primary"><Settings2 className="size-5" /></div>
@@ -80,18 +80,22 @@ export default function SiteSettingsPage() {
                         </Link>
                     </header>
 
-                    <nav aria-label="Site settings sections" className="sticky top-0 z-20 flex gap-1 overflow-x-auto rounded-md border border-border bg-card p-1.5 shadow-sm">
-                        {sectionLinks.map(([id, label]) => <a key={id} href={'#' + id} className="shrink-0 rounded-sm px-3 py-2 text-xs font-medium text-muted-foreground transition hover:bg-accent hover:text-foreground">{label}</a>)}
-                    </nav>
+                    <div className="admin-settings-layout">
+                        <nav aria-label="Site settings sections" className="admin-settings-nav">
+                            <p className="eyebrow px-3 pb-2">Settings</p>
+                            {sectionLinks.map(([id, label], index) => <a key={id} href={'#' + id} className="admin-settings-nav-link"><span className="font-mono text-[11px] text-muted-foreground">{String(index + 1).padStart(2, '0')}</span>{label}</a>)}
+                            <p className="mt-4 border-t border-border px-3 pt-4 text-xs leading-5 text-muted-foreground">Use these controls for site-wide settings. Edit the content and order of homepage sections separately.</p>
+                        </nav>
 
-                    <form onSubmit={submit} className="space-y-6">
-                        <section id="identity" className="scroll-mt-24 rounded-lg border border-border bg-card p-5 shadow-sm backdrop-blur-none md:p-6">
+                        <div className="min-w-0">
+                    <form onSubmit={submit} className="admin-settings-form space-y-5">
+                        <section id="identity" className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6">
                             <h2 className="text-lg font-semibold">Identity</h2>
                             <p className="mb-5 text-sm text-muted-foreground">This appears in the browser, navbar, and portfolio branding.</p>
                             <div className="space-y-2"><Label htmlFor="site_name">Site name</Label><Input id="site_name" value={data.site_name} onChange={(event) => update('site_name', event.target.value)} /><FieldError message={errors.site_name} /></div>
                         </section>
 
-                        <section id="media-icon" className="scroll-mt-24 rounded-lg border border-border bg-card p-5 shadow-sm backdrop-blur-none md:p-6">
+                        <section id="media-icon" className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6">
                             <h2 className="text-lg font-semibold">Settings menu icon</h2>
                             <p className="mb-5 text-sm text-muted-foreground">Choose the icon displayed beside Site Settings in the admin sidebar.</p>
                             <div className="grid grid-cols-4 gap-3 sm:grid-cols-6 md:grid-cols-8">
@@ -105,7 +109,7 @@ export default function SiteSettingsPage() {
                             <FieldError message={errors.settings_icon_media_id} />
                         </section>
 
-                        <section id="contact" className="scroll-mt-24 rounded-lg border border-border bg-card p-5 shadow-sm backdrop-blur-none md:p-6">
+                        <section id="contact" className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6">
                             <h2 className="text-lg font-semibold">Contact and social</h2>
                             <p className="mb-5 text-sm text-muted-foreground">These details are used by the public contact section. Empty fields remain hidden.</p>
                             <div className="grid gap-4 md:grid-cols-3">
@@ -116,7 +120,7 @@ export default function SiteSettingsPage() {
                             <label className="mt-5 flex cursor-pointer items-center gap-3 text-sm"><input type="checkbox" checked={data.is_available} onChange={(event) => update('is_available', event.target.checked)} className="size-4 accent-primary" /> Available for new opportunities</label>
                         </section>
 
-                        <section id="appearance" className="scroll-mt-24 rounded-lg border border-border bg-card p-5 shadow-sm backdrop-blur-none md:p-6">
+                        <section id="appearance" className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6">
                             <h2 className="text-lg font-semibold">Appearance</h2>
                             <p className="mb-5 text-sm text-muted-foreground">Control the visual language used by the dashboard shell.</p>
                             <div className="grid gap-4 md:grid-cols-3">
@@ -126,14 +130,16 @@ export default function SiteSettingsPage() {
                             </div>
                         </section>
 
-                        <section id="media-slots" className="scroll-mt-24 rounded-lg border border-border bg-card p-5 shadow-sm backdrop-blur-none md:p-6">
+                        <section id="media-slots" className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6">
                             <div className="flex items-start gap-3"><Image className="mt-0.5 size-5 text-primary" /><div><h2 className="text-lg font-semibold">Media slots</h2><p className="text-sm text-muted-foreground">Logo, backdrop, avatar, and resume are assigned from Media Library.</p></div></div>
                             <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{(['logo_media', 'background_media', 'avatar_media', 'resume_media'] as const).map((slot) => { const media = settings[slot]; return <div key={slot} className="overflow-hidden rounded-lg border bg-muted/30"><div className="flex h-28 items-center justify-center bg-background">{media?.url ? <img src={media.url} alt={media.alt_text || slot} className="h-full w-full object-contain p-3" /> : <Image className="size-8 text-muted-foreground" />}</div><p className="border-t px-3 py-2 text-xs font-medium capitalize">{slot.replace('_media', '').replace('background', 'backdrop').replace('resume', 'CV')}</p></div>; })}</div>
                             <p className="mt-4 text-xs text-muted-foreground">Use Media Library to assign or replace these files. The active resume is downloadable from the homepage.</p>
                         </section>
 
-                        <div className="flex justify-end"><Button type="submit" size="lg" disabled={processing}><Save className="size-4" />{processing ? 'Saving...' : 'Save site settings'}</Button></div>
+                        <div className="admin-settings-save flex justify-end"><Button type="submit" size="lg" disabled={processing}><Save className="size-4" />{processing ? 'Saving...' : 'Save site settings'}</Button></div>
                     </form>
+                        </div>
+                    </div>
                 </div>
             </AdminLayout>
         </>

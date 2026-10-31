@@ -4,33 +4,14 @@ import { Activity, ArrowRight, ArrowUpRight, Award, FolderOpen, LayoutTemplate, 
 import { AdminLayout } from '@/components/admin/admin-layout';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import type { PageProps } from '@/types';
 
-const groups = [
-    {
-        title: 'Workspace',
-        description: 'Understand site activity and move into the areas you use most.',
-        items: [
-            { title: 'Traffic analytics', description: 'Review visits, sessions, popular pages, and referral sources.', href: '/dashboard/analytics', icon: Activity, action: 'Open analytics' },
-        ],
-    },
-    {
-        title: 'Portfolio content',
-        description: 'Shape what visitors see and how the portfolio is organized.',
-        items: [
-            { title: 'Homepage sections', description: 'Edit section order, visibility, and page content.', href: '/dashboard/sections', icon: LayoutTemplate, action: 'Manage sections' },
-            { title: 'Certificates', description: 'Maintain certificates and achievements shown on the site.', href: '/dashboard/certificates', icon: Award, action: 'Manage certificates' },
-        ],
-    },
-    {
-        title: 'Assets & configuration',
-        description: 'Manage reusable files and the global portfolio identity.',
-        items: [
-            { title: 'Media library', description: 'Upload and manage images, documents, and portfolio assets.', href: '/dashboard/media', icon: FolderOpen, action: 'Browse media' },
-            { title: 'Site settings', description: 'Update branding, contact details, theme, and social links.', href: '/dashboard/settings', icon: Settings2, action: 'Edit settings' },
-        ],
-    },
+const destinations = [
+    { title: 'Homepage sections', description: 'Edit content, visibility, and the order visitors see.', href: '/dashboard/sections', icon: LayoutTemplate, group: 'Content' },
+    { title: 'Certificates', description: 'Import files, update details, and manage what is published.', href: '/dashboard/certificates', icon: Award, group: 'Content' },
+    { title: 'Media library', description: 'Upload files and assign your logo, backdrop, or resume.', href: '/dashboard/media', icon: FolderOpen, group: 'Assets' },
+    { title: 'Site settings', description: 'Edit site identity, contact links, appearance, and media slots.', href: '/dashboard/settings', icon: Settings2, group: 'Configuration' },
+    { title: 'Traffic analytics', description: 'Review privacy focused visits and the pages people open.', href: '/dashboard/analytics', icon: Activity, group: 'Insights' },
 ];
 
 export default function Dashboard() {
@@ -38,42 +19,48 @@ export default function Dashboard() {
 
     return (
         <>
-            <Head title="Overview" />
+            <Head title="Workspace" />
             <AdminLayout sidebarItems={sidebarItems} backgroundUrl={branding?.backgroundImage?.url || backgroundImage?.url} branding={branding}>
-                <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
+                <div className="admin-page admin-overview mx-auto flex w-full max-w-7xl flex-col gap-7">
                     <AdminPageHeader
                         icon={<LayoutTemplate className="size-4" />}
-                        title="Overview"
-                        description="A clear starting point for managing your portfolio and monitoring its public presence."
-                        actions={<Button size="sm" variant="outline" asChild><Link href="/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2">View live site <ArrowUpRight className="size-3.5" /></Link></Button>}
+                        title="Workspace"
+                        description="Manage your public portfolio, its assets, and the details visitors see."
+                        actions={<Button size="sm" asChild><Link href="/" target="_blank" rel="noreferrer">View portfolio <ArrowUpRight className="size-3.5" /></Link></Button>}
                     />
 
-                    {groups.map((group) => (
-                        <section key={group.title} className="space-y-3">
-                            <div className="flex flex-col gap-1 border-b border-border/70 pb-3 sm:flex-row sm:items-end sm:justify-between">
-                                <h2 className="text-sm font-semibold tracking-tight">{group.title}</h2>
-                                <p className="text-xs text-muted-foreground">{group.description}</p>
-                            </div>
-                            <div className="dashboard-link-grid gap-3">
-                                {group.items.map(({ title, description, href, icon: Icon, action }) => (
-                                    <Link key={href} href={href} className="group rounded-lg focus-visible:outline-none">
-                                        <Card className="h-full border-border/80 bg-card/90 transition-colors group-hover:border-primary/40 group-hover:bg-accent/30 group-focus-visible:ring-2 group-focus-visible:ring-ring">
-                                            <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-3">
-                                                <div className="space-y-1.5">
-                                                    <CardTitle className="text-sm font-semibold">{title}</CardTitle>
-                                                    <CardDescription className="max-w-lg text-xs leading-5">{description}</CardDescription>
-                                                </div>
-                                                <span className="flex size-9 shrink-0 items-center justify-center border border-border bg-background text-muted-foreground transition-colors group-hover:text-primary"><Icon className="size-4" /></span>
-                                            </CardHeader>
-                                            <CardContent className="flex items-center gap-1 text-xs font-medium text-primary">
-                                                {action}<ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-                                            </CardContent>
-                                        </Card>
-                                    </Link>
-                                ))}
-                            </div>
-                        </section>
-                    ))}
+                    <section className="admin-overview-intro" aria-labelledby="overview-intro-title">
+                        <div>
+                            <p className="eyebrow">Your portfolio workspace</p>
+                            <h2 id="overview-intro-title">What would you like to update?</h2>
+                            <p>Choose an area to work on. Changes to published content appear on the public portfolio.</p>
+                        </div>
+                        <Link href="/dashboard/sections" className="admin-overview-primary-link">
+                            <span className="admin-overview-primary-icon"><LayoutTemplate className="size-5" aria-hidden="true" /></span>
+                            <span><strong>Continue with homepage content</strong><small>Review sections and publishing order</small></span>
+                            <ArrowRight className="ml-auto size-4" aria-hidden="true" />
+                        </Link>
+                    </section>
+
+                    <section aria-labelledby="manage-heading" className="space-y-3">
+                        <div className="admin-section-heading">
+                            <div><h2 id="manage-heading">Manage</h2><p>All backoffice areas</p></div>
+                            <span className="font-mono text-xs text-muted-foreground">{destinations.length} destinations</span>
+                        </div>
+                        <div className="admin-destination-grid">
+                            {destinations.map(({ title, description, href, icon: Icon, group }) => (
+                                <Link key={href} href={href} className="admin-destination group">
+                                    <span className="admin-destination-icon"><Icon className="size-4" aria-hidden="true" /></span>
+                                    <span className="min-w-0 flex-1">
+                                        <span className="admin-destination-meta">{group}</span>
+                                        <strong>{title}</strong>
+                                        <small>{description}</small>
+                                    </span>
+                                    <ArrowRight className="admin-destination-arrow size-4" aria-hidden="true" />
+                                </Link>
+                            ))}
+                        </div>
+                    </section>
                 </div>
             </AdminLayout>
         </>

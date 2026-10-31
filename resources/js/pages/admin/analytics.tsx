@@ -126,7 +126,7 @@ export default function AnalyticsPage() {
         <>
             <Head title="Traffic analytics" />
             <AdminLayout sidebarItems={sidebarItems} backgroundUrl={branding?.backgroundImage?.url || backgroundImage?.url} branding={branding}>
-                <div className="mx-auto flex w-full max-w-7xl flex-col gap-5">
+                <div className="admin-page admin-analytics-page mx-auto flex w-full max-w-7xl flex-col gap-5">
                     <AdminPageHeader
                         icon={<Activity className="size-4" />}
                         title="Traffic analytics"

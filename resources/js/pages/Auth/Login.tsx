@@ -22,8 +22,8 @@ export default function Login() {
         <>
             <Head title="Log in" />
 
-            <div className="flex min-h-dvh flex-col bg-background text-foreground">
-                <Navbar />
+            <div className="auth-page flex min-h-dvh flex-col bg-background text-foreground">
+                <Navbar showNavigationLinks={false} />
 
                 <main className="flex flex-1 items-center justify-center px-4 py-12">
                     <div className="w-full max-w-sm border border-border bg-card p-6 sm:p-8">
