@@ -1,21 +1,23 @@
 <?php
 
+use App\Http\Middleware\EnsureAdminRole;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\SecurityHeaders;
+use App\Models\AnalyticsVisit;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Console\Scheduling\Schedule;
-use App\Models\AnalyticsVisit;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -31,7 +33,13 @@ return Application::configure(basePath: dirname(__DIR__))
         // Configure middleware here if needed
 
         $middleware->web([
-            HandleInertiaRequests::class
+            HandleInertiaRequests::class,
+        ]);
+
+        $middleware->append(SecurityHeaders::class);
+
+        $middleware->alias([
+            'admin' => EnsureAdminRole::class,
         ]);
 
     })
@@ -90,9 +98,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // 5. Route / Not Found Http Exception
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {
             if ($request->expectsJson()) {
-                if ($e->getPrevious() instanceof ModelNotFoundException) {
-                    /** @var ModelNotFoundException $previous */
-                    $previous = $e->getPrevious();
+                $previous = $e->getPrevious();
+
+                if ($previous instanceof ModelNotFoundException) {
                     $model = class_basename($previous->getModel());
 
                     return response()->json([

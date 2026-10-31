@@ -12,7 +12,3 @@ export interface NavbarType {
     brand_title?: string | null;
     items: NavbarItem[];
 }
-
-import type { BackgroundImage } from '../media';
-import type { User } from '../auth';
-

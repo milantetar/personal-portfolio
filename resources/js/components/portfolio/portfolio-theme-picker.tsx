@@ -17,13 +17,28 @@ interface PortfolioThemePickerProps {
 }
 
 const themes: { value: PortfolioTheme; label: string; swatch: string }[] = [
-    { value: 'midnight', label: 'Graphite', swatch: 'var(--portfolio-theme-midnight)' },
-    { value: 'forest', label: 'Forest', swatch: 'var(--portfolio-theme-forest)' },
+    {
+        value: 'midnight',
+        label: 'Graphite',
+        swatch: 'var(--portfolio-theme-midnight)',
+    },
+    {
+        value: 'forest',
+        label: 'Forest',
+        swatch: 'var(--portfolio-theme-forest)',
+    },
     { value: 'ocean', label: 'Ocean', swatch: 'var(--portfolio-theme-ocean)' },
-    { value: 'instagram', label: 'Warm slate', swatch: 'var(--portfolio-theme-warm)' },
+    {
+        value: 'instagram',
+        label: 'Warm slate',
+        swatch: 'var(--portfolio-theme-warm)',
+    },
 ];
 
-export function PortfolioThemePicker({ value, onChange }: PortfolioThemePickerProps) {
+export function PortfolioThemePicker({
+    value,
+    onChange,
+}: PortfolioThemePickerProps) {
     const [open, setOpen] = useState(false);
 
     return (
@@ -42,8 +57,14 @@ export function PortfolioThemePicker({ value, onChange }: PortfolioThemePickerPr
                     </Button>
                 }
             />
-            <DropdownMenuContent align="end" sideOffset={8} className="w-48 border-border bg-popover p-1 text-popover-foreground">
-                <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Portfolio theme</p>
+            <DropdownMenuContent
+                align="end"
+                sideOffset={8}
+                className="w-48 border-border bg-popover p-1 text-popover-foreground"
+            >
+                <p className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                    Portfolio theme
+                </p>
                 {themes.map((theme) => (
                     <DropdownMenuItem
                         key={theme.value}
@@ -51,12 +72,23 @@ export function PortfolioThemePicker({ value, onChange }: PortfolioThemePickerPr
                             onChange(theme.value);
                             setOpen(false);
                         }}
-                        aria-current={value === theme.value ? 'true' : undefined}
+                        aria-current={
+                            value === theme.value ? 'true' : undefined
+                        }
                         className="min-h-10 cursor-pointer gap-2 focus:bg-accent focus:text-accent-foreground"
                     >
-                        <span className="size-3 rounded-full border border-foreground/20" style={{ backgroundColor: theme.swatch }} aria-hidden="true" />
+                        <span
+                            className="size-3 rounded-full border border-foreground/20"
+                            style={{ backgroundColor: theme.swatch }}
+                            aria-hidden="true"
+                        />
                         <span>{theme.label}</span>
-                        {value === theme.value ? <Check className="ml-auto size-4" aria-hidden="true" /> : null}
+                        {value === theme.value ? (
+                            <Check
+                                className="ml-auto size-4"
+                                aria-hidden="true"
+                            />
+                        ) : null}
                     </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>

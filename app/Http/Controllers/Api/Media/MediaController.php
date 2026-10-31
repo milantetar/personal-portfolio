@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Api\Media;
 
-use App\Http\Controllers\Controller;
-use App\Services\Media\MediaService;
 use App\Data\Media\MediaData;
 use App\Data\Media\MediaUpdateData;
-use App\Repositories\Media\MediaRepository;
-use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\Media\MediaResource;
 use App\Models\Media;
+use App\Repositories\Media\MediaRepository;
+use App\Services\Media\MediaService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class MediaController extends Controller
@@ -18,8 +18,7 @@ class MediaController extends Controller
     public function __construct(
         protected MediaService $mediaService,
         protected MediaRepository $mediaRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -32,10 +31,11 @@ class MediaController extends Controller
 
             if ($mediaFiles->isEmpty()) {
                 Log::warning('API media list is empty.');
+
                 return $this->notFoundResponse('No media files found.');
             }
 
-            Log::info('API media retrieved.', ['count' => $mediaFiles->count()]);
+            Log::info('API media retrieved.', ['count' => $mediaFiles->total()]);
 
             return $this->successResponse(
                 message: 'Media files retrieved successfully',
@@ -78,10 +78,11 @@ class MediaController extends Controller
         Log::info('API media lookup started.', ['media_id' => $id]);
         try {
 
-            $media = $this->mediaRepository->getMediaById($id);
+            $media = $this->mediaRepository->getMediaById((int) $id);
 
-            if (!$media instanceof \App\Models\Media) {
+            if (! $media instanceof Media) {
                 Log::warning('API media not found.', ['media_id' => $id]);
+
                 return $this->notFoundResponse('Media file not found.');
             }
 
@@ -109,6 +110,7 @@ class MediaController extends Controller
 
             if (! $media) {
                 Log::warning('API media update target not found.', ['media_id' => $id]);
+
                 return $this->notFoundResponse('Media file not found.');
             }
 
@@ -138,6 +140,7 @@ class MediaController extends Controller
 
             if (! $media) {
                 Log::warning('API media deletion target not found.', ['media_id' => $id]);
+
                 return $this->notFoundResponse('Media file not found.');
             }
 

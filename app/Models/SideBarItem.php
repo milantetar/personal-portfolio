@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class SidebarItem extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory;
 
     protected function casts(): array
@@ -40,6 +42,9 @@ class SidebarItem extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<Media, $this>
+     */
     public function iconMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'icon_media_id');

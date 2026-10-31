@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web\Dashboard;
 
+use App\Data\Media\MediaData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CertificateRequest;
 use App\Models\Certificate;
@@ -11,11 +12,11 @@ use App\Models\Media;
 use App\Models\SidebarItem;
 use App\Repositories\Dashboard\SidebarItemRepository;
 use App\Services\Media\MediaService;
-use App\Data\Media\MediaData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Inertia\Response;
 
 class CertificateController extends Controller
 {
@@ -24,7 +25,7 @@ class CertificateController extends Controller
         protected MediaService $mediaService,
     ) {}
 
-    public function index()
+    public function index(): Response
     {
         $certificateSidebarItem = SidebarItem::query()->firstOrCreate(
             ['url' => '/dashboard/certificates'],

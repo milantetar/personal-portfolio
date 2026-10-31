@@ -27,6 +27,7 @@ class SiteSettingsUpdateRequest extends FormRequest
             'glass_opacity' => ['required', 'string', 'in:25,50,75,90'],
             'settings_icon_media_id' => ['nullable', 'integer', 'exists:media,id'],
             'resume_media_id' => ['nullable', 'integer', 'exists:media,id'],
+            'favicon_media_id' => ['nullable', 'integer', 'exists:media,id'],
         ];
     }
 }

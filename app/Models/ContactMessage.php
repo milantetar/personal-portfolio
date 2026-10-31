@@ -7,6 +7,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,6 +36,7 @@ use Illuminate\Database\Eloquent\Model;
 ])]
 class ContactMessage extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory;
 
     protected function casts(): array
@@ -45,6 +47,10 @@ class ContactMessage extends Model
         ];
     }
 
+    /**
+     * @param  Builder<ContactMessage>  $query
+     * @return Builder<ContactMessage>
+     */
     public function scopeUnread(Builder $query): Builder
     {
         return $query->where('is_read', false);

@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
-import { Trash2, Image as ImageIcon, UploadCloud, LoaderCircle } from 'lucide-react';
+import {
+    Trash2,
+    Image as ImageIcon,
+    UploadCloud,
+    LoaderCircle,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +18,7 @@ interface MediaItem {
     size: number;
 }
 
-export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
+export function MediaGrid({ items }: { items: MediaItem[] }) {
     const [isUploading, setIsUploading] = useState(false);
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,12 +30,14 @@ export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
         formData.append('file', file);
 
         try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content');
             const response = await fetch('/dashboard/media', {
                 method: 'POST',
-                headers: { 
-                    'X-CSRF-TOKEN': csrfToken || '', 
-                    'Accept': 'application/json' 
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken || '',
+                    Accept: 'application/json',
                 },
                 body: formData,
             });
@@ -51,7 +58,8 @@ export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
     };
 
     const handleDelete = (id: number) => {
-        if (!confirm('Are you sure you want to permanently delete this file?')) return;
+        if (!confirm('Are you sure you want to permanently delete this file?'))
+            return;
         router.delete(`/dashboard/media/${id}`, {
             preserveScroll: true,
         });
@@ -61,22 +69,26 @@ export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
         <div className="space-y-6">
             {/* Upload Area */}
             <div className="flex justify-end">
-                 <Input
+                <Input
                     type="file"
                     id="library-upload"
                     className="peer sr-only"
-                    accept="image/svg+xml, image/jpeg, image/png"
+                    accept="image/jpeg, image/png"
                     onChange={handleUpload}
                     disabled={isUploading}
                 />
                 <Label
                     htmlFor="library-upload"
                     className={cn(
-                        "flex min-h-9 cursor-pointer items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90 peer-focus-visible:ring-2 peer-focus-visible:ring-ring",
-                        isUploading && "pointer-events-none opacity-50"
+                        'flex min-h-9 cursor-pointer items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-opacity peer-focus-visible:ring-2 peer-focus-visible:ring-ring hover:opacity-90',
+                        isUploading && 'pointer-events-none opacity-50',
                     )}
                 >
-                    {isUploading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <UploadCloud className="h-4 w-4" />}
+                    {isUploading ? (
+                        <LoaderCircle className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <UploadCloud className="h-4 w-4" />
+                    )}
                     {isUploading ? 'Uploading...' : 'Upload New Media'}
                 </Label>
             </div>
@@ -84,28 +96,42 @@ export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
             {/* Grid */}
             {items.length === 0 ? (
                 <div className="rounded-md border border-dashed border-border px-4 py-12 text-center">
-                    <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-medium text-foreground">No media found</h3>
-                    <p className="text-sm text-muted-foreground mt-1">Upload some files to get started.</p>
+                    <ImageIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                    <h3 className="text-lg font-medium text-foreground">
+                        No media found
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        Upload some files to get started.
+                    </p>
                 </div>
             ) : (
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
                     {items.map((item) => (
-                        <div key={item.id} className="group relative aspect-square overflow-hidden rounded-md border border-border bg-card transition-colors hover:border-primary/50">
+                        <div
+                            key={item.id}
+                            className="group relative aspect-square overflow-hidden rounded-md border border-border bg-card transition-colors hover:border-primary/50"
+                        >
                             <div className="absolute inset-0 flex items-center justify-center p-4">
                                 {item.url ? (
-                                    <img src={item.url} alt={item.original_name} loading="lazy" width="240" height="240" className="max-h-full max-w-full object-contain" />
+                                    <img
+                                        src={item.url}
+                                        alt={item.original_name}
+                                        loading="lazy"
+                                        width="240"
+                                        height="240"
+                                        className="max-h-full max-w-full object-contain"
+                                    />
                                 ) : (
                                     <ImageIcon className="h-8 w-8 text-muted-foreground" />
                                 )}
                             </div>
-                            
+
                             {/* Overlay for actions */}
                             <div className="absolute inset-0 flex flex-col justify-between bg-card p-3 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                                 <div className="flex justify-end">
-                                    <Button 
-                                        variant="destructive" 
-                                        size="icon" 
+                                    <Button
+                                        variant="destructive"
+                                        size="icon"
                                         className="h-8 w-8"
                                         onClick={() => handleDelete(item.id)}
                                     >
@@ -113,7 +139,10 @@ export function MediaGrid({ items = [] }: { items: MediaItem[] }) {
                                     </Button>
                                 </div>
                                 <div className="text-foreground">
-                                    <p className="text-xs font-medium truncate" title={item.original_name}>
+                                    <p
+                                        className="truncate text-xs font-medium"
+                                        title={item.original_name}
+                                    >
                                         {item.original_name}
                                     </p>
                                     <p className="text-[10px] text-foreground">

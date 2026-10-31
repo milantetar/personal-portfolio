@@ -29,7 +29,9 @@ export function GlassCard({
                         {value}
                     </p>
                 )}
-                {hint && <p className="text-sm text-muted-foreground">{hint}</p>}
+                {hint && (
+                    <p className="text-sm text-muted-foreground">{hint}</p>
+                )}
                 {children}
             </CardContent>
         </Card>

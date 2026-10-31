@@ -34,7 +34,7 @@ class GitHubRepositoryService
         }
 
         return Cache::remember(
-            'github.public-repositories.' . strtolower($username),
+            'github.public-repositories.'.strtolower($username),
             now()->addMinutes(30),
             fn (): array => $this->fetchRepositories($username),
         );
@@ -49,7 +49,7 @@ class GitHubRepositoryService
         $host = strtolower((string) parse_url($profileUrl, PHP_URL_HOST));
         $path = trim((string) parse_url($profileUrl, PHP_URL_PATH), '/');
         $segments = explode('/', $path);
-        $username = $segments[0] ?? '';
+        $username = $segments[0];
 
         if (! in_array($host, ['github.com', 'www.github.com'], true)
             || count($segments) !== 1
@@ -95,7 +95,7 @@ class GitHubRepositoryService
             $perPage = 100;
 
             for ($page = 1; ; $page++) {
-                $response = $request->get('https://api.github.com/users/' . rawurlencode($username) . '/repos', [
+                $response = $request->get('https://api.github.com/users/'.rawurlencode($username).'/repos', [
                     'type' => 'owner',
                     'sort' => 'updated',
                     'direction' => 'desc',

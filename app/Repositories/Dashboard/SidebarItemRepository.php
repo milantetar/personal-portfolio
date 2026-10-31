@@ -11,6 +11,8 @@ class SidebarItemRepository
 {
     /**
      * Get all active and sorted sidebar items.
+     *
+     * @return Collection<int, SidebarItem>
      */
     public function getAllActiveSorted(): Collection
     {
@@ -25,5 +27,4 @@ class SidebarItemRepository
     {
         return SidebarItem::find($id);
     }
-
 }

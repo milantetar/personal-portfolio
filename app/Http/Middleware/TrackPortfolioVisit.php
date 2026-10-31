@@ -32,7 +32,7 @@ class TrackPortfolioVisit
         try {
             AnalyticsVisit::query()->create([
                 'visitor_hash' => hash_hmac('sha256', $sessionId, $key),
-                'path' => '/' . ltrim($request->path(), '/'),
+                'path' => '/'.ltrim($request->path(), '/'),
                 'referrer_host' => $this->referrerHost($request),
                 'device_type' => $this->deviceType($request->userAgent()),
                 'viewed_at' => now(),

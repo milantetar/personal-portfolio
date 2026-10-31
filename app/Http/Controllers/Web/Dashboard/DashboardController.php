@@ -7,14 +7,15 @@ namespace App\Http\Controllers\Web\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Repositories\Dashboard\SidebarItemRepository;
 use Illuminate\Support\Facades\Log;
+use Inertia\Response;
 
 class DashboardController extends Controller
 {
     public function __construct(
         protected SidebarItemRepository $sidebarItemRepository,
-    ){}
+    ) {}
 
-    public function index ()
+    public function index(): Response
     {
         Log::info('Web dashboard requested.', ['user_id' => auth()->id()]);
         $sidebarItems = $this->sidebarItemRepository->getAllActiveSorted();
@@ -28,5 +29,4 @@ class DashboardController extends Controller
             'sidebarItems' => $sidebarItems,
         ]);
     }
-    
 }

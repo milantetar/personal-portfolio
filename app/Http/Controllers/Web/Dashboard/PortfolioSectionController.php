@@ -10,12 +10,13 @@ use App\Repositories\Dashboard\SidebarItemRepository;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Inertia\Response;
 
 class PortfolioSectionController extends Controller
 {
     public function __construct(protected SidebarItemRepository $sidebarItemRepository) {}
 
-    public function index()
+    public function index(): Response
     {
         return inertia('admin/sections', [
             'sections' => PortfolioSection::query()->ordered()->get(),
@@ -52,7 +53,7 @@ class PortfolioSectionController extends Controller
     private function validatedAttributes(Request $request, ?int $currentId = null): array
     {
         $validated = $request->validate([
-            'slug' => ['required', 'string', 'max:80', 'regex:/^[a-z0-9-]+$/', 'unique:portfolio_sections,slug' . ($currentId ? ',' . $currentId : '')],
+            'slug' => ['required', 'string', 'max:80', 'regex:/^[a-z0-9-]+$/', 'unique:portfolio_sections,slug'.($currentId ? ','.$currentId : '')],
             'type' => ['required', 'string', 'in:hero,about,skills,experience,projects,certifications,contact,custom'],
             'title' => ['nullable', 'string', 'max:150'],
             'eyebrow' => ['nullable', 'string', 'max:150'],

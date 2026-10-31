@@ -23,6 +23,8 @@
         "tightenco/ziggy": "^2.6"
     },
     "require-dev": {
+        "fakerphp/faker": "^1.24",
+        "larastan/larastan": "^3.13",
         "laravel/pint": "^1.27",
         "laravel/sail": "^1.53",
         "mockery/mockery": "^1.6",
@@ -49,8 +51,8 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php artisan key:generate",
             "@php artisan migrate --force",
-            "npm install",
-            "npm run build"
+            "pnpm install",
+            "pnpm build"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
@@ -64,12 +66,12 @@
         ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
-            "npm run check",
-            "npm run types:check",
+            "pnpm check",
+            "pnpm types:check",
             "@test"
         ],
         "types:check": [
-            "phpstan analyse"
+            "phpstan analyse --memory-limit=1G"
         ],
         "test": [
             "@php artisan config:clear --ansi",

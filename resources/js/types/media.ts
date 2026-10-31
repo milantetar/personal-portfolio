@@ -47,6 +47,7 @@ export interface Branding {
     logo: Pick<Media, 'id' | 'url' | 'alt_text'> | null;
     backgroundImage: Pick<Media, 'id' | 'url' | 'alt_text'> | null;
     avatar?: Pick<Media, 'id' | 'url' | 'alt_text'> | null;
+    favicon?: Pick<Media, 'id' | 'url' | 'alt_text' | 'mime_type'> | null;
     resume?: Pick<Media, 'id' | 'url' | 'alt_text'> | null;
     themePreset?: string | null;
     glassBlur?: string;

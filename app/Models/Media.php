@@ -7,10 +7,11 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -26,7 +27,8 @@ use Illuminate\Support\Facades\Storage;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read string $url
- * @method static Builder|self filter(array $filters)
+ *
+ * @method static Builder<self> filter(array<string, mixed> $filters)
  */
 #[Fillable([
     'disk',
@@ -40,10 +42,11 @@ use Illuminate\Support\Facades\Storage;
 ])]
 class Media extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory;
 
     protected $appends = ['url'];
-    
+
     protected function casts(): array
     {
         return [
@@ -52,6 +55,9 @@ class Media extends Model
         ];
     }
 
+    /**
+     * @return Attribute<string, never>
+     */
     protected function url(): Attribute
     {
         return Attribute::make(
@@ -59,6 +65,9 @@ class Media extends Model
         )->shouldCache();
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function uploader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');
@@ -67,20 +76,24 @@ class Media extends Model
     /**
      * Scope to filter media by search, mime_type, and size.
      * Note: Pagination is handled in the Repository, not here.
+     *
+     * @param  Builder<Media>  $query
+     * @param  array<string, mixed>  $filters
+     * @return Builder<Media>
      */
     public function scopeFilter(Builder $query, array $filters): Builder
     {
         return $query
             ->when(
-                !empty($filters['search']),
+                ! empty($filters['search']),
                 fn (Builder $q) => $q->where(function (Builder $sub) use ($filters): void {
-                    $sub->where('title', 'like', '%' . $filters['search'] . '%')
-                        ->orWhere('original_name', 'like', '%' . $filters['search'] . '%');
+                    $sub->where('title', 'like', '%'.$filters['search'].'%')
+                        ->orWhere('original_name', 'like', '%'.$filters['search'].'%');
                 })
             )
             ->when(
-                !empty($filters['mime_type']),
-                fn (Builder $q) => $q->where('mime_type', 'like', '%' . $filters['mime_type'] . '%')
+                ! empty($filters['mime_type']),
+                fn (Builder $q) => $q->where('mime_type', 'like', '%'.$filters['mime_type'].'%')
             )
             ->when(
                 isset($filters['min_size']),

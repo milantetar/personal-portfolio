@@ -27,6 +27,7 @@ export interface SiteSettings {
     background_media?: Media | null;
     avatar_media?: Media | null;
     resume_media?: Media | null;
+    favicon_media?: Media | null;
 }
 
 export interface SiteSettingsForm {

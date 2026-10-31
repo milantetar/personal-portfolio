@@ -17,17 +17,15 @@ use Illuminate\Support\Str;
 
 class PortfolioAssistantService
 {
-    public function __construct(private readonly GitHubRepositoryService $gitHubRepositoryService)
-    {
-    }
+    public function __construct(private readonly GitHubRepositoryService $gitHubRepositoryService) {}
 
     /**
-     * @param array<int, array{role: string, content: string}> $messages
+     * @param  array<int, array{role: string, content: string}>  $messages
      */
     public function answer(array $messages): string
     {
         $apiKey = config('services.gemini.api_key');
-        $model = (string) config('services.gemini.model', 'gemini-3.8-flash');
+        $model = (string) config('services.gemini.model', 'gemini-3.5-flash-lite');
 
         if (! is_string($apiKey) || trim($apiKey) === '') {
             throw new PortfolioAssistantException(503, 'The portfolio assistant is not configured yet.');
@@ -52,7 +50,7 @@ class PortfolioAssistantService
             ],
         ];
 
-        $fallbackModel = (string) config('services.gemini.fallback_model', 'gemini-3.5-flash-lite');
+        $fallbackModel = (string) config('services.gemini.fallback_model', 'gemini-3.6-flash');
         $models = array_values(array_unique(array_filter([$model, $fallbackModel], static fn (string $name): bool => trim($name) !== '')));
         $response = null;
         $activeModel = $model;
@@ -80,6 +78,7 @@ class PortfolioAssistantService
                         'failed_model' => $candidateModel,
                         'fallback_model' => $models[$index + 1],
                     ]);
+
                     continue;
                 }
 
@@ -91,6 +90,7 @@ class PortfolioAssistantService
                     'failed_model' => $candidateModel,
                     'fallback_model' => $models[$index + 1],
                 ]);
+
                 continue;
             }
 
@@ -133,7 +133,7 @@ class PortfolioAssistantService
                 ->implode('')
             : '';
 
-        if (! is_string($answer) || trim($answer) === '') {
+        if (trim($answer) === '') {
             Log::warning('Portfolio assistant provider returned an empty response.', ['model' => $activeModel]);
             throw new PortfolioAssistantException(502, 'I could not form a response just now. Please try again.');
         }
@@ -209,12 +209,12 @@ class PortfolioAssistantService
         $repositories = $this->gitHubRepositoryService->publicRepositoriesForProfile($githubProfileUrl);
         foreach (array_slice($repositories, 0, 15) as $repository) {
             $lines[] = Str::limit(implode(' | ', array_filter([
-                $repository['name'] ?? null,
+                $repository['name'],
                 $repository['description'] ?? null,
                 $repository['language'] ?? null,
-                $repository['html_url'] ?? null,
+                $repository['html_url'],
                 $repository['homepage'] ?? null,
-                implode(', ', $repository['topics'] ?? []),
+                implode(', ', $repository['topics']),
             ])), 500, '');
         }
 

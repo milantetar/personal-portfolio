@@ -7,20 +7,21 @@ namespace App\Services\Dashboard;
 use App\Data\Dashboard\SidebarItemData;
 use App\Models\SidebarItem;
 
-class SideBarItemService
+class SidebarItemService
 {
-    public function createSideBarItem(SidebarItemData $data) : SidebarItem
-    {   
+    public function createSidebarItem(SidebarItemData $data): SidebarItem
+    {
         return SidebarItem::create($data->toArray());
     }
 
-    public function updateSideBarItem(SidebarItem $sidebarItem, SidebarItemData $data) : SidebarItem
+    public function updateSidebarItem(SidebarItem $sidebarItem, SidebarItemData $data): SidebarItem
     {
         $sidebarItem->update($data->toArray());
+
         return $sidebarItem;
     }
 
-    public function deleteSideBarItem(SidebarItem $sidebarItem) : void
+    public function deleteSidebarItem(SidebarItem $sidebarItem): void
     {
         $sidebarItem->delete();
     }

@@ -9,6 +9,10 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class MediaRepository
 {
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return LengthAwarePaginator<int, Media>
+     */
     public function getAllMedia(array $filters = [], int $perPage = 10): LengthAwarePaginator
     {
         $query = Media::query()->filter($filters);

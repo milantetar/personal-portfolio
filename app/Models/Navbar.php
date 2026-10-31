@@ -17,7 +17,6 @@ use Illuminate\Support\Carbon;
  * @property string $location
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
  * @property-read Collection<int, NavbarItem> $items
  */
 #[Fillable(['name', 'location', 'brand_title'])]
@@ -25,7 +24,7 @@ class Navbar extends Model
 {
     /**
      * Get the items for this navbar.
-     * 
+     *
      * @return HasMany<NavbarItem, $this>
      */
     public function items(): HasMany

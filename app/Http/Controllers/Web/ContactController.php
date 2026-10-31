@@ -40,9 +40,9 @@ class ContactController extends Controller
 
         if (is_string($recipient) && $recipient !== '') {
             $body = implode("\n\n", [
-                'From: ' . $data['name'],
-                'Reply email: ' . $data['email'],
-                'Subject: ' . $data['subject'],
+                'From: '.$data['name'],
+                'Reply email: '.$data['email'],
+                'Subject: '.$data['subject'],
                 'Message:',
                 $data['message'],
             ]);
@@ -51,7 +51,7 @@ class ContactController extends Controller
                 Mail::raw($body, function (Message $mail) use ($data, $recipient): void {
                     $mail->to($recipient)
                         ->replyTo($data['email'], $data['name'])
-                        ->subject('Portfolio enquiry: ' . $data['subject']);
+                        ->subject('Portfolio enquiry: '.$data['subject']);
                 });
             } catch (Throwable $exception) {
                 Log::warning('Portfolio contact email notification could not be sent, but message was saved.', [

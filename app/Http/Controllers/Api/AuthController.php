@@ -6,9 +6,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Data\Auth\LoginData;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\User\UserResource;
 use App\Models\User;
 use App\Services\Auth\AuthService;
-use App\Http\Resources\User\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -27,8 +27,9 @@ class AuthController extends Controller
         try {
             $user = User::find($id);
 
-            if(!$user){
+            if (! $user) {
                 Log::warning('API user not found.', ['user_id' => $id]);
+
                 return $this->notFoundResponse('No users found.');
             }
 
@@ -53,6 +54,7 @@ class AuthController extends Controller
 
             if ($users->isEmpty()) {
                 Log::warning('API users list is empty.');
+
                 return $this->notFoundResponse('No users found.');
             }
 
@@ -87,6 +89,7 @@ class AuthController extends Controller
             );
         } catch (ValidationException $e) {
             Log::warning('API login validation failed.', ['errors' => $e->errors()]);
+
             return $this->validationErrorResponse('Validation failed', $e->errors());
         } catch (Throwable $exception) {
             Log::error('API login failed.', ['exception' => $exception]);
@@ -104,6 +107,7 @@ class AuthController extends Controller
 
             if (! $user) {
                 Log::warning('API logout rejected because user is unauthenticated.');
+
                 return $this->unauthorizedResponse('Unauthenticated session.');
             }
 

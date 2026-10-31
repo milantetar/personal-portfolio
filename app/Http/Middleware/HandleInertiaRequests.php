@@ -2,8 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\SiteSetting;
+use App\Models\ContactMessage;
 use App\Models\Navbar;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -40,15 +41,19 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'seo' => [
+                'siteUrl' => rtrim((string) config('app.url'), '/'),
+            ],
             'auth' => [
                 'user' => $request->user(),
             ],
             'flash' => [
-                'success' => fn() => $request->session()->get('success'),
-                'error' => fn() => $request->session()->get('error'),
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
             ],
-            'branding' => fn(): array => $this->branding(),
-            'navBars' => fn() => Navbar::query()->with('items')->orderBy('id')->get(),
+            'branding' => fn (): array => $this->branding(),
+            'navBars' => fn () => Navbar::query()->with('items')->orderBy('id')->get(),
+            'unreadMessagesCount' => fn (): int => $request->user() ? ContactMessage::query()->where('is_read', false)->count() : 0,
         ];
     }
 
@@ -56,24 +61,20 @@ class HandleInertiaRequests extends Middleware
     private function branding(): array
     {
         try {
-            $relations = ['logoMedia', 'backgroundMedia'];
-            if (\Illuminate\Support\Facades\Schema::hasColumn('site_settings', 'avatar_media_id')) {
-                $relations[] = 'avatarMedia';
-            }
-
             $settings = SiteSetting::query()
-                ->with($relations)
+                ->with(['logoMedia', 'backgroundMedia', 'avatarMedia', 'faviconMedia'])
                 ->first();
 
             return [
                 'id' => $settings?->id,
-                'siteName' => $settings?->site_name ?? "Milan's Portfolio",
+                'siteName' => $settings?->site_name ?: "Milan's Portfolio",
                 'logo' => $settings?->logoMedia?->only(['id', 'url', 'alt_text']),
                 'backgroundImage' => $settings?->backgroundMedia?->only(['id', 'url', 'alt_text']),
-                'avatar' => in_array('avatarMedia', $relations, true) ? $settings?->avatarMedia?->only(['id', 'url', 'alt_text']) : null,
-                'themePreset' => $settings?->theme_preset ?? 'instagram',
-                'glassBlur' => $settings?->glass_blur ?? 'xl',
-                'glassOpacity' => $settings?->glass_opacity ?? '75',
+                'avatar' => $settings?->avatarMedia?->only(['id', 'url', 'alt_text']),
+                'favicon' => $settings?->faviconMedia?->only(['id', 'url', 'alt_text', 'mime_type']),
+                'themePreset' => $settings?->theme_preset ?: 'midnight',
+                'glassBlur' => $settings?->glass_blur ?: 'xl',
+                'glassOpacity' => $settings?->glass_opacity ?: '75',
             ];
         } catch (\Throwable) {
             return [
@@ -81,7 +82,8 @@ class HandleInertiaRequests extends Middleware
                 'logo' => null,
                 'backgroundImage' => null,
                 'avatar' => null,
-                'themePreset' => 'instagram',
+                'favicon' => null,
+                'themePreset' => 'midnight',
                 'glassBlur' => 'xl',
                 'glassOpacity' => '75',
             ];

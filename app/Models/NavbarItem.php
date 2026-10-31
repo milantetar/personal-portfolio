@@ -17,7 +17,6 @@ use Illuminate\Support\Carbon;
  * @property int $order
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * 
  * @property-read Navbar $navbar
  */
 #[Fillable(['navbar_id', 'label', 'url', 'order'])]
@@ -25,7 +24,7 @@ class NavbarItem extends Model
 {
     /**
      * Get the navbar that owns this item.
-     * 
+     *
      * @return BelongsTo<Navbar, $this>
      */
     public function navbar(): BelongsTo

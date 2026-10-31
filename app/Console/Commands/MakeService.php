@@ -13,7 +13,6 @@ class MakeService extends Command
 
     protected $description = 'Create a new service class';
 
-
     public function handle(): void
     {
         $name = $this->argument('name');
@@ -32,16 +31,16 @@ class MakeService extends Command
         $namespace = 'App\\Services';
 
         if ($directory !== '') {
-            $namespace .= '\\' . str_replace('/', '\\', $directory);
+            $namespace .= '\\'.str_replace('/', '\\', $directory);
         }
 
         $basePath = app_path('Services');
 
         if ($directory !== '') {
-            $basePath .= '/' . $directory;
+            $basePath .= '/'.$directory;
         }
 
-        $path = $basePath . '/' . $className . '.php';
+        $path = $basePath.'/'.$className.'.php';
 
         if (File::exists($path)) {
             $this->error("Service {$className} already exists!");

@@ -14,9 +14,9 @@ return new class extends Migration
             $table->id();
             $table->string('label');
             $table->foreignId('icon_media_id')
-                  ->nullable()
-                  ->constrained('media')
-                  ->nullOnDelete(); // Links JPG/SVG from media library as an icon
+                ->nullable()
+                ->constrained('media')
+                ->nullOnDelete(); // Links JPG/SVG from media library as an icon
             $table->string('url');
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_visible')->default(true);

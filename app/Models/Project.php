@@ -7,6 +7,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,6 +53,7 @@ use Illuminate\Support\Str;
 ])]
 class Project extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory;
 
     protected function casts(): array
@@ -74,21 +76,36 @@ class Project extends Model
         });
     }
 
+    /**
+     * @return BelongsTo<Media, $this>
+     */
     public function thumbnailMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'thumbnail_media_id');
     }
 
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopeVisible(Builder $query): Builder
     {
         return $query->where('is_visible', true);
     }
 
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopeFeatured(Builder $query): Builder
     {
         return $query->where('is_featured', true);
     }
 
+    /**
+     * @param  Builder<Project>  $query
+     * @return Builder<Project>
+     */
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->latest('id');

@@ -21,6 +21,9 @@ class AnalyticsVisit extends Model
         return ['viewed_at' => 'immutable_datetime'];
     }
 
+    /**
+     * @return Builder<static>
+     */
     public function prunable(): Builder
     {
         return static::query()->where('viewed_at', '<', now()->subDays(90));

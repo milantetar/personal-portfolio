@@ -13,10 +13,18 @@ interface MediaUploadZoneProps {
     onFilesSelected?: (files: File[]) => void;
 }
 
-export function MediaUploadZone({ error, id = 'file-upload', isUploading, multiple = false, onFileSelected, onFilesSelected }: MediaUploadZoneProps) {
+export function MediaUploadZone({
+    error,
+    id = 'file-upload',
+    isUploading,
+    multiple = false,
+    onFileSelected,
+    onFilesSelected,
+}: MediaUploadZoneProps) {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files ?? []);
-        if (multiple && files.length > 0 && onFilesSelected) onFilesSelected(files);
+        if (multiple && files.length > 0 && onFilesSelected)
+            onFilesSelected(files);
         else if (files[0]) onFileSelected(files[0]);
         event.target.value = '';
     };
@@ -25,7 +33,7 @@ export function MediaUploadZone({ error, id = 'file-upload', isUploading, multip
         <div className="space-y-1">
             <div className="flex items-center gap-3">
                 <Input
-                    accept="image/svg+xml,image/jpeg,image/png,image/gif,image/webp,image/avif,application/pdf,audio/mpeg"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/avif,application/pdf,audio/mpeg"
                     className="peer sr-only"
                     disabled={isUploading}
                     id={id}
@@ -35,15 +43,23 @@ export function MediaUploadZone({ error, id = 'file-upload', isUploading, multip
                 />
                 <Label
                     className={cn(
-                        'flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-border px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/60 hover:bg-accent/40 hover:text-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring',
+                        'flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-2 rounded-md border border-dashed border-border px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-ring hover:border-primary/60 hover:bg-accent/40 hover:text-foreground',
                         isUploading && 'pointer-events-none opacity-50',
                     )}
                     htmlFor={id}
                 >
                     {isUploading ? (
-                        <><LoaderCircle className="h-4 w-4 animate-spin" /> Uploading...</>
+                        <>
+                            <LoaderCircle className="h-4 w-4 animate-spin" />{' '}
+                            Uploading...
+                        </>
                     ) : (
-                        <><UploadCloud className="h-4 w-4" /> {multiple ? 'Upload multiple files' : 'Upload new image'}</>
+                        <>
+                            <UploadCloud className="h-4 w-4" />{' '}
+                            {multiple
+                                ? 'Upload multiple files'
+                                : 'Upload new image'}
+                        </>
                     )}
                 </Label>
             </div>

@@ -13,11 +13,17 @@ interface AdminLayoutProps {
     branding?: Branding;
 }
 
-export function AdminLayout({ children, sidebarItems = [], backgroundUrl, branding }: AdminLayoutProps) {
+export function AdminLayout({
+    children,
+    sidebarItems = [],
+    backgroundUrl,
+    branding,
+}: AdminLayoutProps) {
     useFlash();
     const reduceMotion = useReducedMotion() ?? false;
 
-    const bgUrl = backgroundUrl || branding?.backgroundImage?.url || FALLBACK_BACKDROP;
+    const bgUrl =
+        backgroundUrl || branding?.backgroundImage?.url || FALLBACK_BACKDROP;
 
     return (
         <div className="admin-ui app-shell relative isolate flex h-dvh min-h-0 flex-col overflow-hidden bg-transparent text-foreground">
@@ -26,7 +32,10 @@ export function AdminLayout({ children, sidebarItems = [], backgroundUrl, brandi
                 style={{ backgroundImage: `url("${bgUrl}")` }}
                 aria-hidden="true"
             />
-            <div className="admin-backdrop-scrim pointer-events-none fixed inset-0 -z-10 bg-background/80" aria-hidden="true" />
+            <div
+                className="admin-backdrop-scrim pointer-events-none fixed inset-0 -z-10 bg-background/80"
+                aria-hidden="true"
+            />
             <Navbar />
             <div className="admin-workspace flex min-h-0 flex-1 flex-col md:flex-row">
                 <Sidebar items={sidebarItems} />

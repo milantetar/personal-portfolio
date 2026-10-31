@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Models\PortfolioSection;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 /*
@@ -49,4 +52,26 @@ expect()->extend('toBeOne', function () {
 function something(): void
 {
     // ..
+}
+
+function adminUser(): User
+{
+    $user = User::factory()->create();
+    $user->assignRole(Role::findOrCreate('admin', 'web'));
+
+    return $user;
+}
+
+/** @param array<string, mixed> $attributes */
+function makePortfolioSection(array $attributes = []): PortfolioSection
+{
+    return PortfolioSection::query()->create(array_merge([
+        'slug' => 'hero',
+        'type' => 'hero',
+        'title' => 'Milan Tetar',
+        'eyebrow' => 'Portfolio',
+        'content' => [],
+        'sort_order' => 1,
+        'is_visible' => true,
+    ], $attributes));
 }

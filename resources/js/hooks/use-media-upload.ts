@@ -10,14 +10,20 @@ interface UseMediaUploadResult {
     error: string | null;
     isUploading: boolean;
     previewUrl: string | null;
-    upload: (file: File, metadata?: { alt_text?: string; title?: string; usage?: string }) => Promise<MediaUploadData | null>;
+    upload: (
+        file: File,
+        metadata?: { alt_text?: string; title?: string; usage?: string },
+    ) => Promise<MediaUploadData | null>;
     clearPreview: () => void;
 }
 
 const getCsrfToken = (): string =>
-    document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content ?? '';
+    document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')
+        ?.content ?? '';
 
-export function useMediaUpload({ endpoint = '/dashboard/media' }: UseMediaUploadOptions = {}): UseMediaUploadResult {
+export function useMediaUpload({
+    endpoint = '/dashboard/media',
+}: UseMediaUploadOptions = {}): UseMediaUploadResult {
     const [error, setError] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -35,61 +41,84 @@ export function useMediaUpload({ endpoint = '/dashboard/media' }: UseMediaUpload
         setError(null);
     }, []);
 
-    const upload = useCallback(async (file: File, metadata: { alt_text?: string; title?: string; usage?: string } = {}): Promise<MediaUploadData | null> => {
-        const temporaryPreviewUrl = URL.createObjectURL(file);
-        previewUrlRef.current = temporaryPreviewUrl;
-        setPreviewUrl(temporaryPreviewUrl);
-        setError(null);
-        setIsUploading(true);
+    const upload = useCallback(
+        async (
+            file: File,
+            metadata: {
+                alt_text?: string;
+                title?: string;
+                usage?: string;
+            } = {},
+        ): Promise<MediaUploadData | null> => {
+            const temporaryPreviewUrl = URL.createObjectURL(file);
+            previewUrlRef.current = temporaryPreviewUrl;
+            setPreviewUrl(temporaryPreviewUrl);
+            setError(null);
+            setIsUploading(true);
 
-        const formData = new FormData();
-        formData.append('file', file);
-        if (metadata.title) formData.append('title', metadata.title);
-        if (metadata.alt_text) formData.append('alt_text', metadata.alt_text);
-        if (metadata.usage) formData.append('usage', metadata.usage);
+            const formData = new FormData();
+            formData.append('file', file);
+            if (metadata.title) formData.append('title', metadata.title);
+            if (metadata.alt_text)
+                formData.append('alt_text', metadata.alt_text);
+            if (metadata.usage) formData.append('usage', metadata.usage);
 
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken(),
-                },
-                body: formData,
-            });
-            const result = (await response.json()) as MediaUploadResponse;
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                    },
+                    body: formData,
+                });
+                const result = (await response.json()) as MediaUploadResponse;
 
-            if (!response.ok || !result.success || !result.data) {
-                const validationMessage = result.errors
-                    ? Object.values(result.errors).flat().join(' ')
-                    : null;
+                if (!response.ok || !result.success || !result.data) {
+                    const validationMessage = result.errors
+                        ? Object.values(result.errors).flat().join(' ')
+                        : null;
 
-                throw new Error(humanizeUploadError(validationMessage || result.message || 'Upload failed.'));
+                    throw new Error(
+                        humanizeUploadError(
+                            validationMessage ||
+                                result.message ||
+                                'Upload failed.',
+                        ),
+                    );
+                }
+
+                URL.revokeObjectURL(temporaryPreviewUrl);
+                previewUrlRef.current = result.data.url;
+                setPreviewUrl(result.data.url);
+
+                return result.data;
+            } catch (caughtError: unknown) {
+                const message =
+                    caughtError instanceof Error
+                        ? humanizeUploadError(caughtError.message)
+                        : 'Upload failed.';
+                URL.revokeObjectURL(temporaryPreviewUrl);
+                previewUrlRef.current = null;
+                setPreviewUrl(null);
+                setError(message);
+
+                return null;
+            } finally {
+                setIsUploading(false);
             }
+        },
+        [endpoint],
+    );
 
-            URL.revokeObjectURL(temporaryPreviewUrl);
-            previewUrlRef.current = result.data.url;
-            setPreviewUrl(result.data.url);
-
-            return result.data;
-        } catch (caughtError: unknown) {
-            const message = caughtError instanceof Error ? humanizeUploadError(caughtError.message) : 'Upload failed.';
-            URL.revokeObjectURL(temporaryPreviewUrl);
-            previewUrlRef.current = null;
-            setPreviewUrl(null);
-            setError(message);
-
-            return null;
-        } finally {
-            setIsUploading(false);
-        }
-    }, [endpoint]);
-
-    useEffect(() => () => {
-        if (previewUrlRef.current?.startsWith('blob:')) {
-            URL.revokeObjectURL(previewUrlRef.current);
-        }
-    }, []);
+    useEffect(
+        () => () => {
+            if (previewUrlRef.current?.startsWith('blob:')) {
+                URL.revokeObjectURL(previewUrlRef.current);
+            }
+        },
+        [],
+    );
 
     return { error, isUploading, previewUrl, upload, clearPreview };
 }

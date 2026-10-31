@@ -12,7 +12,8 @@ interface MediaPageProps extends PageProps {
 }
 
 export default function MediaLibrary() {
-    const { branding, sidebarItems, mediaItems, filters, backgroundImage } = usePage<MediaPageProps>().props;
+    const { branding, sidebarItems, mediaItems, filters, backgroundImage } =
+        usePage<MediaPageProps>().props;
 
     return (
         <>
@@ -20,23 +21,29 @@ export default function MediaLibrary() {
 
             <AdminLayout
                 sidebarItems={sidebarItems || []}
-                backgroundUrl={branding?.backgroundImage?.url || backgroundImage?.url}
+                backgroundUrl={
+                    branding?.backgroundImage?.url || backgroundImage?.url
+                }
                 branding={branding}
             >
                 <div className="admin-page admin-media-page mx-auto flex w-full max-w-7xl flex-col gap-5">
-                <AdminPageHeader icon={<Images className="size-4" />} title="Media library" description="Upload, organize, preview, and assign the assets used by your portfolio." />
-                {/* Minimalist Brief Branding Bar */}
-                <PolymorphicThemeHub
-                    branding={branding}
-                    allMedia={mediaItems.data}
-                />
+                    <AdminPageHeader
+                        icon={<Images className="size-4" />}
+                        title="Media library"
+                        description="Upload, organize, preview, and assign the assets used by your portfolio."
+                    />
+                    {/* Minimalist Brief Branding Bar */}
+                    <PolymorphicThemeHub
+                        branding={branding}
+                        allMedia={mediaItems.data}
+                    />
 
-                {/* Media Data Table */}
-                <MediaDataTable
-                    mediaItems={mediaItems}
-                    filters={filters}
-                    branding={branding}
-                />
+                    {/* Media Data Table */}
+                    <MediaDataTable
+                        mediaItems={mediaItems}
+                        filters={filters}
+                        branding={branding}
+                    />
                 </div>
             </AdminLayout>
         </>

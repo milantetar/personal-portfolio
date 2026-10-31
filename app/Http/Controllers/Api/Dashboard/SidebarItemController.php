@@ -7,9 +7,10 @@ namespace App\Http\Controllers\Api\Dashboard;
 use App\Data\Dashboard\SidebarItemData;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Dashboard\SidebarItemResource;
+use App\Models\SidebarItem;
+use App\Repositories\Dashboard\SidebarItemRepository;
 use App\Services\Dashboard\SidebarItemService;
 use Illuminate\Http\JsonResponse;
-use App\Repositories\Dashboard\SidebarItemRepository;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -18,8 +19,7 @@ class SidebarItemController extends Controller
     public function __construct(
         protected SidebarItemService $sidebarItemService,
         protected SidebarItemRepository $sidebarItemRepository
-    ) {
-    }
+    ) {}
 
     /**
      * Display a listing of the resource.
@@ -29,18 +29,21 @@ class SidebarItemController extends Controller
         Log::info('API sidebar items index started.');
         try {
             $items = $this->sidebarItemRepository->getAllActiveSorted();
-        
+
             if ($items->isEmpty()) {
                 Log::warning('API sidebar items list is empty.');
+
                 return $this->notFoundResponse('No sidebar items found.');
             }
             Log::info('API sidebar items retrieved.', ['count' => $items->count()]);
+
             return $this->successResponse(
                 'Sidebar items retrieved successfully.',
                 SidebarItemResource::collection($items)
             );
         } catch (Throwable $exception) {
             Log::error('API sidebar items index failed.', ['exception' => $exception]);
+
             return $this->serverErrorResponse(
                 'Failed to retrieve sidebar items.',
                 $exception->getMessage()
@@ -65,6 +68,7 @@ class SidebarItemController extends Controller
             );
         } catch (Throwable $exception) {
             Log::error('API sidebar item creation failed.', ['exception' => $exception]);
+
             return $this->serverErrorResponse(
                 'Failed to create sidebar item.',
                 $exception->getMessage()
@@ -82,8 +86,9 @@ class SidebarItemController extends Controller
         try {
             $item = $this->sidebarItemRepository->findById($id);
 
-            if (!$item instanceof \App\Models\SidebarItem) {
+            if (! $item instanceof SidebarItem) {
                 Log::warning('API sidebar item not found.', ['sidebar_item_id' => $id]);
+
                 return $this->notFoundResponse('Sidebar item not found.');
             }
 
@@ -95,6 +100,7 @@ class SidebarItemController extends Controller
             );
         } catch (Throwable $exception) {
             Log::error('API sidebar item lookup failed.', ['sidebar_item_id' => $id, 'exception' => $exception]);
+
             return $this->serverErrorResponse(
                 'Failed to retrieve sidebar item.',
                 $exception->getMessage()
@@ -111,8 +117,9 @@ class SidebarItemController extends Controller
         try {
             $item = $this->sidebarItemRepository->findById($id);
 
-            if (!$item instanceof \App\Models\SidebarItem) {
+            if (! $item instanceof SidebarItem) {
                 Log::warning('API sidebar item update target not found.', ['sidebar_item_id' => $id]);
+
                 return $this->notFoundResponse('Sidebar item not found.');
             }
 
@@ -126,6 +133,7 @@ class SidebarItemController extends Controller
             );
         } catch (Throwable $exception) {
             Log::error('API sidebar item update failed.', ['sidebar_item_id' => $id, 'exception' => $exception]);
+
             return $this->serverErrorResponse(
                 'Failed to update sidebar item.',
                 $exception->getMessage()
@@ -142,8 +150,9 @@ class SidebarItemController extends Controller
         try {
             $item = $this->sidebarItemRepository->findById($id);
 
-            if (!$item instanceof \App\Models\SidebarItem) {
+            if (! $item instanceof SidebarItem) {
                 Log::warning('API sidebar item deletion target not found.', ['sidebar_item_id' => $id]);
+
                 return $this->notFoundResponse('Sidebar item not found.');
             }
 
@@ -155,8 +164,9 @@ class SidebarItemController extends Controller
                 'Sidebar item deleted successfully.'
             );
 
-        }catch (Throwable $exception) {
+        } catch (Throwable $exception) {
             Log::error('API sidebar item deletion failed.', ['sidebar_item_id' => $id, 'exception' => $exception]);
+
             return $this->serverErrorResponse(
                 'Failed to delete sidebar item.',
                 $exception->getMessage()

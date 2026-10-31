@@ -41,7 +41,8 @@ class NavigationController extends Controller
 
         $navbar = Navbar::query()
             ->whereIn('location', self::LOCATIONS)
-            ->findOrFail($validated['navbar_id']);
+            ->whereKey($validated['navbar_id'])
+            ->firstOrFail();
 
         $item = $navbar->items()->create([
             'label' => $validated['label'],
@@ -89,7 +90,8 @@ class NavigationController extends Controller
 
         $navbar = Navbar::query()
             ->whereIn('location', self::LOCATIONS)
-            ->findOrFail($validated['navbar_id']);
+            ->whereKey($validated['navbar_id'])
+            ->firstOrFail();
         $itemIds = array_map('intval', $validated['item_ids']);
         $expectedIds = $navbar->items()->orderBy('id')->pluck('id')->map(static fn ($id): int => (int) $id)->all();
         $submittedIds = $itemIds;

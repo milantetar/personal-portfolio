@@ -6,12 +6,14 @@ namespace App\Http\Controllers\Web\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SiteSettingsUpdateRequest;
-use App\Models\SiteSetting;
+use App\Models\Media;
 use App\Models\SidebarItem;
+use App\Models\SiteSetting;
 use App\Repositories\Dashboard\SidebarItemRepository;
 use App\Services\Media\MediaService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
+use Inertia\Response;
 
 class SiteSettingsController extends Controller
 {
@@ -20,9 +22,9 @@ class SiteSettingsController extends Controller
         protected SidebarItemRepository $sidebarItemRepository,
     ) {}
 
-    public function index()
+    public function index(): Response
     {
-        $settings = SiteSetting::query()->with(['logoMedia', 'backgroundMedia', 'avatarMedia', 'resumeMedia'])->first();
+        $settings = SiteSetting::query()->with(['logoMedia', 'backgroundMedia', 'avatarMedia', 'resumeMedia', 'faviconMedia'])->first();
         $settings ??= SiteSetting::query()->create(['site_name' => "Milan's Portfolio"]);
         $settingsSidebarItem = SidebarItem::query()->whereIn('url', ['/dashboard/settings', 'dashboard/settings'])->first();
         if (! $settingsSidebarItem) {
@@ -39,7 +41,7 @@ class SiteSettingsController extends Controller
         return inertia('admin/site-settings', [
             'settings' => $settings,
             'settingsSidebarItem' => $settingsSidebarItem->load('iconMedia'),
-            'mediaItems' => \App\Models\Media::query()->latest()->get(),
+            'mediaItems' => Media::query()->latest()->get(),
             'sidebarItems' => $this->sidebarItemRepository->getAllActiveSorted(),
         ]);
     }

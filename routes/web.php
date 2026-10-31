@@ -2,22 +2,28 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\AuthController;
-use App\Http\Controllers\Web\Dashboard\DashboardController;
-use App\Http\Controllers\Web\Dashboard\SidebarItemController;
-use App\Http\Controllers\Web\Media\MediaController;
-use App\Http\Controllers\Web\HomeController;
+use App\Http\Controllers\Web\BlogController;
 use App\Http\Controllers\Web\ContactController;
-use App\Http\Controllers\Web\PortfolioAssistantController;
-use App\Http\Controllers\Web\Dashboard\SiteSettingsController;
-use App\Http\Controllers\Web\Dashboard\CertificateController;
-use App\Http\Controllers\Web\Dashboard\PortfolioSectionController;
 use App\Http\Controllers\Web\Dashboard\AnalyticsController;
+use App\Http\Controllers\Web\Dashboard\CertificateController;
+use App\Http\Controllers\Web\Dashboard\ContactMessageController;
+use App\Http\Controllers\Web\Dashboard\DashboardController;
 use App\Http\Controllers\Web\Dashboard\NavigationController;
+use App\Http\Controllers\Web\Dashboard\PortfolioAssistantLogController;
+use App\Http\Controllers\Web\Dashboard\PortfolioSectionController;
+use App\Http\Controllers\Web\Dashboard\PostController;
+use App\Http\Controllers\Web\Dashboard\ProjectController;
+use App\Http\Controllers\Web\Dashboard\SidebarItemController;
+use App\Http\Controllers\Web\Dashboard\SiteSettingsController;
+use App\Http\Controllers\Web\HomeController;
+use App\Http\Controllers\Web\Media\MediaController;
+use App\Http\Controllers\Web\PortfolioAssistantController;
+use App\Http\Controllers\Web\SitemapController;
 use App\Http\Middleware\TrackPortfolioVisit;
+use Illuminate\Support\Facades\Route;
 
-// 1. PUBLIC ROUTE (Anyone can view your portfolio)
+// 1. PUBLIC ROUTES (Portfolio, Blog, Contact, Assistant)
 Route::get('/', [HomeController::class, 'index'])->middleware(TrackPortfolioVisit::class)->name('home');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 Route::post('/portfolio-assistant', [PortfolioAssistantController::class, 'store'])
@@ -25,21 +31,61 @@ Route::post('/portfolio-assistant', [PortfolioAssistantController::class, 'store
     ->name('portfolio-assistant.store');
 Route::get('/assistant', [HomeController::class, 'section'])->defaults('slug', 'assistant')->middleware(TrackPortfolioVisit::class)->name('portfolio.assistant');
 
-// 2. GUEST ROUTES (Only for visitors who are NOT logged in)
+// Public Blog
+Route::get('/blog', [BlogController::class, 'index'])->middleware(TrackPortfolioVisit::class)->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->middleware(TrackPortfolioVisit::class)->name('blog.show');
+
+// Search engine discovery
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
+
+// 2. GUEST ROUTES
 Route::middleware('guest')->group(function (): void {
     Route::get('login', [AuthController::class, 'create'])->name('login');
-    Route::post('login', [AuthController::class, 'store']);
+    Route::post('login', [AuthController::class, 'store'])->middleware('throttle:login');
+
+    Route::get('forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('forgot-password', [AuthController::class, 'sendResetLink'])
+        ->middleware('throttle:6,1')
+        ->name('password.email');
+    Route::get('reset-password/{token}', [AuthController::class, 'showResetPassword'])->name('password.reset');
+    Route::post('reset-password', [AuthController::class, 'resetPassword'])
+        ->middleware('throttle:6,1')
+        ->name('password.store');
 });
 
-// 3. PROTECTED ADMIN ROUTES (Requires login to access the dashboard)
+// 3. PROTECTED ADMIN ROUTES
 Route::middleware('auth')->group(function (): void {
 
-    Route::prefix('dashboard')->group(function (): void {
+    Route::put('password', [AuthController::class, 'updatePassword'])->name('password.update');
 
-        // Dashboard Home
+    Route::prefix('dashboard')->middleware('admin')->group(function (): void {
+
+        // Dashboard Home & Analytics
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
 
+        // Messages & Leads Inbox
+        Route::get('/messages', [ContactMessageController::class, 'index'])->name('messages.index');
+        Route::put('/messages/{message}', [ContactMessageController::class, 'update'])->name('messages.update');
+        Route::delete('/messages/{message}', [ContactMessageController::class, 'destroy'])->name('messages.destroy');
+        Route::match(['post', 'delete'], '/messages/bulk-destroy', [ContactMessageController::class, 'bulkDestroy'])->name('messages.bulk-destroy');
+        Route::match(['post', 'put'], '/messages/bulk-read', [ContactMessageController::class, 'bulkMarkRead'])->name('messages.bulk-read');
+        Route::match(['post', 'put'], '/messages/bulk-mark-read', [ContactMessageController::class, 'bulkMarkRead'])->name('messages.bulk-mark-read');
+
+        // Custom Projects & Case Studies
+        Route::resource('projects', ProjectController::class)->except(['show', 'create', 'edit']);
+
+        // Technical Articles / Blog Engine
+        Route::resource('posts', PostController::class)->except(['show', 'create', 'edit']);
+
+        // AI Assistant Recruiter Insights
+        Route::get('/assistant-logs', [PortfolioAssistantLogController::class, 'index'])->name('assistant-logs.index');
+        Route::delete('/assistant-logs/{log}', [PortfolioAssistantLogController::class, 'destroy'])->name('assistant-logs.destroy');
+        Route::match(['post', 'delete'], '/assistant-logs/clear-all', [PortfolioAssistantLogController::class, 'clearAll'])->name('assistant-logs.clear-all');
+        Route::match(['post', 'delete'], '/assistant-logs/clear', [PortfolioAssistantLogController::class, 'clearAll'])->name('assistant-logs.clear');
+
+        // Configuration & Content
         Route::get('/settings', [SiteSettingsController::class, 'index'])->name('site-settings.index');
         Route::put('/settings', [SiteSettingsController::class, 'update'])->name('site-settings.update');
 

@@ -1,4 +1,3 @@
-
 import { Check, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,7 +23,7 @@ export function ThemeToggle() {
                         aria-label="Change theme"
                         className={cn(
                             'rounded-md border border-border bg-card text-foreground',
-                            'hover:bg-accent hover:text-accent-foreground'
+                            'hover:bg-accent hover:text-accent-foreground',
                         )}
                     >
                         <Palette className="h-5 w-5" />
@@ -46,7 +45,7 @@ export function ThemeToggle() {
                         onClick={() => setTheme(t.value)}
                         className={cn(
                             'cursor-pointer gap-2',
-                            'focus:bg-accent focus:text-accent-foreground'
+                            'focus:bg-accent focus:text-accent-foreground',
                         )}
                     >
                         <span

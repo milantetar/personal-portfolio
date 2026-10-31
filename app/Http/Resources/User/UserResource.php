@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\User;
 
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Spatie\Permission\Models\Role;
 
 /**
  * @property int $id
@@ -15,7 +18,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property Carbon|null $email_verified_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @property-read \App\Models\User $resource
+ * @property-read Collection<int, Role> $roles
+ * @property-read User $resource
  */
 class UserResource extends JsonResource
 {

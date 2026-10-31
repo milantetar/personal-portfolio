@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources\Media;
 
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -16,8 +17,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property string|null $alt_text
  * @property string|null $title
  * @property int|null $uploaded_by
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @property string $url
  */
 class MediaResource extends JsonResource
@@ -33,7 +34,7 @@ class MediaResource extends JsonResource
             'id' => $this->id,
             'disk' => $this->disk,
             'path' => $this->path,
-            'url' => $this->url, 
+            'url' => $this->url,
             'original_name' => $this->original_name,
             'mime_type' => $this->mime_type,
             'size' => $this->size,

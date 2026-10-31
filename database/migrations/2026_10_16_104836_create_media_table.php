@@ -20,9 +20,9 @@ return new class extends Migration
             $table->string('alt_text')->nullable();
             $table->string('title')->nullable();
             $table->foreignId('uploaded_by')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
             $table->timestamps();
         });
     }

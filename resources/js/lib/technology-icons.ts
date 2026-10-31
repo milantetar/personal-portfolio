@@ -61,5 +61,7 @@ export function automaticTechnologyIconUrl(name: string): string | null {
     const key = name.toLowerCase().replace(/[^a-z0-9]/g, '');
     const brand = technologyBrands[key];
 
-    return brand ? `https://cdn.simpleicons.org/${brand.slug}/${brand.color}` : null;
+    return brand
+        ? `https://cdn.simpleicons.org/${brand.slug}/${brand.color}`
+        : null;
 }

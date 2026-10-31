@@ -6,24 +6,45 @@ namespace Database\Seeders\User;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
 
 class UserDataSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Create the initial admin user from environment variables.
+     *
+     * Run with:
+     *   ADMIN_EMAIL=you@example.com ADMIN_PASSWORD='...' php artisan db:seed --class=UserDataSeeder
      */
     public function run(): void
     {
-        // 1. Create or update your primary admin user securely using the email hash lookup
-        User::firstOrCreate(
-            ['email_hash' => hash('sha256', strtolower(trim('yourmail@gmail.com')))],
+        $email = strtolower(trim((string) config('admin.email', '')));
+        $password = (string) config('admin.password', '');
+
+        if ($email === '' || $password === '') {
+            $this->command->warn('ADMIN_EMAIL and ADMIN_PASSWORD are required; skipping the admin seeder.');
+            Log::notice('Admin seeder skipped because ADMIN_EMAIL or ADMIN_PASSWORD is not configured.');
+
+            return;
+        }
+
+        $role = Role::findOrCreate('admin', 'web');
+
+        $user = User::query()->firstOrCreate(
+            ['email_hash' => hash('sha256', $email)],
             [
-                'name' => 'yourmail',
-                'email' => 'yourmail@gmail.com', // Securely encrypted at rest via model cast
-                'password' => 'your_passsword',      // Securely hashed via model cast ('password' => 'hashed')
+                'name' => (string) config('admin.name', 'Portfolio Admin'),
+                'email' => $email,
+                'password' => $password,
                 'email_verified_at' => now(),
-                'roles' => ['admin'], // Assign roles if using Spatie's package
-            ]
+            ],
         );
+
+        if (! $user->hasRole($role)) {
+            $user->assignRole($role);
+        }
+
+        $this->command->info("Admin user ready for {$email}.");
     }
 }

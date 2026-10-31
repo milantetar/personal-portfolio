@@ -1,0 +1,78 @@
+name: CI
+
+on:
+    push:
+        branches: [main, master]
+    pull_request:
+        branches: [main, master]
+    workflow_dispatch:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    tests:
+        name: Lint, types, build, and tests
+        runs-on: ubuntu-latest
+
+        env:
+            APP_ENV: testing
+            DB_CONNECTION: sqlite
+            DB_DATABASE: ':memory:'
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: '8.3'
+                  extensions: mbstring, pdo_sqlite, sqlite3, bcmath, curl, exif, fileinfo, gd, zip
+                  coverage: none
+                  ini-values: memory_limit=1G
+
+            - name: Copy environment file
+              run: cp .env.example .env
+
+            - name: Install Composer dependencies
+              run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
+
+            - name: Generate application key
+              run: php artisan key:generate
+
+            - name: Set up pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+
+            - name: Set up Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+                  cache: pnpm
+
+            - name: Install pnpm dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Generate Wayfinder routes and actions
+              run: php artisan wayfinder:generate --with-form
+
+            - name: Check formatting and lint
+              run: pnpm check
+
+            - name: Check TypeScript types
+              run: pnpm types:check
+
+            - name: Build frontend
+              run: pnpm build:ssr
+
+            - name: Check PHP formatting
+              run: composer lint:check
+
+            - name: Check PHP static analysis
+              run: composer types:check
+
+            - name: Run tests
+              run: php artisan test

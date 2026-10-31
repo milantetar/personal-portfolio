@@ -1,10 +1,5 @@
-
 import { createContext, useContext, useEffect, useState } from 'react';
-import {
-    type Theme,
-    THEME_STORAGE_KEY,
-    resolveTheme,
-} from '@/lib/theme';
+import { type Theme, THEME_STORAGE_KEY, resolveTheme } from '@/lib/theme';
 
 interface ThemeProviderState {
     theme: Theme;
@@ -34,17 +29,21 @@ export function ThemeProvider({
     defaultTheme = 'system',
 }: ThemeProviderProps) {
     const [theme, setThemeState] = useState<Theme>(() => {
-        // localStorage is unavailable during server-side rendering
-        if (typeof window === 'undefined') {
-            return defaultTheme;
-        }
-
-        const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-
-        return storedTheme && VALID_THEMES.includes(storedTheme as Theme)
-            ? (storedTheme as Theme)
-            : defaultTheme;
+        // Keep the first render identical on the server and in the browser.
+        return defaultTheme;
     });
+
+    useEffect(() => {
+        try {
+            const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+
+            if (storedTheme && VALID_THEMES.includes(storedTheme as Theme)) {
+                setThemeState(storedTheme as Theme);
+            }
+        } catch {
+            // Storage may be unavailable; use the configured default theme.
+        }
+    }, []);
 
     // Apply theme whenever it changes
     useEffect(() => {
@@ -52,7 +51,7 @@ export function ThemeProvider({
 
         const apply = () => {
             const prefersDark = window.matchMedia(
-                '(prefers-color-scheme: dark)'
+                '(prefers-color-scheme: dark)',
             ).matches;
 
             const { mode, dataTheme } = resolveTheme(theme, prefersDark);

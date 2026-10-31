@@ -9,6 +9,7 @@ use App\Data\Media\MediaUpdateData;
 use App\Models\Media;
 use App\Models\SiteSetting;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
@@ -20,14 +21,14 @@ class MediaService
         $path = $file->store('media', 'public');
 
         $media = Media::create([
-            'disk'          => 'public',
-            'path'          => $path,
+            'disk' => 'public',
+            'path' => $path,
             'original_name' => $file->getClientOriginalName(),
-            'mime_type'     => $file->getClientMimeType() ?? 'application/octet-stream',
-            'size'          => $file->getSize() ?? 0,
-            'alt_text'      => $data->alt_text ?? $file->getClientOriginalName(),
-            'title'         => $data->title ?? $file->getClientOriginalName(),
-            'uploaded_by'   => $user?->id ?? null,
+            'mime_type' => $file->getClientMimeType(),
+            'size' => $file->getSize(),
+            'alt_text' => $data->alt_text ?? $file->getClientOriginalName(),
+            'title' => $data->title ?? $file->getClientOriginalName(),
+            'uploaded_by' => $user?->id,
         ]);
 
         if (! empty($data->usage) && $data->usage !== 'none') {
@@ -48,7 +49,7 @@ class MediaService
         ];
 
         // If a new file is uploaded, delete the old file from storage and store the new one
-        if ($data->file instanceof \Illuminate\Http\UploadedFile) {
+        if ($data->file instanceof UploadedFile) {
             Storage::disk($media->disk)->delete($media->path);
 
             $file = $data->file;
@@ -62,9 +63,7 @@ class MediaService
 
         $media->update($attributes);
 
-        if (isset($data->usage)) {
-            $this->handleMediaUsage($media, $data->usage);
-        }
+        $this->handleMediaUsage($media, $data->usage);
 
         return $media->fresh();
     }
@@ -90,6 +89,9 @@ class MediaService
             if (Schema::hasColumn('site_settings', 'resume_media_id') && $settings->resume_media_id === $media->id) {
                 $updates['resume_media_id'] = null;
             }
+            if (Schema::hasColumn('site_settings', 'favicon_media_id') && $settings->favicon_media_id === $media->id) {
+                $updates['favicon_media_id'] = null;
+            }
 
             if ($updates !== []) {
                 $settings->update($updates);
@@ -113,6 +115,7 @@ class MediaService
             'background' => 'background_media_id',
             'avatar' => 'avatar_media_id',
             'resume' => 'resume_media_id',
+            'favicon' => 'favicon_media_id',
         ];
 
         if (isset($columnMap[$slot])) {
@@ -137,6 +140,7 @@ class MediaService
             'background' => 'background_media_id',
             'avatar' => 'avatar_media_id',
             'resume' => 'resume_media_id',
+            'favicon' => 'favicon_media_id',
         ];
 
         if (isset($columnMap[$slot])) {
@@ -151,6 +155,8 @@ class MediaService
 
     /**
      * Update site branding and theme customizations safely.
+     *
+     * @param  array<string, mixed>  $attributes
      */
     public function updateBranding(array $attributes): SiteSetting
     {
@@ -159,7 +165,7 @@ class MediaService
         $valid = [];
         foreach ([
             'theme_preset', 'glass_blur', 'glass_opacity',
-            'logo_media_id', 'background_media_id', 'avatar_media_id', 'resume_media_id',
+            'logo_media_id', 'background_media_id', 'avatar_media_id', 'resume_media_id', 'favicon_media_id',
             'hero_title', 'hero_subtitle', 'hero_description',
             'about_title', 'about_description', 'skills_content',
             'projects_content', 'experience_content', 'contact_content',
@@ -202,7 +208,8 @@ class MediaService
 
     /**
      * Delete multiple media records and remove their files from storage.
-     * @param array<int> $ids
+     *
+     * @param  array<int>  $ids
      */
     public function deleteMultipleMedia(array $ids): int
     {

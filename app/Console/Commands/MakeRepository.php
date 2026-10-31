@@ -10,13 +10,14 @@ use Illuminate\Support\Facades\File;
 class MakeRepository extends Command
 {
     protected $signature = 'make:repository {name}';
+
     protected $description = 'Create a new repository class';
 
     public function handle(): void
     {
         $name = $this->argument('name');
 
-        if (!str_ends_with($name, 'Repository')) {
+        if (! str_ends_with($name, 'Repository')) {
             $name .= 'Repository';
         }
 
@@ -27,19 +28,20 @@ class MakeRepository extends Command
         $namespace = 'App\\Repositories';
 
         if ($directory !== '') {
-            $namespace .= '\\' . str_replace('/', '\\', $directory);
+            $namespace .= '\\'.str_replace('/', '\\', $directory);
         }
 
         $basePath = app_path('Repositories');
 
-        if ( $directory !== ''){
-            $basePath .= '/' . $directory;
+        if ($directory !== '') {
+            $basePath .= '/'.$directory;
         }
 
         $path = app_path("Repositories/{$name}.php");
 
         if (File::exists($path)) {
             $this->error("Repository {$name} already exists!");
+
             return;
         }
 

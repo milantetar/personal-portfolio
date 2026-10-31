@@ -7,18 +7,19 @@ namespace App\Http\Controllers\Web\Media;
 use App\Data\Media\MediaData;
 use App\Data\Media\MediaUpdateData;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Media\MediaResource;
 use App\Models\Media;
 use App\Models\User;
-use App\Services\Media\MediaService;
-use App\Repositories\Media\MediaRepository;
 use App\Repositories\Dashboard\SidebarItemRepository;
-use App\Http\Resources\Media\MediaResource;
+use App\Repositories\Media\MediaRepository;
+use App\Services\Media\MediaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Inertia\Response;
 use Throwable;
 
 class MediaController extends Controller
@@ -27,9 +28,9 @@ class MediaController extends Controller
         protected MediaService $mediaService,
         protected MediaRepository $mediaRepository,
         protected SidebarItemRepository $sidebarItemRepository
-    ){}
+    ) {}
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         Log::info('Web media index requested.', ['user_id' => auth()->id(), 'query' => $request->except(['file', 'password', 'token'])]);
         $perPage = min(max((int) $request->integer('per_page', 10), 1), 50);
@@ -48,7 +49,7 @@ class MediaController extends Controller
         $mediaItems = $this->mediaRepository->getAllMedia($filters, $perPage);
         $sidebarItems = $this->sidebarItemRepository->getAllActiveSorted();
 
-        Log::info('Web media index loaded.', ['user_id' => auth()->id(), 'media_count' => $mediaItems->count(), 'total_media' => $mediaItems->total(), 'filters' => $filters, 'per_page' => $perPage]);
+        Log::info('Web media index loaded.', ['user_id' => auth()->id(), 'total_media' => $mediaItems->total(), 'filters' => $filters, 'per_page' => $perPage]);
 
         return inertia('admin/media', [
             'mediaItems' => MediaResource::collection($mediaItems)->response()->getData(true),
@@ -91,14 +92,14 @@ class MediaController extends Controller
         Log::info('Web bulk media upload started.', ['user_id' => $request->user()?->id, 'file_count' => count((array) $request->file('files', []))]);
         $validator = Validator::make($request->all(), [
             'files' => ['required', 'array', 'min:1', 'max:50'],
-            'files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp,avif,svg,pdf,mp3', 'max:20480'],
+            'files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp,avif,svg,ico,pdf,mp3', 'max:20480'],
             'alt_text' => ['nullable', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:255'],
         ], [
             'files.required' => 'Select at least one file to upload.',
             'files.array' => 'The uploaded files have an invalid format.',
             'files.*.file' => 'The server did not receive this file correctly. Check your PHP upload limits and try again.',
-            'files.*.mimes' => 'Unsupported file type. Use JPG, JPEG, PNG, GIF, WEBP, AVIF, SVG, PDF, or MP3.',
+            'files.*.mimes' => 'Unsupported file type. Use JPG, JPEG, PNG, GIF, WEBP, AVIF, SVG, ICO, PDF, or MP3.',
             'files.*.max' => 'This file is too large. The maximum allowed size is 20 MB.',
         ]);
 
@@ -206,7 +207,7 @@ class MediaController extends Controller
     {
         Log::info('Web media slot assignment started.', ['user_id' => $request->user()?->id, 'media_id' => $media->id, 'slot' => $request->input('slot')]);
         $validated = $request->validate([
-            'slot' => 'required|string|in:logo,background,avatar,resume',
+            'slot' => 'required|string|in:logo,background,avatar,resume,favicon',
         ]);
 
         $this->mediaService->assignMediaToSlot($media, $validated['slot']);
@@ -217,14 +218,14 @@ class MediaController extends Controller
             return $this->successResponse('Slot assigned successfully.');
         }
 
-        return redirect()->back()->with('success', ucfirst($validated['slot']) . ' updated successfully.');
+        return redirect()->back()->with('success', ucfirst($validated['slot']).' updated successfully.');
     }
 
     public function clearSlot(Request $request): RedirectResponse|JsonResponse
     {
         Log::info('Web media slot clearing started.', ['user_id' => $request->user()?->id, 'slot' => $request->input('slot')]);
         $validated = $request->validate([
-            'slot' => 'required|string|in:logo,background,avatar,resume',
+            'slot' => 'required|string|in:logo,background,avatar,resume,favicon',
         ]);
 
         $this->mediaService->clearMediaSlot($validated['slot']);
@@ -235,7 +236,7 @@ class MediaController extends Controller
             return $this->successResponse('Slot cleared successfully.');
         }
 
-        return redirect()->back()->with('success', ucfirst($validated['slot']) . ' cleared successfully.');
+        return redirect()->back()->with('success', ucfirst($validated['slot']).' cleared successfully.');
     }
 
     public function updateBrandingSettings(Request $request): RedirectResponse|JsonResponse

@@ -10,12 +10,13 @@ use App\Repositories\Dashboard\SidebarItemRepository;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Inertia\Response;
 
 class AnalyticsController extends Controller
 {
     public function __construct(private readonly SidebarItemRepository $sidebarItemRepository) {}
 
-    public function index(Request $request)
+    public function index(Request $request): Response
     {
         $validated = $request->validate(['range' => ['sometimes', 'in:7,30,90']]);
         $range = (int) ($validated['range'] ?? 30);
@@ -35,13 +36,18 @@ class AnalyticsController extends Controller
             ->groupBy('visit_date')
             ->orderBy('visit_date')
             ->get()
-            ->keyBy('visit_date');
+            ->mapWithKeys(static fn (AnalyticsVisit $row): array => [
+                (string) $row->getAttribute('visit_date') => [
+                    'views' => (int) $row->getAttribute('views'),
+                    'sessions' => (int) $row->getAttribute('sessions'),
+                ],
+            ]);
 
         $daily = collect(range(0, $range - 1))->map(function (int $offset) use ($start, $dailyRows): array {
             $date = $start->addDays($offset)->toDateString();
             $row = $dailyRows->get($date);
 
-            return ['date' => $date, 'views' => (int) ($row?->views ?? 0), 'sessions' => (int) ($row?->sessions ?? 0)];
+            return ['date' => $date, 'views' => $row['views'] ?? 0, 'sessions' => $row['sessions'] ?? 0];
         });
 
         $topPages = (clone $visits)->selectRaw('path, COUNT(*) as views')->groupBy('path')->orderByDesc('views')->limit(8)->get();

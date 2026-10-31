@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'background_media_id',
     'avatar_media_id',
     'resume_media_id',
+    'favicon_media_id',
     'theme_preset',
     'glass_blur',
     'glass_opacity',
@@ -38,6 +40,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class SiteSetting extends Model
 {
+    /** @use HasFactory<Factory<static>> */
     use HasFactory;
 
     protected function casts(): array
@@ -47,27 +50,46 @@ class SiteSetting extends Model
             'background_media_id' => 'integer',
             'avatar_media_id' => 'integer',
             'resume_media_id' => 'integer',
+            'favicon_media_id' => 'integer',
             'is_available' => 'boolean',
         ];
     }
 
+    /**
+     * @return BelongsTo<Media, $this>
+     */
     public function logoMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'logo_media_id');
     }
 
+    /**
+     * @return BelongsTo<Media, $this>
+     */
     public function backgroundMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'background_media_id');
     }
 
+    /**
+     * @return BelongsTo<Media, $this>
+     */
     public function avatarMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'avatar_media_id');
     }
 
+    /**
+     * @return BelongsTo<Media, $this>
+     */
     public function resumeMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'resume_media_id');
+    }
+
+    /** @return BelongsTo<Media, $this> */
+    public function faviconMedia(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'favicon_media_id');
     }
 }

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Data\Auth;
 
-use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\Email;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\Sometimes;
+use Spatie\LaravelData\Data;
 
 class LoginData extends Data
 {
@@ -16,5 +18,8 @@ class LoginData extends Data
 
         #[Required]
         public string $password,
+
+        #[Sometimes, BooleanType]
+        public bool $remember = false,
     ) {}
 }

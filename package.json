@@ -6,8 +6,8 @@
         "build": "vite build",
         "build:ssr": "vite build && vite build --ssr",
         "dev": "vite",
-        "check": "vite",
-        "check:fix": "vite --fix",
+        "check": "vp check",
+        "check:fix": "vp check --fix",
         "types:check": "tsc --noEmit"
     },
     "dependencies": {

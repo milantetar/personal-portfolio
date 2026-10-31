@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PortfolioAssistantRequest;
+use App\Models\PortfolioAssistantLog;
 use App\Services\Portfolio\PortfolioAssistantException;
 use App\Services\Portfolio\PortfolioAssistantService;
 use Illuminate\Http\JsonResponse;
@@ -22,11 +23,21 @@ class PortfolioAssistantController extends Controller
             return response()->json(['message' => 'Send a question to continue.'], 422);
         }
 
-        $dailyKey = 'portfolio-assistant:daily:'.hash('sha256', $request->ip() ?? 'unknown');
+        $userQuestion = trim((string) ($latestMessage['content'] ?? ''));
+        $ipHash = hash('sha256', $request->ip() ?? 'unknown');
+        $dailyKey = 'portfolio-assistant:daily:'.$ipHash;
         $dailyLimit = max(1, (int) config('services.gemini.daily_limit', 60));
 
         if (RateLimiter::tooManyAttempts($dailyKey, $dailyLimit)) {
             $retryAfter = RateLimiter::availableIn($dailyKey);
+
+            PortfolioAssistantLog::query()->create([
+                'session_id' => $request->header('X-Session-ID'),
+                'ip_hash' => $ipHash,
+                'user_question' => $userQuestion,
+                'assistant_answer' => 'Rate limit exceeded.',
+                'status' => 'rate_limited',
+            ]);
 
             return response()->json([
                 'message' => 'This visitor has reached the daily assistant limit. Please try again after it resets.',
@@ -34,13 +45,31 @@ class PortfolioAssistantController extends Controller
                 ->header('Cache-Control', 'no-store, private');
         }
 
-        $secondsUntilReset = max(1, now()->endOfDay()->timestamp - now()->timestamp);
+        $secondsUntilReset = max(1, (int) now()->secondsUntilEndOfDay());
         RateLimiter::hit($dailyKey, $secondsUntilReset);
 
         try {
-            return response()->json(['answer' => $assistant->answer($messages)])
+            $answer = $assistant->answer($messages);
+
+            PortfolioAssistantLog::query()->create([
+                'session_id' => $request->header('X-Session-ID'),
+                'ip_hash' => $ipHash,
+                'user_question' => $userQuestion,
+                'assistant_answer' => $answer,
+                'status' => 'success',
+            ]);
+
+            return response()->json(['answer' => $answer])
                 ->header('Cache-Control', 'no-store, private');
         } catch (PortfolioAssistantException $exception) {
+            PortfolioAssistantLog::query()->create([
+                'session_id' => $request->header('X-Session-ID'),
+                'ip_hash' => $ipHash,
+                'user_question' => $userQuestion,
+                'assistant_answer' => $exception->getMessage(),
+                'status' => 'error',
+            ]);
+
             return response()->json(['message' => $exception->getMessage()], $exception->httpStatus)
                 ->header('Cache-Control', 'no-store, private');
         }

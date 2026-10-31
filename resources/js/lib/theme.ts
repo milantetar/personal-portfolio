@@ -1,10 +1,4 @@
-
-export type Theme =
-    | 'light'
-    | 'dark'
-    | 'instagram'
-    | 'discord'
-    | 'system';
+export type Theme = 'light' | 'dark' | 'instagram' | 'discord' | 'system';
 
 export interface ThemeOption {
     value: Theme;
@@ -51,10 +45,7 @@ export const THEME_STORAGE_KEY = 'portfolio-theme';
  * - the `.light` / `.dark` class to apply on <html>
  * - the `data-theme` attribute value (or null to remove it)
  */
-export function resolveTheme(
-    theme: Theme,
-    systemPrefersDark: boolean,
-) {
+export function resolveTheme(theme: Theme, systemPrefersDark: boolean) {
     switch (theme) {
         case 'light':
             return { mode: 'light' as const, dataTheme: null };
@@ -76,7 +67,9 @@ export function resolveTheme(
 
         case 'system':
             return {
-                mode: systemPrefersDark ? ('dark' as const) : ('light' as const),
+                mode: systemPrefersDark
+                    ? ('dark' as const)
+                    : ('light' as const),
                 dataTheme: null,
             };
     }
