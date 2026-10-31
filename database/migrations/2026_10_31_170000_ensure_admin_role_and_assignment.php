@@ -26,4 +26,3 @@ return new class extends Migration
         // Keep role in place on rollback to avoid breaking permissions
     }
 };
-
