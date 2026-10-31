@@ -14,7 +14,7 @@ concurrency:
 jobs:
     tests:
         name: Lint, types, build, and tests
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         env:
             APP_ENV: testing
@@ -23,7 +23,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             - name: Set up PHP
               uses: shivammathur/setup-php@v2
@@ -42,16 +42,13 @@ jobs:
             - name: Generate application key
               run: php artisan key:generate
 
-            - name: Set up pnpm
-              uses: pnpm/action-setup@v4
-              with:
-                  version: 10
-
             - name: Set up Node
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v5
               with:
                   node-version: 22
-                  cache: pnpm
+
+            - name: Set up pnpm
+              run: npm install --global pnpm@10
 
             - name: Install pnpm dependencies
               run: pnpm install --frozen-lockfile
