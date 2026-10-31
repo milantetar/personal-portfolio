@@ -56,6 +56,7 @@ export default function AssistantLogsPage() {
         null,
     );
     const [isClearing, setIsClearing] = useState(false);
+    const [isClearDialogOpen, setIsClearDialogOpen] = useState(false);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -78,18 +79,20 @@ export default function AssistantLogsPage() {
     };
 
     const handleClearAll = () => {
-        if (
-            !window.confirm(
-                'Clear ALL assistant conversation logs? This action cannot be undone.',
-            )
-        )
-            return;
         setIsClearing(true);
-        router.delete('/dashboard/assistant-logs/clear', {
-            preserveScroll: true,
-            onSuccess: () => toast.success('All assistant logs cleared.'),
-            onFinish: () => setIsClearing(false),
-        });
+        router.post(
+            '/dashboard/assistant-logs/clear-all',
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setActiveLog(null);
+                    setIsClearDialogOpen(false);
+                    toast.success('All assistant logs cleared.');
+                },
+                onFinish: () => setIsClearing(false),
+            },
+        );
     };
 
     return (
@@ -110,7 +113,7 @@ export default function AssistantLogsPage() {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={handleClearAll}
+                                    onClick={() => setIsClearDialogOpen(true)}
                                     disabled={isClearing}
                                     className="text-destructive hover:text-destructive"
                                 >
@@ -397,6 +400,45 @@ export default function AssistantLogsPage() {
                             </div>
                         </>
                     )}
+                </DialogContent>
+            </Dialog>
+
+            <Dialog
+                open={isClearDialogOpen}
+                onOpenChange={(open) =>
+                    !isClearing && setIsClearDialogOpen(open)
+                }
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Clear all assistant logs?</DialogTitle>
+                        <DialogDescription>
+                            This permanently deletes {stats.total_queries}{' '}
+                            {stats.total_queries === 1
+                                ? 'conversation'
+                                : 'conversations'}{' '}
+                            from the assistant log. This cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-end gap-2">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            disabled={isClearing}
+                            onClick={() => setIsClearDialogOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            disabled={isClearing || stats.total_queries === 0}
+                            onClick={handleClearAll}
+                        >
+                            <Trash2 className="size-3.5" />
+                            {isClearing ? 'Clearing…' : 'Clear all logs'}
+                        </Button>
+                    </div>
                 </DialogContent>
             </Dialog>
         </>

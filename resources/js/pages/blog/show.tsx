@@ -63,7 +63,7 @@ export default function BlogShow({ settings, post }: BlogShowProps) {
                 <meta name="description" content={description} />
                 <meta name="robots" content="index,follow" />
                 <link rel="canonical" href={canonicalUrl} />
-                <link rel="icon" href={faviconUrl} />
+                <link head-key="icon" rel="icon" href={faviconUrl} />
 
                 <meta property="og:type" content="article" />
                 <meta property="og:site_name" content={siteName} />

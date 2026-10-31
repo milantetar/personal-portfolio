@@ -67,9 +67,9 @@ Route::middleware('auth')->group(function (): void {
 
         // Messages & Leads Inbox
         Route::get('/messages', [ContactMessageController::class, 'index'])->name('messages.index');
+        Route::post('/messages/bulk-destroy', [ContactMessageController::class, 'bulkDestroy'])->name('messages.bulk-destroy');
         Route::put('/messages/{message}', [ContactMessageController::class, 'update'])->name('messages.update');
         Route::delete('/messages/{message}', [ContactMessageController::class, 'destroy'])->name('messages.destroy');
-        Route::match(['post', 'delete'], '/messages/bulk-destroy', [ContactMessageController::class, 'bulkDestroy'])->name('messages.bulk-destroy');
         Route::match(['post', 'put'], '/messages/bulk-read', [ContactMessageController::class, 'bulkMarkRead'])->name('messages.bulk-read');
         Route::match(['post', 'put'], '/messages/bulk-mark-read', [ContactMessageController::class, 'bulkMarkRead'])->name('messages.bulk-mark-read');
 
@@ -81,9 +81,8 @@ Route::middleware('auth')->group(function (): void {
 
         // AI Assistant Recruiter Insights
         Route::get('/assistant-logs', [PortfolioAssistantLogController::class, 'index'])->name('assistant-logs.index');
+        Route::post('/assistant-logs/clear-all', [PortfolioAssistantLogController::class, 'clearAll'])->name('assistant-logs.clear-all');
         Route::delete('/assistant-logs/{log}', [PortfolioAssistantLogController::class, 'destroy'])->name('assistant-logs.destroy');
-        Route::match(['post', 'delete'], '/assistant-logs/clear-all', [PortfolioAssistantLogController::class, 'clearAll'])->name('assistant-logs.clear-all');
-        Route::match(['post', 'delete'], '/assistant-logs/clear', [PortfolioAssistantLogController::class, 'clearAll'])->name('assistant-logs.clear');
 
         // Configuration & Content
         Route::get('/settings', [SiteSettingsController::class, 'index'])->name('site-settings.index');

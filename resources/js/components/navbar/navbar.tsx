@@ -50,19 +50,14 @@ export function Navbar({
 
     return (
         <>
-            {branding?.favicon?.url ? (
-                <Head>
-                    <link
-                        rel="icon"
-                        href={branding.favicon.url}
-                        type={
-                            branding.favicon.mime_type.startsWith('image/')
-                                ? branding.favicon.mime_type
-                                : undefined
-                        }
-                    />
-                </Head>
-            ) : null}
+            <Head>
+                <link
+                    head-key="icon"
+                    rel="icon"
+                    href={branding?.favicon?.url || '/favicon.ico'}
+                    type={branding?.favicon?.mime_type || 'image/x-icon'}
+                />
+            </Head>
             <header
                 className={`app-topbar sticky top-0 z-50 w-full border-b border-border/80 bg-background/90 ${isDashboard ? 'app-topbar--admin' : 'app-topbar--public'}`}
             >

@@ -146,15 +146,18 @@ export default function MessagesPage() {
         )
             return;
         setIsBulkDeleting(true);
-        router.delete('/dashboard/messages/bulk-destroy', {
-            data: { ids: selectedIds },
-            preserveScroll: true,
-            onSuccess: () => {
-                setSelectedIds([]);
-                toast.success('Messages deleted.');
+        router.post(
+            '/dashboard/messages/bulk-destroy',
+            { ids: selectedIds },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setSelectedIds([]);
+                    toast.success('Messages deleted.');
+                },
+                onFinish: () => setIsBulkDeleting(false),
             },
-            onFinish: () => setIsBulkDeleting(false),
-        });
+        );
     };
 
     const handleBulkMarkRead = () => {

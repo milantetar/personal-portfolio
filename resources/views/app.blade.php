@@ -7,9 +7,6 @@
         <meta name="theme-color" content="#1c1f1d">
         <meta name="robots" content="{{ request()->routeIs('home', 'portfolio.*', 'blog.*') ? 'index,follow' : 'noindex,nofollow' }}">
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         @fonts
         @routes

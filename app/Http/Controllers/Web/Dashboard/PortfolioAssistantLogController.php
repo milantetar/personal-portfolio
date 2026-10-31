@@ -59,7 +59,7 @@ class PortfolioAssistantLogController extends Controller
 
     public function clearAll(): RedirectResponse
     {
-        PortfolioAssistantLog::query()->truncate();
+        PortfolioAssistantLog::query()->delete();
 
         return back()->with('success', 'All assistant chat logs have been cleared.');
     }
