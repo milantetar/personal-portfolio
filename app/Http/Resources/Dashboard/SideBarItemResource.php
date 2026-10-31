@@ -19,7 +19,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-class SidebarItemResource extends JsonResource
+class SideBarItemResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

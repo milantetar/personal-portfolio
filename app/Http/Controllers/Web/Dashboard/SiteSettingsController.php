@@ -7,7 +7,7 @@ namespace App\Http\Controllers\Web\Dashboard;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SiteSettingsUpdateRequest;
 use App\Models\Media;
-use App\Models\SidebarItem;
+use App\Models\SideBarItem;
 use App\Models\SiteSetting;
 use App\Repositories\Dashboard\SidebarItemRepository;
 use App\Services\Media\MediaService;
@@ -26,9 +26,9 @@ class SiteSettingsController extends Controller
     {
         $settings = SiteSetting::query()->with(['logoMedia', 'backgroundMedia', 'avatarMedia', 'resumeMedia', 'faviconMedia'])->first();
         $settings ??= SiteSetting::query()->create(['site_name' => "Milan's Portfolio"]);
-        $settingsSidebarItem = SidebarItem::query()->whereIn('url', ['/dashboard/settings', 'dashboard/settings'])->first();
+        $settingsSidebarItem = SideBarItem::query()->whereIn('url', ['/dashboard/settings', 'dashboard/settings'])->first();
         if (! $settingsSidebarItem) {
-            $settingsSidebarItem = SidebarItem::query()->create([
+            $settingsSidebarItem = SideBarItem::query()->create([
                 'label' => 'Site Settings', 'url' => '/dashboard/settings', 'sort_order' => 1, 'is_visible' => true,
             ]);
         } elseif ($settingsSidebarItem->url !== '/dashboard/settings') {
@@ -56,7 +56,7 @@ class SiteSettingsController extends Controller
         $this->mediaService->updateBranding($request->validated());
 
         if ($request->has('settings_icon_media_id')) {
-            SidebarItem::query()
+            SideBarItem::query()
                 ->where('url', '/dashboard/settings')
                 ->update(['icon_media_id' => $request->integer('settings_icon_media_id') ?: null]);
         }

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Web\Dashboard;
 
-use App\Data\Dashboard\SidebarItemData;
+use App\Data\Dashboard\SideBarItemData;
 use App\Http\Controllers\Controller;
-use App\Models\SidebarItem;
+use App\Models\SideBarItem;
 use App\Repositories\Dashboard\SidebarItemRepository;
-use App\Services\Dashboard\SidebarItemService;
+use App\Services\Dashboard\SidebarManagementService;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
@@ -16,14 +16,14 @@ use Illuminate\Support\Facades\Log;
 class SidebarItemController extends Controller
 {
     public function __construct(
-        protected SidebarItemService $sidebarItemService,
+        protected SidebarManagementService $sidebarItemService,
         protected SidebarItemRepository $sidebarItemRepository
     ) {}
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(SidebarItemData $data): RedirectResponse
+    public function store(SideBarItemData $data): RedirectResponse
     {
         Log::info('Web sidebar item creation started.', ['user_id' => auth()->id()]);
         try {
@@ -41,7 +41,7 @@ class SidebarItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(SidebarItemData $data, SidebarItem $sidebarItem): RedirectResponse
+    public function update(SideBarItemData $data, SideBarItem $sidebarItem): RedirectResponse
     {
         Log::info('Web sidebar item update started.', ['user_id' => auth()->id(), 'sidebar_item_id' => $sidebarItem->id]);
         try {
@@ -61,7 +61,7 @@ class SidebarItemController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(SidebarItem $sidebarItem): RedirectResponse
+    public function destroy(SideBarItem $sidebarItem): RedirectResponse
     {
         Log::info('Web sidebar item deletion started.', ['user_id' => auth()->id(), 'sidebar_item_id' => $sidebarItem->id]);
         try {

@@ -10,7 +10,7 @@ use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Data;
 
-class SidebarItemData extends Data
+class SideBarItemData extends Data
 {
     public function __construct(
         #[Required, Max(255)]

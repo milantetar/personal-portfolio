@@ -9,7 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CertificateRequest;
 use App\Models\Certificate;
 use App\Models\Media;
-use App\Models\SidebarItem;
+use App\Models\SideBarItem;
 use App\Repositories\Dashboard\SidebarItemRepository;
 use App\Services\Media\MediaService;
 use Illuminate\Http\RedirectResponse;
@@ -27,7 +27,7 @@ class CertificateController extends Controller
 
     public function index(): Response
     {
-        $certificateSidebarItem = SidebarItem::query()->firstOrCreate(
+        $certificateSidebarItem = SideBarItem::query()->firstOrCreate(
             ['url' => '/dashboard/certificates'],
             ['label' => 'Certificates', 'sort_order' => 2, 'is_visible' => true],
         );

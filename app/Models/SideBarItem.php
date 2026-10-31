@@ -28,8 +28,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'sort_order',
     'is_visible',
 ])]
-class SidebarItem extends Model
+class SideBarItem extends Model
 {
+    protected $table = 'sidebar_items';
+
     /** @use HasFactory<Factory<static>> */
     use HasFactory;
 
