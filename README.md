@@ -127,7 +127,7 @@ php artisan wayfinder:generate --with-form
 
 ## Deployment
 
-This application uses Inertia SSR so public portfolio and article pages arrive with their content and SEO tags already rendered. Production deployment must build the SSR bundle and keep the Inertia SSR process running.
+This application requires PHP 8.4 or newer and uses Inertia SSR so public portfolio and article pages arrive with their content and SEO tags already rendered. Production deployment must build the SSR bundle and keep the Inertia SSR process running.
 
 ```bash
 composer install --no-dev --optimize-autoloader
