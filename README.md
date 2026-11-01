@@ -1,168 +1,236 @@
-# Personal Portfolio
+# AI Personal Portfolio CMS
 
-A database-driven personal portfolio and admin dashboard built with Laravel, Inertia.js, and React. The public site renders its homepage sections from the database, while the dashboard manages projects, posts, certificates, media, navigation, contact messages, analytics, and AI assistant logs.
+[![CI](https://github.com/milantetar/personal-portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/milantetar/personal-portfolio/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-## Stack
+A database-driven personal portfolio and content management system built with
+Laravel, Inertia, React, and TypeScript.
 
-- **Backend:** Laravel 13, PHP 8.3+, Spatie Laravel Data, Spatie Permission, Laravel Sanctum
-- **Frontend:** Inertia.js 3, React 19, TypeScript (strict), Tailwind CSS 4, shadcn-style components
-- **Tooling:** Vite+, Pint, PHPStan/Larastan, Pest, pnpm
-- **Database:** SQLite by default; MySQL/PostgreSQL supported through Laravel
+The public portfolio, blog, navigation, theme settings, projects, certificates,
+media library, contact inbox, analytics, and AI assistant are managed through a
+role-protected dashboard. Homepage content remains database-driven so the site
+can be updated without changing frontend code.
+
+## Features
+
+- Database-driven portfolio sections and site settings
+- Projects, technical posts, certificates, and navigation management
+- Media upload and assignment for portfolio branding
+- Admin authentication with role-based authorization
+- Contact form and dashboard inbox
+- Portfolio analytics and assistant activity logs
+- Optional GitHub projects integration
+- Optional Gemini-powered portfolio assistant
+- Optional Resend email delivery
+- Inertia server-rendered pages with React
+- Responsive UI with Tailwind CSS and reusable components
+- Generated sitemap and robots.txt routes
+
+## Technology
+
+### Backend
+
+- Laravel 13
+- PHP 8.4+
+- MySQL or SQLite
+- Laravel Sanctum
+- Spatie Laravel Data
+- Spatie Laravel Permission
+- Spatie Query Builder
+
+### Frontend
+
+- React 19
+- TypeScript
+- Inertia.js 3
+- Vite 8
+- Tailwind CSS 4
+- Base UI and Lucide React
+- Laravel Wayfinder
+
+### Development tools
+
+- Composer
+- pnpm
+- Pest
+- Laravel Pint
+- PHPStan/Larastan
+- Vite Plus
 
 ## Requirements
 
-- PHP 8.3 or newer with `pdo_sqlite`, `mbstring`, `fileinfo`, `curl`, and `gd`
+- PHP 8.4 or newer
 - Composer 2
 - Node.js 22 or newer
 - pnpm 10 or newer
+- PHP extensions required by Laravel and the locked Composer dependencies
 - A writable `storage/` and `bootstrap/cache/` directory
 
-## Quick start
+## Getting started
+
+Clone the repository and install the dependencies:
 
 ```bash
-composer setup
+git clone https://github.com/milantetar/personal-portfolio.git
+cd personal-portfolio
+composer install
+pnpm install --frozen-lockfile
 ```
 
-`composer setup` installs PHP and JavaScript dependencies, creates `.env` from `.env.example`, generates the application key, runs migrations, and builds the frontend.
-
-Start the development servers:
+Create the local environment file:
 
 ```bash
-composer dev
+cp .env.example .env
+php artisan key:generate
 ```
 
-Or run the pieces separately:
+Configure the database in `.env`, then run the migrations:
+
+```bash
+php artisan migrate
+php artisan storage:link
+```
+
+Build the frontend assets:
+
+```bash
+pnpm build
+```
+
+Start the application:
 
 ```bash
 php artisan serve
 pnpm dev
 ```
 
-The public site is available at `http://localhost:8000` and the dashboard at `http://localhost:8000/dashboard`.
+The public site is available at `http://localhost:8000`. The admin dashboard
+is available at `http://localhost:8000/dashboard`.
 
-## Creating the first administrator
+For a complete local setup, `composer setup` runs the application setup,
+migrations, dependency installation, and frontend build steps.
 
-Set an administrator account in `.env`:
+## Initial administrator
+
+Set these values in `.env` before running the administrator seeder:
 
 ```dotenv
 ADMIN_NAME="Portfolio Admin"
 ADMIN_EMAIL=you@example.com
-ADMIN_PASSWORD="a-strong-password"
+ADMIN_PASSWORD="use-a-strong-local-password"
 ```
 
-Then create the user and assign the `admin` role:
+Run:
 
 ```bash
-php artisan db:seed --class=UserDataSeeder
+php artisan db:seed --class=DatabaseSeeder
 ```
 
-The seeder is idempotent and does nothing when `ADMIN_EMAIL` or `ADMIN_PASSWORD` is empty. It creates the user if needed but does not overwrite an existing password.
-
-To promote an existing account instead:
+To grant administrator access to an existing account:
 
 ```bash
 php artisan portfolio:grant-admin you@example.com
 ```
 
-Dashboard and dashboard API routes require the `admin` role. Access is denied until an administrator is explicitly assigned. Bootstrap an admin with `ADMIN_EMAIL` and `ADMIN_PASSWORD` using `UserDataSeeder`, or promote an existing user with `php artisan portfolio:grant-admin you@example.com`.
+The dashboard and dashboard API routes require the `admin` role. Never commit
+`.env` or real credentials.
 
-Passwords can be changed from **Dashboard → Settings → Change password**. Password reset emails use the configured mailer.
+## Optional integrations
 
-## Environment notes
+The following integrations are optional and can remain unset during local
+development:
 
-Copy `.env.example` to `.env` and adjust as needed.
+| Variables | Purpose |
+| --- | --- |
+| `GITHUB_TOKEN`, `GITHUB_USERNAME` | GitHub projects and API rate limits |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | Portfolio Q&A assistant |
+| `GEMINI_FALLBACK_MODEL`, `GEMINI_TIMEOUT_SECONDS` | Assistant fallback and timeout behavior |
+| `RESEND_API_KEY`, `MAIL_*` | Contact and password-reset email delivery |
 
-| Variable                                          | Purpose                                            |
-| ------------------------------------------------- | -------------------------------------------------- |
-| `APP_URL`                                         | Canonical URL used for absolute links              |
-| `DB_*`                                            | Database connection; SQLite is the default         |
-| `MAIL_*`, `RESEND_API_KEY`                        | Password reset and contact notifications           |
-| `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`     | Initial administrator bootstrap                    |
-| `GITHUB_TOKEN`, `GITHUB_USERNAME`                 | Public GitHub projects and higher API rate limits  |
-| `GITHUB_CA_BUNDLE`                                | Optional CA bundle for PHP cURL trust-store issues |
-| `GEMINI_API_KEY`, `GEMINI_MODEL`                  | Public portfolio Q&A assistant                     |
-| `GEMINI_FALLBACK_MODEL`, `GEMINI_TIMEOUT_SECONDS` | Assistant fallback behavior                        |
-| `GEMINI_CA_BUNDLE`                                | Optional CA bundle for Gemini requests             |
-| `PORTFOLIO_ASSISTANT_PER_MINUTE_LIMIT`            | Per-visitor assistant rate limit                   |
-| `PORTFOLIO_ASSISTANT_DAILY_LIMIT`                 | Daily assistant limit                              |
-
-The GitHub and Gemini integrations are optional. Without credentials, the corresponding public features degrade gracefully or report that they are unavailable.
-
-Uploaded media is stored on the `public` disk. Run `php artisan storage:link` after deployment.
+Review `.env.example` for the complete list of supported configuration
+variables. Keep backend secrets out of all `VITE_` variables.
 
 ## Content model
 
-- **`PortfolioSection`** and related records drive the public homepage. Edit them from **Dashboard → Sections**, **Projects**, **Certificates**, and **Posts**.
-- **Site settings** hold global identity, appearance, contact details, and media assignments, not duplicated homepage copy.
-- **Certificates** and **media** are separate records connected through relationships.
-- **Navigation** is managed per navbar location for the public and dashboard headers.
+- `PortfolioSection` and related records drive the public homepage.
+- Site settings store global identity, appearance, contact details, and media
+  assignments.
+- Projects and posts provide portfolio and blog content.
+- Certificates and media are separate records connected through relationships.
+- Navigation is managed independently for public and dashboard locations.
 
-The public blog is available at `/blog`, the assistant at `/assistant`, and `sitemap.xml` / `robots.txt` are generated by the application.
+Useful public routes include:
 
-## Checks
-
-Run the same checks used by CI:
-
-```bash
-pnpm check          # formatting and lint
-pnpm types:check    # TypeScript
-pnpm build          # production build
-composer lint       # format PHP
-composer lint:check # verify PHP formatting
-composer types:check # PHPStan
-php artisan test    # Pest feature and unit tests
+```text
+/
+/blog
+/assistant
+/sitemap.xml
+/robots.txt
 ```
 
-Generate Wayfinder route/action helpers before type checking in a fresh checkout:
+## Quality checks
+
+Run the relevant checks before opening a pull request:
+
+```bash
+pnpm check
+pnpm types:check
+pnpm build
+composer lint:check
+composer types:check
+php artisan test
+```
+
+In a fresh checkout, generate the Wayfinder files before TypeScript checks:
 
 ```bash
 php artisan wayfinder:generate --with-form
 ```
 
-`composer test` runs PHP formatting, static analysis, and the test suite.
+The CI workflow in `.github/workflows/ci.yml` validates frontend formatting,
+TypeScript, browser and SSR builds, PHP formatting, static analysis, and tests.
 
-## CI
-
-`.github/workflows/ci.yml` runs on pushes and pull requests to `main` and `master`. It installs PHP 8.3 and Node 22, uses an in-memory SQLite database, generates Wayfinder helpers, then runs frontend checks, the production client and SSR builds, PHP formatting, PHPStan, and the Pest suite.
-
-## Deployment
-
-This application requires PHP 8.4 or newer and uses Inertia SSR so public portfolio and article pages arrive with their content and SEO tags already rendered. Production deployment must build the SSR bundle and keep the Inertia SSR process running.
-
-```bash
-composer install --no-dev --optimize-autoloader
-pnpm install --frozen-lockfile
-pnpm build:ssr
-php artisan migrate --force
-php artisan storage:link
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-```
-
-Set `APP_ENV=production`, `APP_DEBUG=false`, and `APP_URL=https://mtportfolio.tech` in the server environment. Keep the production `.env` and uploaded files on persistent server storage; never commit credentials or media. Point the web server document root at `public/`, enable HTTPS, and run `php artisan inertia:start-ssr` under systemd or another process supervisor so it restarts after reboot and deployment. Back up the database and `storage/app/public` separately.
-
-The GitHub Actions workflow validates `main` and `master` pushes and pull requests. It builds both the browser and SSR bundles; it does not deploy. Add the host's SSH connection values as GitHub Actions secrets before adding an SSH deployment job. Keep CI on the same branch you publish (`master` in this checkout).
-
-## Project layout
+## Project structure
 
 ```text
 app/
-  Auth/                 Encrypted-email user provider
-  Console/Commands/     Admin and scaffolding commands
-  Data/                 Spatie data objects
-  Http/Controllers/     Web, API, and dashboard controllers
+  Auth/                 Authentication providers
+  Console/Commands/     Application commands
+  Data/                 Typed request and response data
+  Http/                 Controllers, middleware, requests, and resources
   Models/               Eloquent models
-  Services/             Auth, media, GitHub, assistant, and portfolio logic
+  Repositories/         Data access abstractions
+  Services/             Domain services
 database/
-  migrations/           Schema
-  seeders/              Administrator bootstrap
-resources/js/
-  components/           Shared, admin, and portfolio UI
-  pages/                Inertia pages (public, auth, blog, admin)
-  types/                Shared TypeScript types
-routes/
-  web.php               Public, auth, and dashboard routes
-  api.php               Sanctum-protected API routes
-tests/Feature/          Pest feature tests
+  migrations/           Database schema
+  seeders/              Local/bootstrap data
+resources/
+  js/components/        Shared, portfolio, and admin components
+  js/pages/             Inertia pages
+  views/                Server-rendered application shells
+routes/                 Web, API, and console routes
+tests/                  Pest feature and unit tests
 ```
+
+## Security practices
+
+- Keep `.env`, API keys, passwords, and database credentials private.
+- Use `APP_DEBUG=false` outside local development.
+- Do not place backend secrets in client-exposed environment variables.
+- Review uploads and authorization rules before production use.
+- Rotate credentials immediately if they are ever exposed.
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development and pull request
+guidelines. Please review the [Code of Conduct](./CODE_OF_CONDUCT.md) before
+participating.
+
+## Security
+
+See [SECURITY.md](./SECURITY.md) for responsible vulnerability reporting.
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE).
