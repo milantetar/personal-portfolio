@@ -140,12 +140,12 @@ The dashboard and dashboard API routes require the `admin` role. Never commit
 The following integrations are optional and can remain unset during local
 development:
 
-| Variables | Purpose |
-| --- | --- |
-| `GITHUB_TOKEN`, `GITHUB_USERNAME` | GitHub projects and API rate limits |
-| `GEMINI_API_KEY`, `GEMINI_MODEL` | Portfolio Q&A assistant |
-| `GEMINI_FALLBACK_MODEL`, `GEMINI_TIMEOUT_SECONDS` | Assistant fallback and timeout behavior |
-| `RESEND_API_KEY`, `MAIL_*` | Contact and password-reset email delivery |
+| Variables                                         | Purpose                                   |
+| ------------------------------------------------- | ----------------------------------------- |
+| `GITHUB_TOKEN`, `GITHUB_USERNAME`                 | GitHub projects and API rate limits       |
+| `GEMINI_API_KEY`, `GEMINI_MODEL`                  | Portfolio Q&A assistant                   |
+| `GEMINI_FALLBACK_MODEL`, `GEMINI_TIMEOUT_SECONDS` | Assistant fallback and timeout behavior   |
+| `RESEND_API_KEY`, `MAIL_*`                        | Contact and password-reset email delivery |
 
 Review `.env.example` for the complete list of supported configuration
 variables. Keep backend secrets out of all `VITE_` variables.
