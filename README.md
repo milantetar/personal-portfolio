@@ -11,6 +11,10 @@ media library, contact inbox, analytics, and AI assistant are managed through a
 role-protected dashboard. Homepage content remains database-driven so the site
 can be updated without changing frontend code.
 
+## Preview
+
+![Personal Portfolio CMS homepage](docs/screenshots/homepage.png)
+
 ## Features
 
 - Database-driven portfolio sections and site settings
