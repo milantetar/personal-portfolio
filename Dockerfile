@@ -5,8 +5,10 @@ FROM dunglas/frankenphp:1-php8.4-alpine AS base
 
 WORKDIR /app
 
-# Install PHP extensions required by Laravel
-RUN install-php-extensions \
+# Install PHP extensions required by Laravel & strip setcap for Render
+RUN apk add --no-cache libcap && \
+    setcap -r /usr/local/bin/frankenphp && \
+    install-php-extensions \
     pdo_sqlite \
     sqlite3 \
     bcmath \
