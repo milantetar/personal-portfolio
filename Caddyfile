@@ -1,4 +1,5 @@
 {
+    admin off
     frankenphp
     order php_server before file_server
 }
