@@ -1,18 +1,7 @@
 # ==========================================
-# Stage 1: Build React & Vite Assets
+# Base: FrankenPHP + Required PHP Extensions
 # ==========================================
-FROM node:22-alpine AS frontend
-WORKDIR /app
-RUN npm install -g pnpm@10
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
-COPY . .
-RUN pnpm build
-
-# ==========================================
-# Stage 2: Production PHP Application
-# ==========================================
-FROM dunglas/frankenphp:1-php8.4-alpine
+FROM dunglas/frankenphp:1-php8.4-alpine AS base
 
 WORKDIR /app
 
@@ -31,12 +20,45 @@ RUN install-php-extensions \
     pcntl \
     zip
 
-# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copy application code
+# ==========================================
+# Stage 1: Build React, Vite & Wayfinder Assets
+# ==========================================
+FROM base AS builder
+
+# Install Node.js & pnpm for Vite build
+RUN apk add --no-cache nodejs npm && \
+    npm install -g pnpm@10
+
+# 1. Install PHP dependencies (needed for `php artisan wayfinder:generate`)
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-interaction --prefer-dist
+
+# 2. Install JS dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# 3. Copy source, ensure Laravel cache paths exist, and build Vite + Wayfinder
 COPY . .
-COPY --from=frontend /app/public/build ./public/build
+RUN mkdir -p storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    bootstrap/cache && \
+    APP_ENV=production \
+    APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA= \
+    DB_CONNECTION=sqlite \
+    DB_DATABASE=:memory: \
+    pnpm build
+
+# ==========================================
+# Stage 2: Production PHP Application
+# ==========================================
+FROM base
+
+# Copy application code and compiled Vite assets
+COPY . .
+COPY --from=builder /app/public/build ./public/build
 
 # Install production PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
