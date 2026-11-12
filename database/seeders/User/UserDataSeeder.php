@@ -6,6 +6,7 @@ namespace Database\Seeders\User;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Role;
 
@@ -31,12 +32,12 @@ class UserDataSeeder extends Seeder
 
         $role = Role::findOrCreate('admin', 'web');
 
-        $user = User::query()->firstOrCreate(
+        $user = User::query()->updateOrCreate(
             ['email_hash' => hash('sha256', $email)],
             [
                 'name' => (string) config('admin.name', 'Portfolio Admin'),
                 'email' => $email,
-                'password' => $password,
+                'password' => Hash::make($password),
                 'email_verified_at' => now(),
             ],
         );

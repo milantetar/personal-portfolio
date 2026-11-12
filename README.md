@@ -72,87 +72,103 @@ can be updated without changing frontend code.
 
 ## Getting started
 
-Clone the repository and install the dependencies:
+### Quick Setup (Recommended)
+
+Clone the repository and run the automated setup command:
 
 ```bash
-git clone https://github.com/milantetar/personal-portfolio.git
+git clone https://github.com/your-username/personal-portfolio.git
 cd personal-portfolio
+composer setup
+```
+
+This installs PHP and Node dependencies, copies `.env.example`, generates the application key, creates and migrates the database, seeds starter portfolio content, links storage, and compiles the frontend.
+
+Alternatively, you can run the interactive setup wizard:
+
+```bash
 composer install
-pnpm install --frozen-lockfile
+php artisan portfolio:install
+pnpm install && pnpm build
 ```
 
-Create the local environment file:
-
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-Configure the database in `.env`, then run the migrations:
-
-```bash
-php artisan migrate
-php artisan storage:link
-```
-
-Build the frontend assets:
-
-```bash
-pnpm build
-```
-
-Start the application:
+Then start the local servers:
 
 ```bash
 php artisan serve
 pnpm dev
 ```
 
-The public site is available at `http://localhost:8000`. The admin dashboard
-is available at `http://localhost:8000/dashboard`.
+The public site is available at `http://localhost:8000`.
+The admin dashboard is available at `http://localhost:8000/dashboard` (default login: `admin@example.com` / `password`).
 
-For a complete local setup, `composer setup` runs the application setup,
-migrations, dependency installation, and frontend build steps.
+---
 
-## Initial administrator
+## 🎨 Customizing Your Portfolio (No Code Required)
 
-Set these values in `.env` before running the administrator seeder:
+Once logged into the admin dashboard at `/dashboard`, you can customize your entire portfolio:
 
-```dotenv
-ADMIN_NAME="Portfolio Admin"
-ADMIN_EMAIL=you@example.com
-ADMIN_PASSWORD="use-a-strong-local-password"
+1. **Site Settings & Branding (`/admin/site-settings`)**:
+   - Change your site title, hero headline, subtitle, bio, and contact email.
+   - Upload your own Avatar, Logo, Background image, and Resume PDF.
+   - Set your social profiles (GitHub, LinkedIn, etc.).
+   - Switch visual themes (*Midnight, Forest, Ocean, Instagram*).
+
+2. **Sections (`/admin/sections`)**:
+   - Reorder, edit, show, or hide sections (Hero, About, Skills, Experience, Projects, Certifications, Contact).
+
+3. **Featured & GitHub Projects**:
+   - Add custom curated projects via the admin dashboard.
+   - Enter your GitHub username in `Site Settings` (or `.env`) to automatically pull and display your public repositories.
+
+4. **AI Assistant (`/admin/site-settings`)**:
+   - Add a free `GEMINI_API_KEY` in `.env` to enable your on-site AI assistant to answer visitor questions about your work.
+
+---
+
+## 🚀 Hassle-Free Production Deployment
+
+To deploy this project to production (e.g. Railway, Render, Fly.io, DigitalOcean, VPS, or cPanel) with **minimal hassle**, you only need a handful of core environment variables.
+
+### Minimal Required `.env` Variables
+
+```ini
+APP_NAME="My Portfolio"
+APP_ENV=production
+APP_DEBUG=false
+APP_KEY=base64:...                      # Generate with: php artisan key:generate
+APP_URL=https://your-portfolio.com
+
+# Database (SQLite is zero-configuration and runs without a database server)
+DB_CONNECTION=sqlite
+DB_DATABASE=/absolute/path/to/database/database.sqlite
+
+# Session & Cache
+SESSION_DRIVER=database
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+FILESYSTEM_DISK=local
 ```
 
-Run:
+### What about `GITHUB_CA_BUNDLE` and `GEMINI_CA_BUNDLE`?
 
-```bash
-php artisan db:seed --class=DatabaseSeeder
-```
+> [!NOTE]
+> **You can completely leave `GITHUB_CA_BUNDLE` and `GEMINI_CA_BUNDLE` empty or omit them.**
+> 
+> * **Why they exist:** On local Windows machines (e.g. WampServer/XAMPP), PHP cURL sometimes lacks a bundled `cacert.pem` trust store, causing `cURL error 60: SSL certificate problem`. These two variables allow Windows developers to manually point PHP to a local `.pem` certificate.
+> * **In Production:** Linux servers, Docker containers, Railway, Render, Forge, and cloud hosts already provide up-to-date system root certificates (`ca-certificates`). cURL connects securely without needing any custom CA bundle.
 
-To grant administrator access to an existing account:
+### Optional Integrations Checklist
 
-```bash
-php artisan portfolio:grant-admin you@example.com
-```
+None of these are required to run the portfolio — configure them only when you want the feature:
 
-The dashboard and dashboard API routes require the `admin` role. Never commit
-`.env` or real credentials.
-
-## Optional integrations
-
-The following integrations are optional and can remain unset during local
-development:
-
-| Variables                                         | Purpose                                   |
-| ------------------------------------------------- | ----------------------------------------- |
-| `GITHUB_TOKEN`, `GITHUB_USERNAME`                 | GitHub projects and API rate limits       |
-| `GEMINI_API_KEY`, `GEMINI_MODEL`                  | Portfolio Q&A assistant                   |
-| `GEMINI_FALLBACK_MODEL`, `GEMINI_TIMEOUT_SECONDS` | Assistant fallback and timeout behavior   |
-| `RESEND_API_KEY`, `MAIL_*`                        | Contact and password-reset email delivery |
-
-Review `.env.example` for the complete list of supported configuration
-variables. Keep backend secrets out of all `VITE_` variables.
+| Variable | Required? | Purpose |
+|---|---|---|
+| `GITHUB_USERNAME` | Optional | GitHub username to fetch public repositories. Can also be set directly in the Admin Dashboard. |
+| `GITHUB_TOKEN` | Optional | GitHub Personal Access Token. Raises API rate limits from 60 to 5,000 requests/hour. |
+| `GEMINI_API_KEY` | Optional | Google AI Studio key. If left blank, the public AI assistant tab automatically hides itself. |
+| `RESEND_API_KEY` / `MAIL_*` | Optional | Email service for contact form notifications and password resets. Leave unset or use `MAIL_MAILER=log` for local testing. |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional | Initial credentials seeded by `php artisan db:seed`. You can change these inside `/dashboard`. |
 
 ## Content model
 

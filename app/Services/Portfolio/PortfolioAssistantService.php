@@ -205,8 +205,9 @@ class PortfolioAssistantService
 
         $lines[] = '';
         $lines[] = 'Public GitHub repositories:';
-        $githubProfileUrl = $site?->github_url ?: 'https://github.com/'.config('services.github.username', 'milantetar');
-        $repositories = $this->gitHubRepositoryService->publicRepositoriesForProfile($githubProfileUrl);
+        $githubUsername = config('services.github.username');
+        $githubProfileUrl = $site?->github_url ?: (filled($githubUsername) ? 'https://github.com/'.$githubUsername : null);
+        $repositories = filled($githubProfileUrl) ? $this->gitHubRepositoryService->publicRepositoriesForProfile($githubProfileUrl) : [];
         foreach (array_slice($repositories, 0, 15) as $repository) {
             $lines[] = Str::limit(implode(' | ', array_filter([
                 $repository['name'],

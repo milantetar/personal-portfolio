@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: personal-portfolio
+    runtime: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    dockerContext: .
+    envVars:
+      - key: APP_NAME
+        value: "Personal Portfolio"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /app/database/database.sqlite
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: ADMIN_NAME
+        value: "Portfolio Admin"
+      - key: ADMIN_EMAIL
+        value: admin@example.com
+      - key: ADMIN_PASSWORD
+        generateValue: true

@@ -79,7 +79,11 @@ export default function Home({
     const [portfolioTheme, setPortfolioTheme] =
         useState<PortfolioTheme>(initialTheme);
 
-    const siteUrl = page.props.seo?.siteUrl || 'https://mtportfolio.tech';
+    const siteUrl =
+        page.props.seo?.siteUrl ||
+        (typeof window !== 'undefined'
+            ? window.location.origin
+            : 'http://localhost:8000');
     const siteName = site.site_name || 'Portfolio';
     const pageTitle =
         activeSection?.title ||

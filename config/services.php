@@ -39,7 +39,7 @@ return [
 
     'github' => [
         'token' => env('GITHUB_TOKEN'),
-        'username' => env('GITHUB_USERNAME', 'milantetar'),
+        'username' => env('GITHUB_USERNAME'),
         'ca_bundle' => env('GITHUB_CA_BUNDLE'),
     ],
 

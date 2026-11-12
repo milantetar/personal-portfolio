@@ -40,7 +40,8 @@ class HomeController extends Controller
     private function renderPortfolio(string $activeSectionSlug, Collection $sections, GitHubRepositoryService $gitHubRepositoryService): Response
     {
         $settings = SiteSetting::query()->with(['logoMedia', 'backgroundMedia', 'avatarMedia', 'resumeMedia'])->first();
-        $githubProfileUrl = $settings?->github_url ?: 'https://github.com/'.config('services.github.username', 'milantetar');
+        $githubUsername = config('services.github.username');
+        $githubProfileUrl = $settings?->github_url ?: (filled($githubUsername) ? 'https://github.com/'.$githubUsername : null);
 
         return inertia('home', [
             'settings' => $settings,
