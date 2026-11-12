@@ -30,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('model:prune', ['--model' => [AnalyticsVisit::class]])->daily();
     })
     ->withMiddleware(function (Middleware $middleware) {
-        // Configure middleware here if needed
+        $middleware->trustProxies(at: '*');
 
         $middleware->web([
             HandleInertiaRequests::class,
