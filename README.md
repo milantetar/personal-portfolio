@@ -109,20 +109,20 @@ The admin dashboard is available at `http://localhost:8000/dashboard` (default l
 Once logged into the admin dashboard at `/dashboard`, you can customize your entire portfolio:
 
 1. **Site Settings & Branding (`/admin/site-settings`)**:
-   - Change your site title, hero headline, subtitle, bio, and contact email.
-   - Upload your own Avatar, Logo, Background image, and Resume PDF.
-   - Set your social profiles (GitHub, LinkedIn, etc.).
-   - Switch visual themes (*Midnight, Forest, Ocean, Instagram*).
+    - Change your site title, hero headline, subtitle, bio, and contact email.
+    - Upload your own Avatar, Logo, Background image, and Resume PDF.
+    - Set your social profiles (GitHub, LinkedIn, etc.).
+    - Switch visual themes (_Midnight, Forest, Ocean, Instagram_).
 
 2. **Sections (`/admin/sections`)**:
-   - Reorder, edit, show, or hide sections (Hero, About, Skills, Experience, Projects, Certifications, Contact).
+    - Reorder, edit, show, or hide sections (Hero, About, Skills, Experience, Projects, Certifications, Contact).
 
 3. **Featured & GitHub Projects**:
-   - Add custom curated projects via the admin dashboard.
-   - Enter your GitHub username in `Site Settings` (or `.env`) to automatically pull and display your public repositories.
+    - Add custom curated projects via the admin dashboard.
+    - Enter your GitHub username in `Site Settings` (or `.env`) to automatically pull and display your public repositories.
 
 4. **AI Assistant (`/admin/site-settings`)**:
-   - Add a free `GEMINI_API_KEY` in `.env` to enable your on-site AI assistant to answer visitor questions about your work.
+    - Add a free `GEMINI_API_KEY` in `.env` to enable your on-site AI assistant to answer visitor questions about your work.
 
 ---
 
@@ -154,21 +154,21 @@ FILESYSTEM_DISK=local
 
 > [!NOTE]
 > **You can completely leave `GITHUB_CA_BUNDLE` and `GEMINI_CA_BUNDLE` empty or omit them.**
-> 
-> * **Why they exist:** On local Windows machines (e.g. WampServer/XAMPP), PHP cURL sometimes lacks a bundled `cacert.pem` trust store, causing `cURL error 60: SSL certificate problem`. These two variables allow Windows developers to manually point PHP to a local `.pem` certificate.
-> * **In Production:** Linux servers, Docker containers, Railway, Render, Forge, and cloud hosts already provide up-to-date system root certificates (`ca-certificates`). cURL connects securely without needing any custom CA bundle.
+>
+> - **Why they exist:** On local Windows machines (e.g. WampServer/XAMPP), PHP cURL sometimes lacks a bundled `cacert.pem` trust store, causing `cURL error 60: SSL certificate problem`. These two variables allow Windows developers to manually point PHP to a local `.pem` certificate.
+> - **In Production:** Linux servers, Docker containers, Railway, Render, Forge, and cloud hosts already provide up-to-date system root certificates (`ca-certificates`). cURL connects securely without needing any custom CA bundle.
 
 ### Optional Integrations Checklist
 
 None of these are required to run the portfolio — configure them only when you want the feature:
 
-| Variable | Required? | Purpose |
-|---|---|---|
-| `GITHUB_USERNAME` | Optional | GitHub username to fetch public repositories. Can also be set directly in the Admin Dashboard. |
-| `GITHUB_TOKEN` | Optional | GitHub Personal Access Token. Raises API rate limits from 60 to 5,000 requests/hour. |
-| `GEMINI_API_KEY` | Optional | Google AI Studio key. If left blank, the public AI assistant tab automatically hides itself. |
-| `RESEND_API_KEY` / `MAIL_*` | Optional | Email service for contact form notifications and password resets. Leave unset or use `MAIL_MAILER=log` for local testing. |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional | Initial credentials seeded by `php artisan db:seed`. You can change these inside `/dashboard`. |
+| Variable                         | Required? | Purpose                                                                                                                   |
+| -------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `GITHUB_USERNAME`                | Optional  | GitHub username to fetch public repositories. Can also be set directly in the Admin Dashboard.                            |
+| `GITHUB_TOKEN`                   | Optional  | GitHub Personal Access Token. Raises API rate limits from 60 to 5,000 requests/hour.                                      |
+| `GEMINI_API_KEY`                 | Optional  | Google AI Studio key. If left blank, the public AI assistant tab automatically hides itself.                              |
+| `RESEND_API_KEY` / `MAIL_*`      | Optional  | Email service for contact form notifications and password resets. Leave unset or use `MAIL_MAILER=log` for local testing. |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional  | Initial credentials seeded by `php artisan db:seed`. You can change these inside `/dashboard`.                            |
 
 ## Content model
 

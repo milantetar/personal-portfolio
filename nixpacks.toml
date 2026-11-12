@@ -7,7 +7,7 @@ cmds = [
     "composer install --no-dev --optimize-autoloader --no-interaction",
     "pnpm install --frozen-lockfile",
     "pnpm build",
-    "php artisan storage:link"
+    "php artisan storage:link",
 ]
 
 [start]
