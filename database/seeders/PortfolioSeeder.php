@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
 
 class PortfolioSeeder extends Seeder
 {
@@ -44,7 +43,7 @@ class PortfolioSeeder extends Seeder
                     'primary_cta_url' => '#projects',
                     'primary_cta_label' => 'View Work',
                     'secondary_cta_url' => '#contact',
-                    'secondary_cta_label' => 'Contact'
+                    'secondary_cta_label' => 'Contact',
                 ]),
                 'sort_order' => 1,
                 'is_visible' => 1,
@@ -57,13 +56,13 @@ class PortfolioSeeder extends Seeder
                 'title' => 'Technical Skills',
                 'eyebrow' => '#skills',
                 'content' => json_encode([
-                    'body' => "Backend\nLaravel\nPHP\nNode.js\nREST APIs\n\nDatabases\nMySQL\nPostgreSQL\n\nFrontend\nReact\nTypeScript\nTailwind CSS"
+                    'body' => "Backend\nLaravel\nPHP\nNode.js\nREST APIs\n\nDatabases\nMySQL\nPostgreSQL\n\nFrontend\nReact\nTypeScript\nTailwind CSS",
                 ]),
                 'sort_order' => 2,
                 'is_visible' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]
+            ],
         ]);
 
         // 3. Seed Generic Projects
@@ -95,7 +94,7 @@ class PortfolioSeeder extends Seeder
                 'sort_order' => 2,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]
+            ],
         ]);
 
         // 4. Seed Certificates
@@ -119,7 +118,7 @@ class PortfolioSeeder extends Seeder
                 'is_visible' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]
+            ],
         ]);
 
         // 5. Seed Navigation Links
@@ -142,11 +141,11 @@ class PortfolioSeeder extends Seeder
         // 6. Seed Generic Analytics Sample Data
         $devices = ['desktop', 'mobile'];
         $paths = ['/', '/about', '/projects', '/contact'];
-        
+
         $analyticsData = [];
         for ($i = 1; $i <= 50; $i++) {
             $analyticsData[] = [
-                'visitor_hash' => hash('sha256', 'mock-visitor-' . $i),
+                'visitor_hash' => hash('sha256', 'mock-visitor-'.$i),
                 'path' => $paths[array_rand($paths)],
                 'referrer_host' => null,
                 'device_type' => $devices[array_rand($devices)],
