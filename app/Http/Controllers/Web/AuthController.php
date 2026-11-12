@@ -28,7 +28,7 @@ class AuthController extends Controller
     {
         Log::info('Web auth login page requested.');
 
-        return Inertia::render('auth/login');
+        return Inertia::render('Auth/Login');
     }
 
     // Handle Web Login
@@ -60,7 +60,7 @@ class AuthController extends Controller
 
     public function showForgotPassword(): Response
     {
-        return Inertia::render('auth/forgot-password');
+        return Inertia::render('Auth/forgot-password');
     }
 
     public function sendResetLink(Request $request): RedirectResponse
@@ -82,7 +82,7 @@ class AuthController extends Controller
 
     public function showResetPassword(Request $request, string $token): Response
     {
-        return Inertia::render('auth/reset-password', [
+        return Inertia::render('Auth/reset-password', [
             'token' => $token,
             'email' => (string) $request->query('email', ''),
         ]);
