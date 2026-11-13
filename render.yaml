@@ -2,15 +2,11 @@ services:
     - type: web
       name: personal-portfolio
       runtime: docker
-      # SQLite requires a persistent disk, available on paid Render services.
-      plan: starter
+      # Free SQLite is ephemeral: database changes can disappear on restart.
+      plan: free
       dockerfilePath: Dockerfile
       dockerContext: .
       healthCheckPath: /up
-      disk:
-          name: portfolio-sqlite
-          mountPath: /app/storage/app/database
-          sizeGB: 1
       envVars:
           - key: APP_NAME
             value: 'Personal Portfolio'

@@ -2,8 +2,10 @@
 
 SQLite is appropriate for this small portfolio with one application instance.
 Cloudinary stores uploads; SQLite stores content, users, and media references.
-The Blueprint uses a paid Render Starter service and a 1 GB persistent disk.
-Render's free filesystem cannot retain database edits across restarts.
+The current Blueprint uses Render's free plan without a disk. It cannot retain
+database edits across restarts. The transfer instructions below apply only if
+you explicitly upgrade to a paid instance and attach a persistent disk at
+`/app/storage/app/database`; they do not apply to the free preview.
 See [Render persistent disks](https://render.com/docs/disks).
 
 ## Settings

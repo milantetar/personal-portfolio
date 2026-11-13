@@ -6,13 +6,13 @@ Inertia SSR is disabled because this image runs a single PHP web process.
 
 ## Required services and secrets
 
-The selected deployment uses SQLite on a Render persistent disk and Cloudinary
-for media. Neon is optional and is not needed for this setup. The repository's
-`render.yaml` selects a paid Starter web service with a 1 GB disk. Review the
-cost in Render before deploying; editing these files does not provision services.
-SQLite inside a free web container loses changes on redeploy or restart.
-Follow [the SQLite deployment steps](sqlite-deployment.md) to transfer your
-existing database privately and preserve its encryption key.
+The selected Blueprint uses a free Render web service, SQLite, and Cloudinary
+for media. It provisions no persistent disk. SQLite database changes can disappear
+on redeploy or restart; this setup is suitable for a disposable preview.
+Startup recreates starter content and the configured administrator when the
+database is absent. It does not copy your existing local portfolio database.
+For lasting dashboard edits, use an external database or opt into a paid disk
+using [the SQLite deployment steps](sqlite-deployment.md).
 
 Set these in Render's Environment page (or during initial Blueprint creation):
 
@@ -26,7 +26,7 @@ Set these in Render's Environment page (or during initial Blueprint creation):
 | `RESEND_API_KEY`    | Your Resend API key for contact notifications and password reset emails.                                                 |
 | `MAIL_FROM_ADDRESS` | A valid sender email on your verified Resend domain, such as `portfolio@example.com`. A bare domain is invalid.          |
 
-The Blueprint selects SQLite on a persistent disk, Cloudinary, database sessions/cache, synchronous
+The Blueprint selects ephemeral SQLite, Cloudinary, database sessions/cache, synchronous
 jobs, and stderr logging. It uses `/up` for health checks. Set `APP_URL` to your
 custom HTTPS domain if using one; otherwise startup uses `RENDER_EXTERNAL_URL`.
 Optional integrations remain `GITHUB_USERNAME`, `GITHUB_TOKEN`, and `GEMINI_API_KEY`.
@@ -150,9 +150,9 @@ wait for that workflow before treating the container as verified.
 ## 2. Configure the persistent production database
 
 The default Blueprint configures SQLite at
-`/app/storage/app/database/portfolio.sqlite` on its persistent disk.
-Follow [sqlite-deployment.md](sqlite-deployment.md) for the first deployment,
-existing-data transfer, backups, and disk permissions.
+`/app/storage/app/database/portfolio.sqlite` on the free container filesystem.
+This file is ephemeral. For durable SQLite storage, explicitly choose a paid
+instance and disk before following [sqlite-deployment.md](sqlite-deployment.md).
 
 ### Optional PostgreSQL alternative
 
@@ -174,9 +174,8 @@ web service with a persistent disk. Mount a disk at a private path such as
 `/var/data`, use `DB_CONNECTION=sqlite`, clear `DB_URL`, and set
 `DB_DATABASE=/var/data/portfolio.sqlite`. Ensure the directory is writable by
 the image's `portfolio` user before using it; do not solve ownership problems
-with `chmod 777`. The Blueprint already provisions a disk at
-`/app/storage/app/database`; use its configured path rather than `/var/data`
-unless you deliberately change the mount and database path together.
+with `chmod 777`. The free Blueprint does not provision this disk. Add one and
+upgrade the instance explicitly if you choose persistent SQLite.
 
 Transfer a consistent SQLite backup privately to that disk using Render's SSH/SCP
 instructions. Do not overwrite a running database: stop writes first, keep a
@@ -338,7 +337,7 @@ Linux should use its system certificate store; never disable TLS verification.
 1. Push the reviewed source to your repository. Wait for PHP/frontend CI and the
    Docker/PostgreSQL smoke workflow. Run the browser audit locally.
 2. In Render, select **New > Blueprint**, choose the repository, and review the
-   paid Starter web service and persistent disk. Add the required secrets from the table above.
+   free web service with no disk. Add the required secrets from the table above.
 3. Add optional Gemini/GitHub variables manually. Existing Blueprint services do
    not necessarily prompt again for newly introduced secrets.
 4. Keep `APP_ENV=production`, `APP_DEBUG=false`, `SESSION_SECURE_COOKIE=true`,
