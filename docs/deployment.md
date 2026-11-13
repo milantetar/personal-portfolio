@@ -78,15 +78,41 @@ when deploying an existing database containing encrypted user records.
 
 ## Local Docker smoke test
 
-```sh
-docker build -t personal-portfolio .
-docker run --rm -p 8080:8080 --env-file .env.docker personal-portfolio
+Install Docker Desktop with Linux containers, then run from the project root:
+
+```powershell
+php docker/setup-local.php
+notepad .env.docker
+docker compose up --build -d
+docker compose ps
 ```
 
-Create `.env.docker` privately with the production values above, plus
-`APP_URL=http://localhost:8080` and `SESSION_SECURE_COOKIE=false` for local HTTP.
-Use a dedicated test PostgreSQL database. The startup script applies migrations
-to the supplied database. Never commit this environment file.
+The setup script creates `.env.docker` from `docker/local.env.example`, generates
+a random application key and admin password, and refuses to overwrite an existing
+file. Set `GEMINI_API_KEY` privately using a key from
+[AI Studio](https://aistudio.google.com/apikey). Open `http://localhost:8080` and
+use `/login` with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env.docker`.
+Test `/assistant` after adding the key. Saving environment changes requires
+`docker compose up -d --force-recreate`; no image rebuild is needed for secrets.
+
+Compose binds only to localhost and uses separate named SQLite and media volumes.
+Startup migrates and bootstraps that Docker database with starter content; it
+does not import your current development data. `docker compose down` preserves
+these volumes. Do not use `down -v` unless you intend to delete the Docker data.
+`APP_ENV=local` and `SESSION_SECURE_COOKIE=false` allow the local HTTP URL while
+`APP_DEBUG=false` keeps error details private. Keep production settings on Render.
+
+To test Cloudinary, set `MEDIA_STORAGE_DISK=cloudinary` and `CLOUDINARY_URL` in
+the private file. To test Neon, create a dedicated test branch and set
+`DB_CONNECTION=pgsql`, `DB_DATABASE=` and `DB_URL` to its connection string
+including `sslmode=require`. Startup applies migrations to the database you
+select, so check the target branch before starting. SQLite is sufficient for
+local Docker testing; Neon is needed only when you choose it for deployment.
+
+Never add API keys as Dockerfile `ARG` or `ENV` values, build arguments, or
+`VITE_*` variables. `.env.docker` is excluded from Git and the Docker build context;
+Compose supplies it only at runtime. Avoid sharing `docker compose config`,
+`docker inspect`, or application configuration output: these may contain secrets.
 
 For rollback, redeploy the previous image while keeping secrets and database
 settings unchanged. Rolling back an image does not roll back database migrations;
@@ -239,14 +265,17 @@ production database or claim to validate a live PostgreSQL restore.
 
 ```dotenv
 GEMINI_API_KEY=your_private_key
-GEMINI_MODEL=gemini-3.5-flash-lite
-GEMINI_FALLBACK_MODEL=gemini-3.5-flash-lite
+GEMINI_MODEL=gemini-4-hydrogen
+GEMINI_FALLBACK_MODEL=gemini-4-hydrogen
 GEMINI_TIMEOUT_SECONDS=12
 PORTFOLIO_ASSISTANT_PER_MINUTE_LIMIT=10
 PORTFOLIO_ASSISTANT_DAILY_LIMIT=60
 ```
 
-The model above is listed in Google's model catalogue at review time. If your
+The model above is listed in [Google's current model catalogue](https://aistudio.google.com/docs/models)
+as of November 13, 2026. Existing `.env` values override the new defaults; update
+`GEMINI_MODEL` and `GEMINI_FALLBACK_MODEL` there yourself if you want this model
+outside Docker, then run `php artisan config:clear`. If your
 project has different access, choose an available text model supporting
 `generateContent`. Keeping fallback equal to the primary avoids silently
 selecting a different model; set a distinct fallback only after checking its

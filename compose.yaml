@@ -1,0 +1,20 @@
+services:
+  app:
+    build: .
+    ports:
+      - '127.0.0.1:8080:8080'
+    env_file:
+      - .env.docker
+    volumes:
+      - portfolio_database:/app/storage/app/database
+      - portfolio_media:/app/storage/app/public
+    healthcheck:
+      test: ['CMD', 'php', '-r', "exit(@file_get_contents('http://127.0.0.1:8080/up') === false ? 1 : 0);"]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+
+volumes:
+  portfolio_database:
+  portfolio_media:

@@ -74,6 +74,7 @@ RUN mkdir -p storage/framework/cache/data \
     storage/framework/sessions \
     storage/framework/views \
     storage/app/public \
+    storage/app/database \
     database \
     bootstrap/cache && \
     ln -s /app/storage/app/public public/storage && \
@@ -90,6 +91,8 @@ RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh && \
 
 ENV APP_ENV=production APP_DEBUG=false LOG_CHANNEL=stderr LOG_LEVEL=info INERTIA_SSR_ENABLED=false
 ENV XDG_CONFIG_HOME=/config XDG_DATA_HOME=/data
+# Pass GEMINI_API_KEY, CLOUDINARY_URL and DB_URL at runtime with --env-file
+# or your hosting provider's secret settings. Never use ARG/ENV for secret values.
 USER portfolio
 
 EXPOSE 8080

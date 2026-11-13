@@ -47,8 +47,8 @@ return [
 
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-3.5-flash-lite'),
-        'fallback_model' => env('GEMINI_FALLBACK_MODEL', 'gemini-3.6-flash'),
+        'model' => env('GEMINI_MODEL', 'gemini-4-hydrogen'),
+        'fallback_model' => env('GEMINI_FALLBACK_MODEL', 'gemini-4-hydrogen'),
         'timeout' => env('GEMINI_TIMEOUT_SECONDS', 12),
         'ca_bundle' => env('GEMINI_CA_BUNDLE'),
         'per_minute_limit' => env('PORTFOLIO_ASSISTANT_PER_MINUTE_LIMIT', 10),

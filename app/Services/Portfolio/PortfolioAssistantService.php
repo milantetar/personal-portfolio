@@ -25,7 +25,7 @@ class PortfolioAssistantService
     public function answer(array $messages): string
     {
         $apiKey = config('services.gemini.api_key');
-        $model = (string) config('services.gemini.model', 'gemini-3.5-flash-lite');
+        $model = (string) config('services.gemini.model', 'gemini-4-hydrogen');
 
         if (! is_string($apiKey) || trim($apiKey) === '') {
             throw new PortfolioAssistantException(503, 'The portfolio assistant is not configured yet.');
@@ -50,7 +50,7 @@ class PortfolioAssistantService
             ],
         ];
 
-        $fallbackModel = (string) config('services.gemini.fallback_model', 'gemini-3.6-flash');
+        $fallbackModel = (string) config('services.gemini.fallback_model', 'gemini-4-hydrogen');
         $models = array_values(array_unique(array_filter([$model, $fallbackModel], static fn (string $name): bool => trim($name) !== '')));
         $response = null;
         $activeModel = $model;
