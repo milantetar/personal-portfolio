@@ -1786,19 +1786,19 @@ samp {
 .portfolio-site[data-theme='forest'],
 .portfolio-site[data-theme='ocean'],
 .portfolio-site[data-theme='instagram'] {
-    --background: 150 6% 12%;
+    --background: 150 6% 16%;
     --foreground: 90 13% 94%;
-    --card: 150 5% 16%;
+    --card: 150 5% 20%;
     --card-foreground: 90 13% 94%;
-    --popover: 150 5% 14%;
+    --popover: 150 5% 18%;
     --popover-foreground: 90 13% 94%;
     --primary: 120 8% 59%;
     --primary-foreground: 150 6% 10%;
-    --secondary: 145 5% 22%;
+    --secondary: 145 5% 26%;
     --secondary-foreground: 90 13% 94%;
-    --muted: 145 5% 20%;
+    --muted: 145 5% 24%;
     --muted-foreground: 105 7% 72%;
-    --accent: 130 8% 24%;
+    --accent: 130 8% 28%;
     --accent-foreground: 90 13% 96%;
     --border: 140 6% 29%;
     --input: 140 6% 34%;
@@ -1806,30 +1806,30 @@ samp {
 }
 
 .portfolio-site[data-theme='forest'] {
-    --background: 150 9% 10%;
-    --card: 150 7% 14%;
-    --popover: 150 7% 12%;
-    --secondary: 145 7% 20%;
-    --muted: 145 7% 18%;
-    --accent: 130 10% 23%;
+    --background: 150 9% 14%;
+    --card: 150 7% 18%;
+    --popover: 150 7% 16%;
+    --secondary: 145 7% 24%;
+    --muted: 145 7% 22%;
+    --accent: 130 10% 27%;
 }
 
 .portfolio-site[data-theme='ocean'] {
-    --background: 205 9% 11%;
-    --card: 205 8% 15%;
-    --popover: 205 8% 13%;
-    --secondary: 205 7% 21%;
-    --muted: 205 7% 19%;
-    --accent: 205 8% 24%;
+    --background: 205 9% 15%;
+    --card: 205 8% 19%;
+    --popover: 205 8% 17%;
+    --secondary: 205 7% 25%;
+    --muted: 205 7% 23%;
+    --accent: 205 8% 28%;
 }
 
 .portfolio-site[data-theme='instagram'] {
-    --background: 25 5% 12%;
-    --card: 25 4% 16%;
-    --popover: 25 4% 14%;
-    --secondary: 25 4% 22%;
-    --muted: 25 4% 20%;
-    --accent: 25 5% 25%;
+    --background: 25 5% 16%;
+    --card: 25 4% 20%;
+    --popover: 25 4% 18%;
+    --secondary: 25 4% 26%;
+    --muted: 25 4% 24%;
+    --accent: 25 5% 29%;
 }
 
 /* Keep custom imagery available as a page backdrop, while making every text

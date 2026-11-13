@@ -100,7 +100,7 @@ pnpm dev
 ```
 
 The public site is available at `http://localhost:8000`.
-The admin dashboard is available at `http://localhost:8000/dashboard` (default login: `admin@example.com` / `password`).
+The admin dashboard is available at `http://localhost:8000/dashboard`. Set a unique admin email and password during installation; noninteractive installation requires `ADMIN_EMAIL` and an `ADMIN_PASSWORD` of at least 12 characters.
 
 ---
 

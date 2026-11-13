@@ -25,7 +25,7 @@ class ContactController extends Controller
             return back()->with('success', 'Thanks for reaching out. Your message has been sent.');
         }
 
-        // Persist message to database so it is never lost
+        // Keep an inbox copy when email delivery fails.
         $contactMessage = ContactMessage::query()->create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -58,7 +58,11 @@ class ContactController extends Controller
                     'message_id' => $contactMessage->id,
                     'exception' => $exception->getMessage(),
                 ]);
+
+                return back()->with('error', 'Your message was saved, but the email notification failed. Please contact me directly if it is urgent.');
             }
+        } else {
+            return back()->with('error', 'Your message was saved, but email notifications are not configured. Please contact me directly if it is urgent.');
         }
 
         return back()->with('success', 'Thanks for reaching out. Your message has been received.');

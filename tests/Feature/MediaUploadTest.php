@@ -6,20 +6,16 @@ use App\Models\Media;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-it('stores supported SVG uploads', function (): void {
+it('rejects SVG uploads', function (): void {
     Storage::fake('public');
 
     $this->actingAs(adminUser())
         ->postJson('/dashboard/media', [
             'file' => UploadedFile::fake()->create('icon.svg', 10, 'image/svg+xml'),
         ])
-        ->assertCreated();
+        ->assertUnprocessable();
 
-    $media = Media::query()->sole();
-
-    expect($media->mime_type)->toStartWith('image/svg+xml');
-
-    Storage::disk('public')->assertExists($media->path);
+    expect(Media::query()->count())->toBe(0);
 });
 
 it('stores supported image uploads', function (): void {

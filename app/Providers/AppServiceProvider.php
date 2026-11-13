@@ -46,10 +46,14 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
-        RateLimiter::for('login', static function (Request $request): Limit {
-            return Limit::perDay(5)->by(
-                'login:'.hash('sha256', Str::lower(trim((string) $request->input('email')))),
-            );
+        RateLimiter::for('login', static function (Request $request): array {
+            $ip = $request->ip() ?? 'unknown';
+            $email = Str::lower(trim((string) $request->input('email')));
+
+            return [
+                Limit::perMinute(20)->by('login-ip:'.hash('sha256', $ip)),
+                Limit::perMinute(5)->by('login-account-ip:'.hash('sha256', $email.'|'.$ip)),
+            ];
         });
 
         RateLimiter::for('portfolio-assistant', static function (Request $request): Limit {

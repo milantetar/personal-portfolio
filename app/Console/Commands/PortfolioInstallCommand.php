@@ -21,6 +21,16 @@ class PortfolioInstallCommand extends Command
     public function handle(): int
     {
         $this->newLine();
+
+        if (! $this->input->isInteractive() &&
+            (strtolower(trim((string) config('admin.email', ''))) === 'admin@example.com' ||
+                blank(config('admin.email')) ||
+                strlen((string) config('admin.password', '')) < 12)) {
+            $this->error('Set ADMIN_EMAIL and an ADMIN_PASSWORD of at least 12 characters for noninteractive installation.');
+
+            return self::FAILURE;
+        }
+
         $this->info('=========================================');
         $this->info('  🚀 Personal Portfolio CMS Setup Wizard  ');
         $this->info('=========================================');
@@ -85,7 +95,7 @@ class PortfolioInstallCommand extends Command
         } else {
             $name = $defaultName;
             $email = $defaultEmail;
-            $password = config('admin.password') ?: 'password';
+            $password = (string) config('admin.password', '');
         }
 
         $emailClean = strtolower(trim((string) $email));

@@ -241,7 +241,7 @@ export function PolymorphicThemeHub({
             <input
                 ref={faviconInputRef}
                 type="file"
-                accept=".ico,.png,.svg,image/x-icon,image/png,image/svg+xml"
+                accept=".ico,.png,image/x-icon,image/png"
                 className="hidden"
                 onChange={(e) => {
                     const file = e.target.files?.[0];

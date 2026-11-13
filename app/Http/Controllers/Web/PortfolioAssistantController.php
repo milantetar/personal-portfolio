@@ -10,6 +10,7 @@ use App\Models\PortfolioAssistantLog;
 use App\Services\Portfolio\PortfolioAssistantException;
 use App\Services\Portfolio\PortfolioAssistantService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
 
 class PortfolioAssistantController extends Controller
@@ -28,7 +29,24 @@ class PortfolioAssistantController extends Controller
         $dailyKey = 'portfolio-assistant:daily:'.$ipHash;
         $dailyLimit = max(1, (int) config('services.gemini.daily_limit', 60));
 
-        if (RateLimiter::tooManyAttempts($dailyKey, $dailyLimit)) {
+        $lock = Cache::lock('portfolio-assistant:admission:'.$ipHash, 5);
+        if (! $lock->get()) {
+            return response()->json(['message' => 'The assistant is busy. Please retry shortly.'], 429)
+                ->header('Retry-After', '1')
+                ->header('Cache-Control', 'no-store, private');
+        }
+
+        try {
+            $limited = RateLimiter::tooManyAttempts($dailyKey, $dailyLimit);
+            if (! $limited) {
+                $secondsUntilReset = max(1, (int) now()->secondsUntilEndOfDay());
+                RateLimiter::hit($dailyKey, $secondsUntilReset);
+            }
+        } finally {
+            $lock->release();
+        }
+
+        if ($limited) {
             $retryAfter = RateLimiter::availableIn($dailyKey);
 
             PortfolioAssistantLog::query()->create([
@@ -44,9 +62,6 @@ class PortfolioAssistantController extends Controller
             ], 429)->header('Retry-After', (string) $retryAfter)
                 ->header('Cache-Control', 'no-store, private');
         }
-
-        $secondsUntilReset = max(1, (int) now()->secondsUntilEndOfDay());
-        RateLimiter::hit($dailyKey, $secondsUntilReset);
 
         try {
             $answer = $assistant->answer($messages);

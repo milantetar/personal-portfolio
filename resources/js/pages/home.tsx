@@ -188,8 +188,8 @@ export default function Home({
         Math.max(0, Number(site.glass_opacity ?? 72)),
     );
     const backdropScrimOpacity = Math.min(
-        0.86,
-        0.58 + backdropIntensity * 0.0028,
+        0.68,
+        0.34 + backdropIntensity * 0.002,
     );
 
     const changePortfolioTheme = (theme: PortfolioTheme) => {

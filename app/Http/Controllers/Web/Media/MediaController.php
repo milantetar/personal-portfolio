@@ -92,14 +92,14 @@ class MediaController extends Controller
         Log::info('Web bulk media upload started.', ['user_id' => $request->user()?->id, 'file_count' => count((array) $request->file('files', []))]);
         $validator = Validator::make($request->all(), [
             'files' => ['required', 'array', 'min:1', 'max:50'],
-            'files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp,avif,svg,ico,pdf,mp3', 'max:20480'],
+            'files.*' => ['required', 'file', 'mimes:jpg,jpeg,png,gif,webp,avif,ico,pdf,mp3', 'max:20480'],
             'alt_text' => ['nullable', 'string', 'max:255'],
             'title' => ['nullable', 'string', 'max:255'],
         ], [
             'files.required' => 'Select at least one file to upload.',
             'files.array' => 'The uploaded files have an invalid format.',
             'files.*.file' => 'The server did not receive this file correctly. Check your PHP upload limits and try again.',
-            'files.*.mimes' => 'Unsupported file type. Use JPG, JPEG, PNG, GIF, WEBP, AVIF, SVG, ICO, PDF, or MP3.',
+            'files.*.mimes' => 'Unsupported file type. Use JPG, JPEG, PNG, GIF, WEBP, AVIF, ICO, PDF, or MP3.',
             'files.*.max' => 'This file is too large. The maximum allowed size is 20 MB.',
         ]);
 

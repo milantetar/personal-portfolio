@@ -15,7 +15,7 @@ class MediaUpdateData extends Data
 {
     public function __construct(
         #[Nullable]
-        #[Mimes('jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'svg', 'ico', 'pdf', 'mp3')]
+        #[Mimes('jpg', 'jpeg', 'png', 'gif', 'webp', 'avif', 'ico', 'pdf', 'mp3')]
         #[Max(20480)]
         public ?UploadedFile $file = null,
 
