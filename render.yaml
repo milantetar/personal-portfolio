@@ -50,6 +50,12 @@ services:
             value: cloudinary
           - key: CLOUDINARY_URL
             sync: false
+          - key: GEMINI_API_KEY
+            sync: false
+          - key: GEMINI_MODEL
+            value: gemini-4-hydrogen
+          - key: GEMINI_FALLBACK_MODEL
+            value: gemini-4-hydrogen
           - key: ADMIN_NAME
             value: 'Portfolio Admin'
           - key: ADMIN_EMAIL
