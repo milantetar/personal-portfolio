@@ -44,6 +44,8 @@ services:
             sync: false
           - key: SEED_ON_DEPLOY
             value: 'true'
+          - key: DEPLOYMENT_CONTENT_SEED
+            value: 'true'
           - key: FILESYSTEM_DISK
             value: local
           - key: MEDIA_STORAGE_DISK

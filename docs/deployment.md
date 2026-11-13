@@ -9,8 +9,10 @@ Inertia SSR is disabled because this image runs a single PHP web process.
 The selected Blueprint uses a free Render web service, SQLite, and Cloudinary
 for media. It provisions no persistent disk. SQLite database changes can disappear
 on redeploy or restart; this setup is suitable for a disposable preview.
-Startup recreates starter content and the configured administrator when the
-database is absent. It does not copy your existing local portfolio database.
+Startup restores the reviewed public portfolio snapshot and the configured
+administrator when the database is empty. It does not copy the entire local
+database: analytics, accounts, sessions, tokens, messages, and logs are excluded.
+See [public content deployment](public-content-deployment.md).
 For lasting dashboard edits, use an external database or opt into a paid disk
 using [the SQLite deployment steps](sqlite-deployment.md).
 
@@ -52,11 +54,14 @@ Startup runs migrations before accepting traffic. A migration or cache error
 stops the container and appears in Render logs. Back up the database before
 deployments that change its schema.
 
-`SEED_ON_DEPLOY=true` runs `portfolio:bootstrap-deployment`: starter content is
-created only if site settings are absent, and the initial administrator is
+`SEED_ON_DEPLOY=true` runs `portfolio:bootstrap-deployment`: the bundled public
+snapshot is restored on empty SQLite when `DEPLOYMENT_CONTENT_SEED=true`.
+The initial administrator is
 created only if that email has no account. Existing content and passwords are
-preserved on later restarts. You can set it to `false` after initial setup.
-Open `/login`, sign in, change your password, and replace the starter content.
+preserved while the database survives. Keep both seed flags enabled on the free
+plan so a lost database restores your baseline portfolio and configured admin.
+Analytics starts empty on each fresh database and collects only new visits.
+Open `/login` and sign in using the administrator environment credentials.
 Use one web instance while migrations run at startup; for multiple replicas,
 move migrations into a single release task.
 

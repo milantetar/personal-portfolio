@@ -50,3 +50,38 @@ jobs:
                     sleep 2
                   done
                   exit 1
+            - name: Start and probe production image with SQLite public content
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  trap 'docker logs portfolio-sqlite-ci; docker rm -f portfolio-sqlite-ci' EXIT
+                  docker run --detach --name portfolio-sqlite-ci --network host \
+                    --env APP_KEY="base64:$(openssl rand -base64 32)" \
+                    --env DB_CONNECTION=sqlite --env DB_URL= \
+                    --env DB_DATABASE=/app/storage/app/database/portfolio.sqlite \
+                    --env SESSION_DRIVER=database --env CACHE_STORE=database \
+                    --env QUEUE_CONNECTION=sync --env MAIL_MAILER=log \
+                    --env SEED_ON_DEPLOY=true --env DEPLOYMENT_CONTENT_SEED=true \
+                    --env ADMIN_EMAIL=admin@example.test \
+                    --env ADMIN_PASSWORD=ci-only-long-password portfolio:ci
+                  for attempt in $(seq 1 60); do
+                    if curl --fail --silent http://localhost:8080/up; then
+                      docker exec portfolio-sqlite-ci php -r '
+                        require "vendor/autoload.php";
+                        $app = require "bootstrap/app.php";
+                        $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+                        $snapshot = json_decode(file_get_contents(config("deployment-content.path")), true, 512, JSON_THROW_ON_ERROR);
+                        foreach (["site_settings", "certificates", "portfolio_sections", "media"] as $table) {
+                          if (Illuminate\Support\Facades\DB::table($table)->count() !== count($snapshot["tables"][$table])) exit(1);
+                        }
+                        if (Illuminate\Support\Facades\DB::table("analytics_visits")->count() !== 0) exit(1);
+                        foreach ($snapshot["assets"] as $path => $filename) {
+                          if (! Illuminate\Support\Facades\Storage::disk("public")->exists($path)) exit(1);
+                        }
+                      '
+                      curl --fail --silent http://localhost:8080/ > /dev/null
+                      exit 0
+                    fi
+                    sleep 2
+                  done
+                  exit 1

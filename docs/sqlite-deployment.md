@@ -8,6 +8,10 @@ you explicitly upgrade to a paid instance and attach a persistent disk at
 `/app/storage/app/database`; they do not apply to the free preview.
 See [Render persistent disks](https://render.com/docs/disks).
 
+For the selected free plan, use [public content deployment](public-content-deployment.md)
+instead: a bundled public snapshot restores the baseline on each new database,
+with analytics initially empty. Dashboard edits remain ephemeral.
+
 ## Settings
 
 ```dotenv

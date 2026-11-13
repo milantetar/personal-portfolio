@@ -19,7 +19,7 @@ it('preserves existing content and administrator passwords during deployment boo
 });
 
 it('creates starter content and the administrator only once', function (): void {
-    config(['admin.email' => 'admin@example.test', 'admin.password' => 'initial-password']);
+    config(['admin.email' => 'admin@example.test', 'admin.password' => 'initial-password', 'deployment-content.enabled' => false]);
 
     $this->artisan('portfolio:bootstrap-deployment')->assertSuccessful();
     $this->artisan('portfolio:bootstrap-deployment')->assertSuccessful();

@@ -7,8 +7,10 @@ namespace App\Console\Commands;
 use App\Models\SiteSetting;
 use App\Models\User;
 use Database\Seeders\PortfolioSeeder;
+use Database\Seeders\PublicPortfolioSeeder;
 use Database\Seeders\User\UserDataSeeder;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class BootstrapDeployment extends Command
 {
@@ -26,7 +28,12 @@ class BootstrapDeployment extends Command
         }
 
         if (! SiteSetting::query()->exists()) {
-            $this->call('db:seed', ['--class' => PortfolioSeeder::class, '--force' => true]);
+            $seeder = config('deployment-content.enabled') && DB::getDriverName() === 'sqlite' && is_file((string) config('deployment-content.path'))
+                ? PublicPortfolioSeeder::class
+                : PortfolioSeeder::class;
+            if ($this->call('db:seed', ['--class' => $seeder, '--force' => true]) !== self::SUCCESS) {
+                return self::FAILURE;
+            }
         }
 
         if (! User::query()->where('email_hash', hash('sha256', $email))->exists()) {
