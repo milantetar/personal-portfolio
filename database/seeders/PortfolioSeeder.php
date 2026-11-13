@@ -131,12 +131,19 @@ class PortfolioSeeder extends Seeder
 
         $navbarId = DB::table('navbars')->where('location', 'homepage-header')->value('id');
 
-        DB::table('navbar_items')->insertOrIgnore([
+        $navigationItems = [
             ['navbar_id' => $navbarId, 'label' => 'HOME', 'url' => '#hero', 'order' => 1, 'created_at' => now(), 'updated_at' => now()],
             ['navbar_id' => $navbarId, 'label' => 'ABOUT', 'url' => '#about', 'order' => 2, 'created_at' => now(), 'updated_at' => now()],
             ['navbar_id' => $navbarId, 'label' => 'PROJECTS', 'url' => '#projects', 'order' => 3, 'created_at' => now(), 'updated_at' => now()],
             ['navbar_id' => $navbarId, 'label' => 'CONTACT', 'url' => '#contact', 'order' => 4, 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        ];
+        foreach ($navigationItems as $item) {
+            // Migrations already create these links; preserve their IDs on bootstrap.
+            DB::table('navbar_items')->updateOrInsert(
+                ['navbar_id' => $navbarId, 'label' => $item['label']],
+                $item,
+            );
+        }
 
         // 6. Seed Generic Analytics Sample Data
         $devices = ['desktop', 'mobile'];
@@ -153,5 +160,12 @@ class PortfolioSeeder extends Seeder
             ];
         }
         DB::table('analytics_visits')->insertOrIgnore($analyticsData);
+
+        // PostgreSQL sequences must advance past the explicit starter IDs.
+        if (DB::getDriverName() === 'pgsql') {
+            foreach (['site_settings', 'projects', 'certificates'] as $table) {
+                DB::statement("SELECT setval(pg_get_serial_sequence('{$table}', 'id'), (SELECT MAX(id) FROM {$table}), true)");
+            }
+        }
     }
 }

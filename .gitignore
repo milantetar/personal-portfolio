@@ -14,6 +14,8 @@
 .env
 .env.backup
 .env.production
+.env.*
+!.env.example
 .phpactor.json
 .phpunit.result.cache
 Homestead.json
@@ -44,3 +46,7 @@ yarn-error.log
 
 /debug.log
 /skills-lock.json
+/database/seeders/sql/*.sql
+/storage/app/private/backups/
+/storage/app/private/exports/
+/storage/app/private/browser-audit/

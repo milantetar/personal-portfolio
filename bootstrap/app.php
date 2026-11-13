@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureAdminRole;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\TrustConfiguredProxies;
 use App\Models\AnalyticsVisit;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -30,7 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('model:prune', ['--model' => [AnalyticsVisit::class]])->daily();
     })
     ->withMiddleware(function (Middleware $middleware) {
-        $middleware->trustProxies(at: '*');
+        $middleware->replace(TrustProxies::class, TrustConfiguredProxies::class);
+        $middleware->trustHosts(at: static fn (): array => array_map(
+            static fn (string $host): string => '^'.preg_quote($host, '/').'$',
+            config('security.trusted_hosts', []),
+        ), subdomains: false);
 
         $middleware->web([
             HandleInertiaRequests::class,

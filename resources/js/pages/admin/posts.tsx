@@ -79,8 +79,17 @@ export default function PostsPage() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingPost, setEditingPost] = useState<Post | null>(null);
 
-    const { data, setData, processing, reset, errors } =
-        useForm<PostFormData>(emptyForm);
+    const {
+        data,
+        setData,
+        processing,
+        reset,
+        errors,
+        transform,
+        post,
+        put,
+        clearErrors,
+    } = useForm<PostFormData>(emptyForm);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -100,6 +109,7 @@ export default function PostsPage() {
     };
 
     const openCreate = () => {
+        clearErrors();
         setEditingPost(null);
         reset();
         setData(emptyForm);
@@ -107,6 +117,7 @@ export default function PostsPage() {
     };
 
     const openEdit = (p: Post) => {
+        clearErrors();
         setEditingPost(p);
         setData({
             title: p.title,
@@ -144,8 +155,9 @@ export default function PostsPage() {
             is_published: data.is_published,
         };
 
+        transform(() => payload);
         if (editingPost) {
-            router.put(`/dashboard/posts/${editingPost.id}`, payload, {
+            put(`/dashboard/posts/${editingPost.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     closeForm();
@@ -153,7 +165,7 @@ export default function PostsPage() {
                 },
             });
         } else {
-            router.post('/dashboard/posts', payload, {
+            post('/dashboard/posts', {
                 preserveScroll: true,
                 onSuccess: () => {
                     closeForm();

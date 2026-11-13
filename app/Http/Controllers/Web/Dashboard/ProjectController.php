@@ -48,9 +48,10 @@ class ProjectController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $this->prepareSlug($request);
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'unique:projects,slug'],
+            'slug' => ['required', 'string', 'alpha_dash:ascii', 'max:255', 'unique:projects,slug'],
             'tagline' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'challenge' => ['nullable', 'string'],
@@ -65,10 +66,6 @@ class ProjectController extends Controller
             'is_visible' => ['boolean'],
             'sort_order' => ['integer'],
         ]);
-
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['title']);
-        }
 
         Project::query()->create($validated);
 
@@ -77,9 +74,10 @@ class ProjectController extends Controller
 
     public function update(Request $request, Project $project): RedirectResponse
     {
+        $this->prepareSlug($request);
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', Rule::unique('projects', 'slug')->ignore($project->id)],
+            'slug' => ['required', 'string', 'alpha_dash:ascii', 'max:255', Rule::unique('projects', 'slug')->ignore($project->id)],
             'tagline' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'challenge' => ['nullable', 'string'],
@@ -94,10 +92,6 @@ class ProjectController extends Controller
             'is_visible' => ['boolean'],
             'sort_order' => ['integer'],
         ]);
-
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['title']);
-        }
 
         $project->update($validated);
 
@@ -109,5 +103,12 @@ class ProjectController extends Controller
         $project->delete();
 
         return back()->with('success', 'Project deleted.');
+    }
+
+    private function prepareSlug(Request $request): void
+    {
+        if (blank($request->input('slug')) && is_string($request->input('title'))) {
+            $request->merge(['slug' => Str::slug($request->input('title'))]);
+        }
     }
 }

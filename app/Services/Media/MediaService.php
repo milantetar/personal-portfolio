@@ -9,6 +9,7 @@ use App\Data\Media\MediaUpdateData;
 use App\Models\Media;
 use App\Models\SiteSetting;
 use App\Models\User;
+use Cloudinary\Cloudinary;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -18,11 +19,15 @@ class MediaService
     public function createMedia(MediaData $data, ?User $user = null): Media
     {
         $file = $data->file;
-        $path = $file->store('media', 'public');
+        $disk = (string) config('services.media_storage_disk', 'public');
+        $cloudinary = $disk === 'cloudinary' ? $this->uploadToCloudinary($file) : null;
+        $path = $cloudinary['url'] ?? $file->store('media', $disk);
 
         $media = Media::create([
-            'disk' => 'public',
+            'disk' => $disk,
             'path' => $path,
+            'cloudinary_public_id' => $cloudinary['public_id'] ?? null,
+            'cloudinary_resource_type' => $cloudinary['resource_type'] ?? null,
             'original_name' => $file->getClientOriginalName(),
             'mime_type' => $file->getClientMimeType(),
             'size' => $file->getSize(),
@@ -50,15 +55,34 @@ class MediaService
 
         // If a new file is uploaded, delete the old file from storage and store the new one
         if ($data->file instanceof UploadedFile) {
-            Storage::disk($media->disk)->delete($media->path);
-
             $file = $data->file;
-            $path = $file->store('media', 'public');
+            $oldDisk = $media->disk;
+            $oldPath = $media->path;
+            $oldCloudinaryId = $media->cloudinary_public_id;
+            $oldCloudinaryType = $media->cloudinary_resource_type;
+            $disk = (string) config('services.media_storage_disk', 'public');
+            $cloudinary = $disk === 'cloudinary' ? $this->uploadToCloudinary($file) : null;
+            $path = $cloudinary['url'] ?? $file->store('media', $disk);
 
             $attributes['path'] = $path;
+            $attributes['disk'] = $disk;
+            $attributes['cloudinary_public_id'] = $cloudinary['public_id'] ?? null;
+            $attributes['cloudinary_resource_type'] = $cloudinary['resource_type'] ?? null;
             $attributes['original_name'] = $file->getClientOriginalName();
             $attributes['mime_type'] = $file->getMimeType() ?? 'application/octet-stream';
             $attributes['size'] = $file->getSize();
+
+            $media->update($attributes);
+
+            if ($oldCloudinaryId !== null && $oldCloudinaryType !== null) {
+                $this->deleteFromCloudinary($oldCloudinaryId, $oldCloudinaryType);
+            } elseif ($oldDisk !== 'cloudinary') {
+                Storage::disk($oldDisk)->delete($oldPath);
+            }
+
+            $this->handleMediaUsage($media, $data->usage);
+
+            return $media->fresh();
         }
 
         $media->update($attributes);
@@ -198,7 +222,9 @@ class MediaService
     public function deleteMedia(Media $media): bool
     {
         // Delete the physical file from the storage disk
-        if (Storage::disk($media->disk)->exists($media->path)) {
+        if ($media->disk === 'cloudinary' && $media->cloudinary_public_id !== null) {
+            $this->deleteFromCloudinary($media->cloudinary_public_id, $media->cloudinary_resource_type ?? 'image');
+        } elseif (Storage::disk($media->disk)->exists($media->path)) {
             Storage::disk($media->disk)->delete($media->path);
         }
 
@@ -239,5 +265,40 @@ class MediaService
         }
 
         return $settings->fresh();
+    }
+
+    /** @return array{url: string, public_id: string, resource_type: string} */
+    private function uploadToCloudinary(UploadedFile $file): array
+    {
+        $cloudinaryUrl = (string) config('services.cloudinary.url', '');
+        if ($cloudinaryUrl === '') {
+            throw new \RuntimeException('CLOUDINARY_URL must be configured when MEDIA_STORAGE_DISK is cloudinary.');
+        }
+
+        $result = (new Cloudinary($cloudinaryUrl))->uploadApi()->upload($file->getRealPath(), [
+            'folder' => trim((string) config('services.cloudinary.folder', 'personal-portfolio'), '/').'/media',
+            'resource_type' => 'auto',
+            'use_filename' => false,
+            'unique_filename' => true,
+        ]);
+
+        return [
+            'url' => (string) $result['secure_url'],
+            'public_id' => (string) $result['public_id'],
+            'resource_type' => (string) $result['resource_type'],
+        ];
+    }
+
+    private function deleteFromCloudinary(string $publicId, string $resourceType): void
+    {
+        $cloudinaryUrl = (string) config('services.cloudinary.url', '');
+        if ($cloudinaryUrl === '') {
+            throw new \RuntimeException('CLOUDINARY_URL must be configured to delete Cloudinary media.');
+        }
+
+        (new Cloudinary($cloudinaryUrl))->uploadApi()->destroy($publicId, [
+            'resource_type' => $resourceType,
+            'invalidate' => true,
+        ]);
     }
 }

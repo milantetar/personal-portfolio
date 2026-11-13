@@ -84,8 +84,17 @@ export default function ProjectsPage() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
 
-    const { data, setData, processing, reset, errors } =
-        useForm<ProjectFormData>(emptyForm);
+    const {
+        data,
+        setData,
+        processing,
+        reset,
+        errors,
+        transform,
+        post,
+        put,
+        clearErrors,
+    } = useForm<ProjectFormData>(emptyForm);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -97,6 +106,7 @@ export default function ProjectsPage() {
     };
 
     const openCreate = () => {
+        clearErrors();
         setEditingProject(null);
         reset();
         setData(emptyForm);
@@ -104,6 +114,7 @@ export default function ProjectsPage() {
     };
 
     const openEdit = (project: Project) => {
+        clearErrors();
         setEditingProject(project);
         setData({
             title: project.title,
@@ -157,8 +168,9 @@ export default function ProjectsPage() {
             sort_order: Number(data.sort_order) || 0,
         };
 
+        transform(() => payload);
         if (editingProject) {
-            router.put(`/dashboard/projects/${editingProject.id}`, payload, {
+            put(`/dashboard/projects/${editingProject.id}`, {
                 preserveScroll: true,
                 onSuccess: () => {
                     closeForm();
@@ -166,7 +178,7 @@ export default function ProjectsPage() {
                 },
             });
         } else {
-            router.post('/dashboard/projects', payload, {
+            post('/dashboard/projects', {
                 preserveScroll: true,
                 onSuccess: () => {
                     closeForm();

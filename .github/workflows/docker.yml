@@ -1,0 +1,52 @@
+name: Docker deployment check
+
+on:
+    push:
+        branches: [main, master]
+    pull_request:
+        branches: [main, master]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    smoke:
+        runs-on: ubuntu-24.04
+        services:
+            postgres:
+                image: postgres:17-alpine
+                env:
+                    POSTGRES_DB: portfolio
+                    POSTGRES_USER: portfolio
+                    POSTGRES_PASSWORD: testing-only
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd "pg_isready -U portfolio"
+                    --health-interval 5s --health-timeout 5s --health-retries 10
+        steps:
+            - uses: actions/checkout@v5
+            - name: Build production image
+              run: docker build --tag portfolio:ci .
+            - name: Start and probe production image with PostgreSQL
+              shell: bash
+              run: |
+                  set -euo pipefail
+                  trap 'docker logs portfolio-ci; docker rm -f portfolio-ci' EXIT
+                  docker run --detach --name portfolio-ci --network host \
+                    --env APP_KEY="base64:$(openssl rand -base64 32)" \
+                    --env DB_CONNECTION=pgsql \
+                    --env DB_URL=postgresql://portfolio:testing-only@127.0.0.1:5432/portfolio \
+                    --env SESSION_DRIVER=database --env CACHE_STORE=database \
+                    --env QUEUE_CONNECTION=sync --env MAIL_MAILER=log \
+                    --env SEED_ON_DEPLOY=true --env ADMIN_EMAIL=admin@example.test \
+                    --env ADMIN_PASSWORD=ci-only-long-password portfolio:ci
+                  for attempt in $(seq 1 60); do
+                    if curl --fail --silent http://localhost:8080/up; then
+                      curl --fail --silent http://localhost:8080/ > /dev/null
+                      exit 0
+                    fi
+                    sleep 2
+                  done
+                  exit 1

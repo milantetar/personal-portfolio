@@ -1,5 +1,5 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Image, LayoutTemplate, Save, Settings2 } from 'lucide-react';
+import { FileText, Image, LayoutTemplate, Save, Settings2 } from 'lucide-react';
 import { type FormEvent, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -467,7 +467,10 @@ export default function SiteSettingsPage() {
                                                     className="overflow-hidden rounded-lg border bg-muted/30"
                                                 >
                                                     <div className="flex h-28 items-center justify-center bg-background">
-                                                        {media?.url ? (
+                                                        {media?.url &&
+                                                        media.mime_type.startsWith(
+                                                            'image/',
+                                                        ) ? (
                                                             <img
                                                                 src={media.url}
                                                                 alt={
@@ -476,6 +479,15 @@ export default function SiteSettingsPage() {
                                                                 }
                                                                 className="h-full w-full object-contain p-3"
                                                             />
+                                                        ) : media?.url ? (
+                                                            <a
+                                                                href={media.url}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                aria-label="Open assigned document"
+                                                            >
+                                                                <FileText className="size-8 text-muted-foreground" />
+                                                            </a>
                                                         ) : (
                                                             <Image className="size-8 text-muted-foreground" />
                                                         )}

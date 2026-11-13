@@ -139,16 +139,22 @@ APP_DEBUG=false
 APP_KEY=base64:...                      # Generate with: php artisan key:generate
 APP_URL=https://your-portfolio.com
 
-# Database (SQLite is zero-configuration and runs without a database server)
-DB_CONNECTION=sqlite
-DB_DATABASE=/absolute/path/to/database/database.sqlite
+# Render: use persistent PostgreSQL, not a container-local SQLite file.
+DB_CONNECTION=pgsql
+DB_URL=postgresql://user:password@host:5432/database
 
 # Session & Cache
 SESSION_DRIVER=database
 CACHE_STORE=database
-QUEUE_CONNECTION=database
+QUEUE_CONNECTION=sync
 FILESYSTEM_DISK=local
+MEDIA_STORAGE_DISK=cloudinary
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+INERTIA_SSR_ENABLED=false
 ```
+
+See [the Docker and Render deployment guide](docs/deployment.md) for required
+secrets, first deployment, health checks, uploads, and rollback instructions.
 
 ### What about `GITHUB_CA_BUNDLE` and `GEMINI_CA_BUNDLE`?
 
@@ -210,6 +216,16 @@ php artisan wayfinder:generate --with-form
 
 The CI workflow in `.github/workflows/ci.yml` validates frontend formatting,
 TypeScript, browser and SSR builds, PHP formatting, static analysis, and tests.
+
+With an initialized local SQLite portfolio, run `pnpm browser:audit` for the
+isolated Playwright flows. See [the browser audit report](docs/browser-audit.md)
+and [the full deployment guide](docs/deployment.md), including Gemini,
+Cloudinary, email, data export, database persistence, and recovery.
+
+With an initialized local SQLite portfolio, run `pnpm browser:audit` for the
+isolated Playwright flows. See [the browser audit report](docs/browser-audit.md)
+and [the full deployment guide](docs/deployment.md), including Gemini,
+Cloudinary, email, data export, database persistence, and recovery.
 
 ## Project structure
 

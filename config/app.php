@@ -41,7 +41,8 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG', false),
+    // Public production responses must never expose debug pages or request secrets.
+    'debug' => env('APP_ENV', 'production') !== 'production' && (bool) env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------

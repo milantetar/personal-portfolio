@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Storage;
  * @property int $id
  * @property string $disk
  * @property string $path
+ * @property string|null $cloudinary_public_id
+ * @property string|null $cloudinary_resource_type
  * @property string $original_name
  * @property string $mime_type
  * @property int $size
@@ -33,6 +35,8 @@ use Illuminate\Support\Facades\Storage;
 #[Fillable([
     'disk',
     'path',
+    'cloudinary_public_id',
+    'cloudinary_resource_type',
     'original_name',
     'mime_type',
     'size',
@@ -61,7 +65,9 @@ class Media extends Model
     protected function url(): Attribute
     {
         return Attribute::make(
-            get: fn () => Storage::disk($this->disk)->url($this->path),
+            get: fn () => $this->disk === 'cloudinary'
+                ? $this->path
+                : Storage::disk($this->disk)->url($this->path),
         )->shouldCache();
     }
 

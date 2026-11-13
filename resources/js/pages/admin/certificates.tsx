@@ -511,8 +511,9 @@ export default function CertificatesPage() {
                     <form onSubmit={submit} className="space-y-4">
                         <div className="grid gap-4 md:grid-cols-2">
                             <div className="space-y-2">
-                                <Label>Title</Label>
+                                <Label htmlFor="certificate-title">Title</Label>
                                 <Input
+                                    id="certificate-title"
                                     value={data.title}
                                     onChange={(e) =>
                                         update('title', e.target.value)
@@ -525,8 +526,11 @@ export default function CertificatesPage() {
                                 )}
                             </div>
                             <div className="space-y-2">
-                                <Label>Issuer</Label>
+                                <Label htmlFor="certificate-issuer">
+                                    Issuer
+                                </Label>
                                 <Input
+                                    id="certificate-issuer"
                                     value={data.issuer}
                                     onChange={(e) =>
                                         update('issuer', e.target.value)
@@ -539,8 +543,11 @@ export default function CertificatesPage() {
                                 )}
                             </div>
                             <div className="space-y-2">
-                                <Label>Issued date</Label>
+                                <Label htmlFor="certificate-issued-at">
+                                    Issued date
+                                </Label>
                                 <Input
+                                    id="certificate-issued-at"
                                     type="date"
                                     value={data.issued_at}
                                     onChange={(e) =>
@@ -549,8 +556,11 @@ export default function CertificatesPage() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Credential URL</Label>
+                                <Label htmlFor="certificate-url">
+                                    Credential URL
+                                </Label>
                                 <Input
+                                    id="certificate-url"
                                     type="url"
                                     value={data.credential_url}
                                     onChange={(e) =>
@@ -560,8 +570,11 @@ export default function CertificatesPage() {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Certificate file</Label>
+                                <Label htmlFor="certificate-media">
+                                    Certificate file
+                                </Label>
                                 <select
+                                    id="certificate-media"
                                     value={data.media_id ?? ''}
                                     onChange={(e) =>
                                         update(
@@ -582,8 +595,11 @@ export default function CertificatesPage() {
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <Label>Display order</Label>
+                                <Label htmlFor="certificate-order">
+                                    Display order
+                                </Label>
                                 <Input
+                                    id="certificate-order"
                                     type="number"
                                     min="0"
                                     value={data.sort_order}
@@ -596,8 +612,11 @@ export default function CertificatesPage() {
                                 />
                             </div>
                             <div className="space-y-2 md:col-span-2">
-                                <Label>Description</Label>
+                                <Label htmlFor="certificate-description">
+                                    Description
+                                </Label>
                                 <textarea
+                                    id="certificate-description"
                                     value={data.description}
                                     onChange={(e) =>
                                         update('description', e.target.value)

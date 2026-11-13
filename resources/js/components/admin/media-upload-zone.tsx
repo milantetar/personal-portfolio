@@ -33,7 +33,7 @@ export function MediaUploadZone({
         <div className="space-y-1">
             <div className="flex items-center gap-3">
                 <Input
-                    accept="image/jpeg,image/png,image/gif,image/webp,image/avif,application/pdf,audio/mpeg"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/avif,image/svg+xml,image/x-icon,image/vnd.microsoft.icon,.ico,application/pdf,audio/mpeg"
                     className="peer sr-only"
                     disabled={isUploading}
                     id={id}

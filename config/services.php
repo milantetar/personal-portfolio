@@ -16,10 +16,6 @@ return [
     |
     */
 
-    'postmark' => [
-        'key' => env('POSTMARK_API_KEY'),
-    ],
-
     'resend' => [
         'key' => env('RESEND_API_KEY'),
     ],
@@ -36,6 +32,12 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+
+    'cloudinary' => [
+        'url' => env('CLOUDINARY_URL'),
+        'folder' => env('CLOUDINARY_FOLDER', 'personal-portfolio'),
+    ],
+    'media_storage_disk' => env('MEDIA_STORAGE_DISK', 'public'),
 
     'github' => [
         'token' => env('GITHUB_TOKEN'),

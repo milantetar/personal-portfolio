@@ -56,9 +56,10 @@ class PostController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $this->prepareSlug($request);
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', 'unique:posts,slug'],
+            'slug' => ['required', 'string', 'alpha_dash:ascii', 'max:255', 'unique:posts,slug'],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'string'],
             'cover_media_id' => ['nullable', 'integer', 'exists:media,id'],
@@ -66,10 +67,6 @@ class PostController extends Controller
             'tags.*' => ['string', 'max:30'],
             'is_published' => ['boolean'],
         ]);
-
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['title']);
-        }
 
         if (! empty($validated['is_published'])) {
             $validated['published_at'] = now();
@@ -82,9 +79,10 @@ class PostController extends Controller
 
     public function update(Request $request, Post $post): RedirectResponse
     {
+        $this->prepareSlug($request);
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', Rule::unique('posts', 'slug')->ignore($post->id)],
+            'slug' => ['required', 'string', 'alpha_dash:ascii', 'max:255', Rule::unique('posts', 'slug')->ignore($post->id)],
             'excerpt' => ['nullable', 'string', 'max:500'],
             'content' => ['required', 'string'],
             'cover_media_id' => ['nullable', 'integer', 'exists:media,id'],
@@ -92,10 +90,6 @@ class PostController extends Controller
             'tags.*' => ['string', 'max:30'],
             'is_published' => ['boolean'],
         ]);
-
-        if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['title']);
-        }
 
         if (! empty($validated['is_published']) && ! $post->is_published) {
             $validated['published_at'] = now();
@@ -111,5 +105,12 @@ class PostController extends Controller
         $post->delete();
 
         return back()->with('success', 'Post deleted.');
+    }
+
+    private function prepareSlug(Request $request): void
+    {
+        if (blank($request->input('slug')) && is_string($request->input('title'))) {
+            $request->merge(['slug' => Str::slug($request->input('title'))]);
+        }
     }
 }

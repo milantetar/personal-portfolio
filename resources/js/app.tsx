@@ -28,7 +28,7 @@ void createInertiaApp({
     withApp: (app) => (
         <ThemeProvider defaultTheme="dark">
             {app}
-            <Toaster position="bottom-right" richColors />
+            <Toaster position="bottom-right" richColors closeButton />
         </ThemeProvider>
     ),
     progress: {
