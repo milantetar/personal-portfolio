@@ -50,6 +50,8 @@ services:
             value: cloudinary
           - key: CLOUDINARY_URL
             sync: false
+          - key: CLOUDINARY_FOLDER
+            sync: false
           - key: GEMINI_API_KEY
             sync: false
           - key: GEMINI_MODEL
