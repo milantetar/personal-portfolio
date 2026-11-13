@@ -57,9 +57,9 @@ services:
           - key: GEMINI_API_KEY
             sync: false
           - key: GEMINI_MODEL
-            value: gemini-4-hydrogen
+            value: gemini-3.5-flash-lite
           - key: GEMINI_FALLBACK_MODEL
-            value: gemini-4-hydrogen
+            value: gemini-3.6-flash
           - key: ADMIN_NAME
             value: 'Portfolio Admin'
           - key: ADMIN_EMAIL
