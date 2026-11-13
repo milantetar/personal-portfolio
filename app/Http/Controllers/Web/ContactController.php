@@ -36,19 +36,19 @@ class ContactController extends Controller
             'is_read' => false,
         ]);
 
-        $recipient = SiteSetting::query()->value('email');
+        $settings = SiteSetting::query()->first(['email', 'site_name']);
+        $recipient = $settings?->email;
 
         if (is_string($recipient) && $recipient !== '') {
-            $body = implode("\n\n", [
-                'From: '.$data['name'],
-                'Reply email: '.$data['email'],
-                'Subject: '.$data['subject'],
-                'Message:',
-                $data['message'],
-            ]);
-
             try {
-                Mail::raw($body, function (Message $mail) use ($data, $recipient): void {
+                Mail::send(['html' => 'emails.contact-enquiry', 'text' => 'emails.contact-enquiry-text'], [
+                    'siteName' => $settings->site_name ?: config('app.name'),
+                    'senderName' => $data['name'],
+                    'senderEmail' => $data['email'],
+                    'enquirySubject' => $data['subject'],
+                    'messageBody' => $data['message'],
+                    'replyUrl' => 'mailto:'.str_replace('%40', '@', rawurlencode($data['email'])).'?subject='.rawurlencode('Re: '.$data['subject']),
+                ], function (Message $mail) use ($data, $recipient): void {
                     $mail->to($recipient)
                         ->replyTo($data['email'], $data['name'])
                         ->subject('Portfolio enquiry: '.$data['subject']);

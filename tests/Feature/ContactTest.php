@@ -63,7 +63,29 @@ it('emails the site owner when an address is configured', function (): void {
     ]);
 
     expect($transport->messages())->toHaveCount(1);
-    expect($transport->messages()->first()->getOriginalMessage()->getTo()[0]->getAddress())->toBe('owner@example.com');
+    $email = $transport->messages()->first()->getOriginalMessage();
+    expect($email->getTo()[0]->getAddress())->toBe('owner@example.com')
+        ->and($email->getReplyTo()[0]->getAddress())->toBe('ada@example.com')
+        ->and($email->getHtmlBody())->toContain('Milan Test', 'Ada Lovelace', 'I would like to work with you.', 'Reply to message', 'mailto:ada@example.com?subject=Re%3A%20Hello')
+        ->and($email->getTextBody())->toContain('Ada Lovelace', 'I would like to work with you.');
+});
+
+it('escapes visitor content in HTML emails while preserving message line breaks', function (): void {
+    SiteSetting::query()->create(['site_name' => 'Portfolio', 'email' => 'owner@example.com']);
+    $transport = Mail::getSymfonyTransport();
+    $body = "First line\n<script>alert('unsafe')</script>\nLast line";
+
+    $this->from('/')->post('/contact', [
+        'name' => '<b>Ada</b>',
+        'email' => 'ada@example.com',
+        'subject' => '<img src=x onerror=alert(1)>',
+        'message' => $body,
+    ])->assertRedirect('/');
+
+    $email = $transport->messages()->sole()->getOriginalMessage();
+    expect($email->getHtmlBody())->toContain('&lt;b&gt;Ada&lt;/b&gt;', '&lt;img src=x onerror=alert(1)&gt;', '&lt;script&gt;', "First line<br />\n")
+        ->not->toContain('<script>', '<img src=x', '<b>Ada</b>')
+        ->and($email->getTextBody())->toContain($body);
 });
 
 it('does not email anyone when no owner address is configured', function (): void {
