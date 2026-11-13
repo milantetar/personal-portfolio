@@ -2,10 +2,15 @@ services:
     - type: web
       name: personal-portfolio
       runtime: docker
-      plan: free
+      # SQLite requires a persistent disk, available on paid Render services.
+      plan: starter
       dockerfilePath: Dockerfile
       dockerContext: .
       healthCheckPath: /up
+      disk:
+          name: portfolio-sqlite
+          mountPath: /app/storage/app/database
+          sizeGB: 1
       envVars:
           - key: APP_NAME
             value: 'Personal Portfolio'
@@ -16,9 +21,11 @@ services:
           - key: APP_KEY
             sync: false
           - key: DB_CONNECTION
-            value: pgsql
+            value: sqlite
+          - key: DB_DATABASE
+            value: /app/storage/app/database/portfolio.sqlite
           - key: DB_URL
-            sync: false
+            value: ''
           - key: SESSION_DRIVER
             value: database
           - key: CACHE_STORE

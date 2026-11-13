@@ -6,30 +6,27 @@ Inertia SSR is disabled because this image runs a single PHP web process.
 
 ## Required services and secrets
 
-For this repository, the lowest-maintenance free-hosting arrangement is a Render
-web service with an external PostgreSQL database (for example Neon) and Cloudinary
-for media. Your development environment can continue using SQLite. The steps
-below do not provision paid services or change your local `.env`.
-
-Use the repository's `render.yaml` Blueprint. Create a persistent PostgreSQL
-database separately and supply its connection string as `DB_URL`. No paid
-database is provisioned automatically by this Blueprint. Free Render PostgreSQL
-databases expire after 30 days; use a database plan appropriate for lasting data.
-SQLite inside a free web container is erased on redeploy, restart, or spin-down.
+The selected deployment uses SQLite on a Render persistent disk and Cloudinary
+for media. Neon is optional and is not needed for this setup. The repository's
+`render.yaml` selects a paid Starter web service with a 1 GB disk. Review the
+cost in Render before deploying; editing these files does not provision services.
+SQLite inside a free web container loses changes on redeploy or restart.
+Follow [the SQLite deployment steps](sqlite-deployment.md) to transfer your
+existing database privately and preserve its encryption key.
 
 Set these in Render's Environment page (or during initial Blueprint creation):
 
 | Variable            | Value                                                                                                                                                               |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `APP_KEY`           | Run `php artisan key:generate --show` locally, then copy the complete `base64:...` value. Keep it stable across deploys.                                            |
-| `DB_URL`            | Your PostgreSQL connection string. Use the internal URL for a Render database in the same region; use the provider's required TLS options for an external database. |
+| `DB_URL`            | Leave empty for SQLite. Remove any old Neon URL from Render's environment settings. |
 | `CLOUDINARY_URL`    | `cloudinary://API_KEY:API_SECRET@CLOUD_NAME` from your Cloudinary account.                                                                                          |
 | `ADMIN_EMAIL`       | Your administrator email address.                                                                                                                                   |
 | `ADMIN_PASSWORD`    | Render generates this secret; retrieve it from Environment to sign in initially.                                                                                    |
 | `RESEND_API_KEY`    | Your Resend API key for contact notifications and password reset emails.                                                                                            |
 | `MAIL_FROM_ADDRESS` | A valid sender email on your verified Resend domain, such as `portfolio@example.com`. A bare domain is invalid.                                                     |
 
-The Blueprint selects PostgreSQL, Cloudinary, database sessions/cache, synchronous
+The Blueprint selects SQLite on a persistent disk, Cloudinary, database sessions/cache, synchronous
 jobs, and stderr logging. It uses `/up` for health checks. Set `APP_URL` to your
 custom HTTPS domain if using one; otherwise startup uses `RENDER_EXTERNAL_URL`.
 Optional integrations remain `GITHUB_USERNAME`, `GITHUB_TOKEN`, and `GEMINI_API_KEY`.
@@ -150,7 +147,14 @@ SQLite files, private exports/backups, the original SQL dump, or browser traces.
 The Docker CI workflow checks an actual production container with PostgreSQL;
 wait for that workflow before treating the container as verified.
 
-## 2. Create the persistent production database
+## 2. Configure the persistent production database
+
+The default Blueprint configures SQLite at
+`/app/storage/app/database/portfolio.sqlite` on its persistent disk.
+Follow [sqlite-deployment.md](sqlite-deployment.md) for the first deployment,
+existing-data transfer, backups, and disk permissions.
+
+### Optional PostgreSQL alternative
 
 Create a Neon PostgreSQL project in a region close to the Render web service.
 Copy the provider's connection string from its Connect dialog, including TLS
@@ -170,7 +174,9 @@ web service with a persistent disk. Mount a disk at a private path such as
 `/var/data`, use `DB_CONNECTION=sqlite`, clear `DB_URL`, and set
 `DB_DATABASE=/var/data/portfolio.sqlite`. Ensure the directory is writable by
 the image's `portfolio` user before using it; do not solve ownership problems
-with `chmod 777`. This alternative is not provisioned by `render.yaml`.
+with `chmod 777`. The Blueprint already provisions a disk at
+`/app/storage/app/database`; use its configured path rather than `/var/data`
+unless you deliberately change the mount and database path together.
 
 Transfer a consistent SQLite backup privately to that disk using Render's SSH/SCP
 instructions. Do not overwrite a running database: stop writes first, keep a
@@ -332,7 +338,7 @@ Linux should use its system certificate store; never disable TLS verification.
 1. Push the reviewed source to your repository. Wait for PHP/frontend CI and the
    Docker/PostgreSQL smoke workflow. Run the browser audit locally.
 2. In Render, select **New > Blueprint**, choose the repository, and review the
-   free web service. Add the required secrets from the table above.
+   paid Starter web service and persistent disk. Add the required secrets from the table above.
 3. Add optional Gemini/GitHub variables manually. Existing Blueprint services do
    not necessarily prompt again for newly introduced secrets.
 4. Keep `APP_ENV=production`, `APP_DEBUG=false`, `SESSION_SECURE_COOKIE=true`,
@@ -350,7 +356,8 @@ Linux should use its system certificate store; never disable TLS verification.
 
 Free Render services can sleep and have cold starts. Local files disappear
 across restarts/spin-down/redeploys, and free services lack a runtime Shell.
-Do not use container files for production SQLite, uploads, or backups. Free
+Keep production SQLite under the persistent disk mount; keep uploads in Cloudinary.
+Do not use ephemeral container files for production databases, uploads, or backups. Free
 Render Postgres has an expiry; review provider limits before selecting it.
 See [Render free service limitations](https://render.com/docs/free).
 
