@@ -16,15 +16,15 @@ existing database privately and preserve its encryption key.
 
 Set these in Render's Environment page (or during initial Blueprint creation):
 
-| Variable            | Value                                                                                                                                                               |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `APP_KEY`           | Run `php artisan key:generate --show` locally, then copy the complete `base64:...` value. Keep it stable across deploys.                                            |
-| `DB_URL`            | Leave empty for SQLite. Remove any old Neon URL from Render's environment settings. |
-| `CLOUDINARY_URL`    | `cloudinary://API_KEY:API_SECRET@CLOUD_NAME` from your Cloudinary account.                                                                                          |
-| `ADMIN_EMAIL`       | Your administrator email address.                                                                                                                                   |
-| `ADMIN_PASSWORD`    | Render generates this secret; retrieve it from Environment to sign in initially.                                                                                    |
-| `RESEND_API_KEY`    | Your Resend API key for contact notifications and password reset emails.                                                                                            |
-| `MAIL_FROM_ADDRESS` | A valid sender email on your verified Resend domain, such as `portfolio@example.com`. A bare domain is invalid.                                                     |
+| Variable            | Value                                                                                                                    |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `APP_KEY`           | Run `php artisan key:generate --show` locally, then copy the complete `base64:...` value. Keep it stable across deploys. |
+| `DB_URL`            | Leave empty for SQLite. Remove any old Neon URL from Render's environment settings.                                      |
+| `CLOUDINARY_URL`    | `cloudinary://API_KEY:API_SECRET@CLOUD_NAME` from your Cloudinary account.                                               |
+| `ADMIN_EMAIL`       | Your administrator email address.                                                                                        |
+| `ADMIN_PASSWORD`    | Render generates this secret; retrieve it from Environment to sign in initially.                                         |
+| `RESEND_API_KEY`    | Your Resend API key for contact notifications and password reset emails.                                                 |
+| `MAIL_FROM_ADDRESS` | A valid sender email on your verified Resend domain, such as `portfolio@example.com`. A bare domain is invalid.          |
 
 The Blueprint selects SQLite on a persistent disk, Cloudinary, database sessions/cache, synchronous
 jobs, and stderr logging. It uses `/up` for health checks. Set `APP_URL` to your
