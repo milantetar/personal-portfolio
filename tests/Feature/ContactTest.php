@@ -6,7 +6,7 @@ use App\Models\ContactMessage;
 use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Mail;
 
-it('stores a contact message', function (): void {
+it('stores a contact message and reports when email is not configured', function (): void {
     Mail::fake();
 
     $this->from('/')
@@ -17,7 +17,7 @@ it('stores a contact message', function (): void {
             'message' => 'I would like to work with you.',
         ])
         ->assertRedirect('/')
-        ->assertSessionHas('success');
+        ->assertSessionHas('error');
 
     $message = ContactMessage::query()->sole();
 
@@ -60,7 +60,7 @@ it('emails the site owner when an address is configured', function (): void {
         'email' => 'ada@example.com',
         'subject' => 'Hello',
         'message' => 'I would like to work with you.',
-    ]);
+    ])->assertRedirect('/')->assertSessionHas('success');
 
     expect($transport->messages())->toHaveCount(1);
     $email = $transport->messages()->first()->getOriginalMessage();
