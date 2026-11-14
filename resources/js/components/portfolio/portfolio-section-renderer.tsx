@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { GitHubIcon, LinkedInIcon } from '@/components/portfolio/brand-icons';
 import { TechnologyBrandIcon } from '@/components/portfolio/technology-brand-icon';
+import { OptimizedImage } from '@/components/optimized-image';
 import {
     isInternalPortfolioHref,
     portfolioHref,
@@ -125,14 +126,14 @@ function SectionIntro({
             {hero ? (
                 <h1
                     id={`${section.slug}-heading`}
-                    className="max-w-4xl font-display text-[clamp(2rem,5.2vw,5rem)] leading-[0.98] font-semibold tracking-tighter text-foreground"
+                    className="max-w-3xl font-display text-4xl leading-tight font-semibold tracking-tight text-foreground md:text-5xl"
                 >
                     {section.title}
                 </h1>
             ) : (
                 <h2
                     id={`${section.slug}-heading`}
-                    className="font-display text-3xl leading-tight font-medium tracking-tight text-foreground sm:text-4xl"
+                    className="font-display text-2xl leading-snug font-medium tracking-tight text-foreground md:text-3xl"
                 >
                     {section.title}
                 </h2>
@@ -153,9 +154,9 @@ function SectionFrame({
     hero?: boolean;
 }) {
     const frameClassName = hero
-        ? 'portfolio-section portfolio-section--hero portfolio-hero px-4 py-12 sm:px-8 sm:py-16 lg:px-12'
-        : `portfolio-section portfolio-section--${section.type} portfolio-editorial-section px-5 py-8 sm:px-8 sm:py-10 lg:px-10 lg:py-12`;
-    const innerClassName = `portfolio-section-inner ${hero ? 'portfolio-hero-layout' : section.type === 'projects' || section.type === 'certifications' ? 'portfolio-projects-layout flex flex-col gap-6 sm:gap-8' : 'flex flex-col gap-6 sm:gap-8'}`;
+        ? 'portfolio-section portfolio-section--hero portfolio-hero px-4 py-16 sm:px-8 sm:py-20'
+        : `portfolio-section portfolio-section--${section.type} portfolio-editorial-section px-5 py-16 sm:px-8 sm:py-20`;
+    const innerClassName = `portfolio-section-inner ${hero ? 'portfolio-hero-layout glass-card' : section.type === 'projects' || section.type === 'certifications' ? 'portfolio-projects-layout flex flex-col gap-5' : 'flex flex-col gap-5'}`;
 
     return (
         <section
@@ -191,12 +192,11 @@ function CertificateMedia({ certificate }: { certificate: Certificate }) {
     }
 
     return (
-        <img
+        <OptimizedImage
             src={media.url}
             alt={`${certificate.title} certificate`}
-            loading="lazy"
-            width="48"
-            height="48"
+            width={48}
+            height={48}
             className="size-12 shrink-0 border border-border bg-muted/40 object-contain p-1"
             onError={() => setHasError(true)}
         />
@@ -424,14 +424,16 @@ export function PortfolioSectionRenderer({
                             </Button>
                         ) : null}
                         {resumeUrl ? (
-                            <Button variant="outline" asChild>
-                                <a href={resumeUrl} download>
-                                    Download résumé
-                                    <ArrowUpRight className="size-4" />
-                                </a>
-                            </Button>
+                            <a
+                                href={resumeUrl}
+                                download
+                                className="inline-flex items-center gap-2 text-sm text-foreground underline decoration-border underline-offset-4 hover:decoration-primary"
+                            >
+                                Download résumé
+                                <ArrowUpRight className="size-4" />
+                            </a>
                         ) : secondaryUrl && secondaryLabel ? (
-                            <Button variant="outline" asChild>
+                            <Button variant="link" asChild>
                                 {isInternalPortfolioHref(secondaryUrl) ? (
                                     <Link href={secondaryUrl} prefetch="hover">
                                         {secondaryLabel}
@@ -456,7 +458,7 @@ export function PortfolioSectionRenderer({
     if (section.type === 'about') {
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion}>
-                <div className="portfolio-copy-card">
+                <div className="portfolio-copy-card glass-card">
                     <LinkifiedText
                         value={stringValue(
                             content,
@@ -554,7 +556,7 @@ export function PortfolioSectionRenderer({
                         return (
                             <section
                                 key={group.name}
-                                className="portfolio-skill-group"
+                                className="portfolio-skill-group glass-card"
                             >
                                 <h3>{group.name}</h3>
                                 <ul>
@@ -589,7 +591,7 @@ export function PortfolioSectionRenderer({
 
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion}>
-                <ol className="portfolio-copy-card portfolio-experience-timeline max-w-3xl space-y-0">
+                <ol className="portfolio-copy-card glass-card portfolio-experience-timeline max-w-3xl space-y-0">
                     {experienceItems.map((item, index) => {
                         const isRole =
                             /\b(?:trainee|engineer|developer|intern)\b/i.test(
@@ -639,7 +641,7 @@ export function PortfolioSectionRenderer({
                                     return (
                                         <article
                                             key={project}
-                                            className="portfolio-project-card"
+                                            className="portfolio-project-card glass-card"
                                         >
                                             <h4>{projectTitle}</h4>
                                             {details.length ? (
@@ -665,7 +667,7 @@ export function PortfolioSectionRenderer({
                                 {projects.map((project) => (
                                     <article
                                         key={project.id}
-                                        className="portfolio-project-card portfolio-github-card"
+                                        className="portfolio-project-card glass-card portfolio-github-card"
                                     >
                                         <div className="portfolio-project-card-heading">
                                             <h3>{project.name}</h3>
@@ -739,7 +741,7 @@ export function PortfolioSectionRenderer({
                         {certificates.map((certificate) => (
                             <article
                                 key={certificate.id}
-                                className="portfolio-project-card portfolio-certificate-card"
+                                className="portfolio-project-card glass-card portfolio-certificate-card"
                             >
                                 <CertificateMedia certificate={certificate} />
                                 <div className="min-w-0">
@@ -794,7 +796,7 @@ export function PortfolioSectionRenderer({
     if (section.type === 'contact') {
         return (
             <SectionFrame section={section} reduceMotion={reduceMotion}>
-                <div className="portfolio-copy-card max-w-3xl">
+                <div className="portfolio-copy-card glass-card max-w-3xl">
                     {stringValue(
                         content,
                         'body',
@@ -852,7 +854,7 @@ export function PortfolioSectionRenderer({
 
     return (
         <SectionFrame section={section} reduceMotion={reduceMotion}>
-            <div className="portfolio-copy-card">
+            <div className="portfolio-copy-card glass-card">
                 <LinkifiedText
                     value={stringValue(content, 'body')}
                     className="block max-w-3xl text-sm leading-7 whitespace-pre-line text-muted-foreground"

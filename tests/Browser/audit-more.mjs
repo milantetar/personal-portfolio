@@ -48,6 +48,11 @@ await run('Media upload, metadata edit, preview and deletion', async () => {
         .getByRole('button', { name: '+ Add Media', exact: true })
         .click();
     await page.locator('#new-media-title').fill(`Browser media ${stamp}`);
+    const uploadResponse = page.waitForResponse(
+        (response) =>
+            response.request().method() === 'POST' &&
+            new URL(response.url()).pathname === '/dashboard/media',
+    );
     await page.locator('#new-media-file-upload').setInputFiles({
         name: `browser-audit-${stamp}.png`,
         mimeType: 'image/png',
@@ -56,6 +61,7 @@ await run('Media upload, metadata edit, preview and deletion', async () => {
             'base64',
         ),
     });
+    expect((await uploadResponse).status()).toBe(201);
     await expect(page.getByRole('dialog')).toBeHidden();
     await page
         .getByPlaceholder('Search files...')
@@ -172,10 +178,22 @@ await run('Section create, edit, hide, publish and delete', async () => {
     ).toBeVisible();
     const response = await page.request.get(`${base}/audit-section-${stamp}`);
     expect(response.status()).toBe(404);
-    for (const close of await page
-        .getByRole('button', { name: 'Close toast', exact: true })
-        .all())
-        await close.click();
+    const closeToasts = page.getByRole('button', {
+        name: 'Close toast',
+        exact: true,
+    });
+    for (
+        let attempt = 0;
+        attempt < 10 && (await closeToasts.count());
+        attempt++
+    ) {
+        await closeToasts
+            .first()
+            .click({ timeout: 1000 })
+            .catch(() => {
+                // A toast can expire between counting it and clicking it.
+            });
+    }
     await page
         .getByRole('button', {
             name: `Publish Edited section ${stamp}`,

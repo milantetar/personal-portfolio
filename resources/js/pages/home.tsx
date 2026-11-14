@@ -7,6 +7,8 @@ import type { CSSProperties } from 'react';
 import { PortfolioAssistant } from '@/components/portfolio/portfolio-assistant';
 import { GitHubIcon, LinkedInIcon } from '@/components/portfolio/brand-icons';
 import { PortfolioSectionRenderer } from '@/components/portfolio/portfolio-section-renderer';
+import { OptimizedImage } from '@/components/optimized-image';
+import { ResponsiveBackdrop } from '@/components/responsive-backdrop';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { FALLBACK_BACKDROP } from '@/config/theme';
 import {
@@ -160,8 +162,8 @@ export default function Home({
         Math.max(0, Number(site.glass_opacity ?? 72)),
     );
     const backdropScrimOpacity = Math.min(
-        0.68,
-        0.34 + backdropIntensity * 0.002,
+        0.42,
+        0.18 + backdropIntensity * 0.002,
     );
 
     return (
@@ -256,10 +258,9 @@ export default function Home({
                     } as CSSProperties
                 }
             >
-                <div
-                    className="portfolio-backdrop fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat"
-                    style={{ backgroundImage: `url("${backdrop}")` }}
-                    aria-hidden="true"
+                <ResponsiveBackdrop
+                    source={backdrop}
+                    className="portfolio-backdrop pointer-events-none fixed inset-0 -z-20 block overflow-hidden"
                 />
                 <div
                     className="portfolio-backdrop-scrim pointer-events-none fixed inset-0 -z-10"
@@ -277,11 +278,11 @@ export default function Home({
                             className="flex shrink-0 items-center gap-2.5 text-foreground transition-opacity hover:opacity-75"
                         >
                             {logo ? (
-                                <img
+                                <OptimizedImage
                                     src={logo}
                                     alt=""
-                                    width="32"
-                                    height="32"
+                                    width={32}
+                                    height={32}
                                     className="size-8 object-contain"
                                 />
                             ) : null}
@@ -291,7 +292,7 @@ export default function Home({
                         </Link>
 
                         <div className="hidden items-center gap-6 md:flex lg:gap-8">
-                            {homepageNavbar?.items.map((item) => {
+                            {homepageNavbar?.items.slice(0, 4).map((item) => {
                                 const href = portfolioHref(
                                     item.url,
                                     sections,
@@ -319,6 +320,50 @@ export default function Home({
                                     </a>
                                 );
                             })}
+                            {(homepageNavbar?.items.length || 0) > 4 ? (
+                                <details className="portfolio-nav-more relative text-xs text-muted-foreground">
+                                    <summary className="cursor-pointer font-medium hover:text-foreground focus-visible:text-foreground">
+                                        More
+                                    </summary>
+                                    <div className="absolute top-full right-0 z-50 mt-3 grid min-w-40 gap-1 rounded-xl border border-border bg-card p-2 shadow-sm">
+                                        {homepageNavbar?.items
+                                            .slice(4)
+                                            .map((item) => {
+                                                const href = portfolioHref(
+                                                    item.url,
+                                                    sections,
+                                                    item.label,
+                                                );
+                                                const className =
+                                                    'rounded-md px-3 py-2 font-medium hover:bg-accent hover:text-foreground';
+                                                return isInternalPortfolioHref(
+                                                    href,
+                                                ) ? (
+                                                    <Link
+                                                        key={item.id}
+                                                        href={href}
+                                                        prefetch="hover"
+                                                        className={className}
+                                                    >
+                                                        {navigationLabel(
+                                                            item.label,
+                                                        )}
+                                                    </Link>
+                                                ) : (
+                                                    <a
+                                                        key={item.id}
+                                                        href={href}
+                                                        className={className}
+                                                    >
+                                                        {navigationLabel(
+                                                            item.label,
+                                                        )}
+                                                    </a>
+                                                );
+                                            })}
+                                    </div>
+                                </details>
+                            ) : null}
                         </div>
 
                         <div className="flex items-center gap-3 text-muted-foreground">

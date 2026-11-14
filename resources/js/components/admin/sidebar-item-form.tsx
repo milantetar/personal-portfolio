@@ -4,6 +4,7 @@ import { useForm } from '@inertiajs/react';
 import { Image as ImageIcon, Trash2 } from 'lucide-react';
 
 import { MediaUploadZone } from '@/components/admin/media-upload-zone';
+import { SafeMediaImage } from '@/components/safe-media-image';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -144,10 +145,11 @@ export function SidebarItemFormModal({
                         {selectedPreviewUrl ? (
                             <div className="flex items-center gap-3 rounded-md border border-border bg-background p-3">
                                 <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-sm border border-border bg-background">
-                                    <img
+                                    <SafeMediaImage
                                         alt="Selected icon preview"
                                         className="max-h-full max-w-full object-contain p-1"
-                                        src={selectedPreviewUrl}
+                                        source={selectedPreviewUrl}
+                                        displayWidth={80}
                                     />
                                 </div>
                                 <p className="flex-1 text-sm font-medium">

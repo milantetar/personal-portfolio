@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Code2 } from 'lucide-react';
+import { OptimizedImage } from '@/components/optimized-image';
 
 import { automaticTechnologyIconUrl } from '@/lib/technology-icons';
 
@@ -138,25 +139,35 @@ export function TechnologyBrandIcon({
     className = '',
 }: TechnologyBrandIconProps) {
     const [hasError, setHasError] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
     const localBrand = !iconUrl ? localBrandFor(name) : null;
     const source = iconUrl || automaticTechnologyIconUrl(name);
 
-    useEffect(() => setHasError(false), [source]);
+    useEffect(() => {
+        setHasError(false);
+        setIsLoaded(false);
+    }, [source]);
 
     return (
         <span
-            className={`technology-brand-icon ${className}`}
+            className={`technology-brand-icon relative ${className}`}
             aria-hidden="true"
         >
             {localBrand ? (
                 <LocalBrandMark brand={localBrand} />
             ) : source && !hasError ? (
-                <img
-                    src={source}
-                    alt=""
-                    loading="lazy"
-                    onError={() => setHasError(true)}
-                />
+                <>
+                    {!isLoaded ? <Code2 className="size-4" /> : null}
+                    <OptimizedImage
+                        src={source}
+                        alt=""
+                        width={24}
+                        height={24}
+                        className={isLoaded ? '' : 'absolute opacity-0'}
+                        onLoad={() => setIsLoaded(true)}
+                        onError={() => setHasError(true)}
+                    />
+                </>
             ) : (
                 <Code2 className="size-4" />
             )}

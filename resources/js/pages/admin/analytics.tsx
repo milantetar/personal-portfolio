@@ -93,26 +93,6 @@ function TrafficChart({ data }: { data: DailyTraffic[] }) {
                     preserveAspectRatio="none"
                     className="h-full w-full overflow-visible"
                 >
-                    <defs>
-                        <linearGradient
-                            id="traffic-area"
-                            x1="0"
-                            x2="0"
-                            y1="0"
-                            y2="1"
-                        >
-                            <stop
-                                offset="0%"
-                                stopColor="hsl(var(--primary))"
-                                stopOpacity=".2"
-                            />
-                            <stop
-                                offset="100%"
-                                stopColor="hsl(var(--primary))"
-                                stopOpacity="0"
-                            />
-                        </linearGradient>
-                    </defs>
                     {[0, 1, 2, 3].map((step) => {
                         const y = padding + (step / 3) * (height - padding * 2);
                         return (
@@ -129,7 +109,11 @@ function TrafficChart({ data }: { data: DailyTraffic[] }) {
                     })}
                     {data.some((point) => point.views > 0) ? (
                         <>
-                            <polygon points={area} fill="url(#traffic-area)" />
+                            <polygon
+                                points={area}
+                                fill="hsl(var(--primary))"
+                                fillOpacity=".12"
+                            />
                             <polyline
                                 points={line}
                                 fill="none"
@@ -278,7 +262,7 @@ export default function AnalyticsPage() {
                 }
                 branding={branding}
             >
-                <div className="admin-page admin-analytics-page mx-auto flex w-full max-w-7xl flex-col gap-5">
+                <div className="admin-page admin-analytics-page flex w-full flex-col gap-4">
                     <AdminPageHeader
                         icon={<Activity className="size-4" />}
                         title="Traffic analytics"

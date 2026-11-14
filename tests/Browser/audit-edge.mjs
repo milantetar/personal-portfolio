@@ -39,6 +39,22 @@ await run('Portfolio theme persists across navigation and reload', async () => {
     await page.reload();
     await expect(page.locator('html[data-theme="discord"]')).toBeVisible();
 });
+await run(
+    'Internal portfolio links navigate without reloading the document',
+    async () => {
+        await page.goto(base);
+        await page.evaluate(() => {
+            window.portfolioNavigationMarker = 'same-document';
+        });
+        await page
+            .locator('nav[aria-label="Main navigation"] a[href="/about"]')
+            .click();
+        await expect(page).toHaveURL(`${base}/about`);
+        expect(
+            await page.evaluate(() => window.portfolioNavigationMarker),
+        ).toBe('same-document');
+    },
+);
 await run('Sitemap, robots, missing page and guest API access', async () => {
     const sitemap = await context.request.get(`${base}/sitemap.xml`);
     expect(sitemap.status()).toBe(200);

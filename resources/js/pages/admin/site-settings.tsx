@@ -4,6 +4,7 @@ import { type FormEvent, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { AdminLayout } from '@/components/admin/admin-layout';
+import { SafeMediaImage } from '@/components/safe-media-image';
 import { useTheme } from '@/components/theme-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -108,7 +109,7 @@ export default function SiteSettingsPage() {
                 }
                 branding={branding}
             >
-                <div className="admin-page admin-site-settings-page mx-auto w-full max-w-7xl space-y-6">
+                <div className="admin-page admin-site-settings-page w-full space-y-4">
                     <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex items-start gap-3">
                             <div className="rounded-lg bg-primary/15 p-2 text-primary">
@@ -165,7 +166,7 @@ export default function SiteSettingsPage() {
                             >
                                 <section
                                     id="identity"
-                                    className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
+                                    className="admin-settings-section glass-card scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
                                 >
                                     <h2 className="text-lg font-semibold">
                                         Identity
@@ -196,7 +197,7 @@ export default function SiteSettingsPage() {
 
                                 <section
                                     id="media-icon"
-                                    className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
+                                    className="admin-settings-section glass-card scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
                                 >
                                     <h2 className="text-lg font-semibold">
                                         Settings menu icon
@@ -252,13 +253,14 @@ export default function SiteSettingsPage() {
                                                         media.original_name
                                                     }
                                                 >
-                                                    <img
-                                                        src={media.url}
+                                                    <SafeMediaImage
+                                                        source={media.url}
                                                         alt={
                                                             media.alt_text ||
                                                             media.original_name
                                                         }
                                                         className="aspect-square size-full object-contain"
+                                                        displayWidth={160}
                                                     />
                                                 </button>
                                             ))}
@@ -270,7 +272,7 @@ export default function SiteSettingsPage() {
 
                                 <section
                                     id="contact"
-                                    className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
+                                    className="admin-settings-section glass-card scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
                                 >
                                     <h2 className="text-lg font-semibold">
                                         Contact and social
@@ -350,7 +352,7 @@ export default function SiteSettingsPage() {
 
                                 <section
                                     id="appearance"
-                                    className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
+                                    className="admin-settings-section glass-card scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
                                 >
                                     <h2 className="text-lg font-semibold">
                                         Appearance
@@ -440,7 +442,7 @@ export default function SiteSettingsPage() {
 
                                 <section
                                     id="media-slots"
-                                    className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
+                                    className="admin-settings-section glass-card scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
                                 >
                                     <div className="flex items-start gap-3">
                                         <Image className="mt-0.5 size-5 text-primary" />
@@ -476,13 +478,18 @@ export default function SiteSettingsPage() {
                                                         media.mime_type.startsWith(
                                                             'image/',
                                                         ) ? (
-                                                            <img
-                                                                src={media.url}
+                                                            <SafeMediaImage
+                                                                source={
+                                                                    media.url
+                                                                }
                                                                 alt={
                                                                     media.alt_text ||
                                                                     slot
                                                                 }
                                                                 className="h-full w-full object-contain p-3"
+                                                                displayWidth={
+                                                                    320
+                                                                }
                                                             />
                                                         ) : media?.url ? (
                                                             <a
@@ -544,7 +551,7 @@ export default function SiteSettingsPage() {
                             >
                                 <section
                                     id="security"
-                                    className="admin-settings-section scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
+                                    className="admin-settings-section glass-card scroll-mt-24 rounded-lg border border-border bg-card p-5 md:p-6"
                                 >
                                     <h2 className="text-lg font-semibold">
                                         Security

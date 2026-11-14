@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { router } from '@inertiajs/react';
 
 import type { MediaUploadData, MediaUploadResponse } from '@/types/media';
 
@@ -91,6 +92,7 @@ export function useMediaUpload({
                 URL.revokeObjectURL(temporaryPreviewUrl);
                 previewUrlRef.current = result.data.url;
                 setPreviewUrl(result.data.url);
+                router.flushAll();
 
                 return result.data;
             } catch (caughtError: unknown) {

@@ -6,7 +6,7 @@ import {
     type KeyboardEvent,
 } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowUp, Bot, LoaderCircle } from 'lucide-react';
+import { ArrowUp, LoaderCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
@@ -146,16 +146,13 @@ export function PortfolioAssistant({ enabled }: PortfolioAssistantProps) {
                         transition={{ duration: 0.28, ease: 'easeOut' }}
                         className="portfolio-assistant-welcome"
                     >
-                        <span className="portfolio-assistant-mark">
-                            <Bot className="size-5" aria-hidden="true" />
-                        </span>
-                        <p className="eyebrow">Portfolio assistant</p>
+                        <p className="eyebrow">Milan's portfolio assistant</p>
                         <h1 id="assistant-heading" className="font-display">
-                            What would you like to know?
+                            Ask about Milan's work
                         </h1>
                         <p className="portfolio-assistant-description">
-                            Ask about Milan's projects, Laravel experience,
-                            skills, or certificates.
+                            Explore his projects, experience, skills and
+                            certificates.
                         </p>
                     </motion.header>
                 ) : (
@@ -164,6 +161,12 @@ export function PortfolioAssistant({ enabled }: PortfolioAssistantProps) {
                         aria-live="polite"
                         aria-relevant="additions text"
                     >
+                        <h1
+                            id="assistant-heading"
+                            className="portfolio-assistant-conversation-title"
+                        >
+                            Milan's portfolio assistant
+                        </h1>
                         {messages.map((message, index) => (
                             <motion.div
                                 key={`${message.role}-${index}`}
@@ -175,10 +178,12 @@ export function PortfolioAssistant({ enabled }: PortfolioAssistantProps) {
                                 className={`portfolio-assistant-message portfolio-assistant-message--${message.role}`}
                             >
                                 {message.role === 'assistant' ? (
-                                    <Bot
-                                        className="mt-1 size-4 shrink-0 text-primary"
+                                    <span
+                                        className="portfolio-assistant-avatar"
                                         aria-hidden="true"
-                                    />
+                                    >
+                                        M
+                                    </span>
                                 ) : null}
                                 <p>{message.content}</p>
                             </motion.div>
@@ -192,7 +197,7 @@ export function PortfolioAssistant({ enabled }: PortfolioAssistantProps) {
                                     className="size-4 animate-spin"
                                     aria-hidden="true"
                                 />
-                                Thinking…
+                                Looking through Milan's portfolio…
                             </p>
                         ) : null}
                         <div ref={endOfMessages} />

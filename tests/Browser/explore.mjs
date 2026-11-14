@@ -3,7 +3,7 @@ import fs from 'node:fs';
 
 const root = 'storage/app/private/browser-audit';
 const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 const errors = [];
 page.on('pageerror', (error) => errors.push(error.message));
 page.on('console', (message) => {
@@ -38,6 +38,21 @@ async function inspect(path) {
         brokenImages: [...document.images]
             .filter((el) => el.complete && el.naturalWidth === 0)
             .map((el) => el.src),
+        imagesWithoutDimensions: [...document.images]
+            .filter(
+                (el) => !el.hasAttribute('width') || !el.hasAttribute('height'),
+            )
+            .map((el) => el.src),
+        blurredElements: [...document.querySelectorAll('*')]
+            .filter((el) => {
+                const style = getComputedStyle(el);
+                return (
+                    style.display !== 'none' &&
+                    style.visibility !== 'hidden' &&
+                    style.backdropFilter !== 'none'
+                );
+            })
+            .map((el) => `${el.tagName.toLowerCase()}.${el.className}`),
         overflow: document.documentElement.scrollWidth > innerWidth,
     }));
     pages.push({ path, status: response.status(), ...details });
@@ -53,9 +68,19 @@ async function inspect(path) {
             details.title +
             ' broken-images=' +
             details.brokenImages.length,
+        ' missing-dimensions=' +
+            details.imagesWithoutDimensions.length +
+            ' blur=' +
+            details.blurredElements.length,
     );
 }
 await inspect('/');
+await inspect('/about');
+await inspect('/skills');
+await inspect('/projects');
+await inspect('/education');
+await inspect('/certifications');
+await inspect('/contact');
 await inspect('/assistant');
 await inspect('/blog');
 await inspect('/forgot-password');
@@ -91,6 +116,12 @@ console.log('Browser errors:', JSON.stringify(errors));
 await browser.close();
 process.exitCode =
     errors.length ||
-    pages.some((entry) => entry.status !== 200 || entry.brokenImages.length > 0)
+    pages.some(
+        (entry) =>
+            entry.status !== 200 ||
+            entry.brokenImages.length > 0 ||
+            entry.imagesWithoutDimensions.length > 0 ||
+            entry.blurredElements.length > 8,
+    )
         ? 1
         : 0;

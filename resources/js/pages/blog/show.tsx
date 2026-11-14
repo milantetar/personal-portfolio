@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 
 import { Navbar } from '@/components/navbar/navbar';
+import { OptimizedImage } from '@/components/optimized-image';
 import { absoluteSiteUrl, canonicalSiteUrl, metaDescription } from '@/lib/seo';
 import type { PageProps, Post, SiteSettings } from '@/types';
 
@@ -156,10 +157,14 @@ export default function BlogShow({ settings, post }: BlogShowProps) {
                         </header>
 
                         {post.cover_media?.url ? (
-                            <img
+                            <OptimizedImage
                                 src={post.cover_media.url}
                                 alt={post.cover_media.alt_text || post.title}
-                                className="mt-8 w-full border border-border object-cover"
+                                width={1200}
+                                height={675}
+                                sizes="(max-width: 768px) 100vw, 1024px"
+                                priority
+                                className="mt-8 aspect-video w-full rounded-xl border border-border object-cover"
                             />
                         ) : null}
 

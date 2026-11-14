@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 
 import { AdminLayout } from '@/components/admin/admin-layout';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
+import { SafeMediaImage } from '@/components/safe-media-image';
 import { GitHubIcon } from '@/components/portfolio/brand-icons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -269,8 +270,8 @@ export default function ProjectsPage() {
                                                     <div className="flex size-11 items-center justify-center overflow-hidden rounded-md border border-border bg-muted/40">
                                                         {project.thumbnail_media
                                                             ?.url ? (
-                                                            <img
-                                                                src={
+                                                            <SafeMediaImage
+                                                                source={
                                                                     project
                                                                         .thumbnail_media
                                                                         .url
@@ -279,6 +280,9 @@ export default function ProjectsPage() {
                                                                     project.title
                                                                 }
                                                                 className="size-full object-cover"
+                                                                displayWidth={
+                                                                    88
+                                                                }
                                                             />
                                                         ) : (
                                                             <ImageIcon className="size-4 text-muted-foreground/60" />

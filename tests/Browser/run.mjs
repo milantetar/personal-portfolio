@@ -28,12 +28,16 @@ function execute(command, args) {
         );
 }
 execute('php', ['tests/Browser/prepare.php']);
+const uploadTemp = path.resolve(root, 'tmp');
+fs.mkdirSync(uploadTemp, { recursive: true });
 const log = fs.openSync(`${root}/server.log`, 'w');
 const server = spawn(
     'php',
     [
         '-d',
         'xdebug.mode=off',
+        '-d',
+        `upload_tmp_dir=${uploadTemp}`,
         '-S',
         '127.0.0.1:8019',
         '-t',

@@ -6,6 +6,7 @@ use App\Models\Certificate;
 use App\Models\Post;
 use App\Models\Project;
 use App\Models\SiteSetting;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -53,6 +54,19 @@ it('serves a visible section by slug', function (): void {
         ->assertInertia(fn (Assert $page) => $page
             ->component('home')
             ->where('activeSectionSlug', 'about'));
+});
+
+it('loads GitHub repositories only for the projects section', function (): void {
+    Cache::forget('github.public-repositories.portfolio-performance-check');
+    SiteSetting::query()->create(['github_url' => 'https://github.com/portfolio-performance-check']);
+    makePortfolioSection();
+    makePortfolioSection(['slug' => 'projects', 'type' => 'projects', 'title' => 'Projects']);
+
+    $this->get('/')->assertInertia(fn (Assert $page) => $page->has('projects', 0));
+    Http::assertNothingSent();
+
+    $this->get('/projects')->assertInertia(fn (Assert $page) => $page->component('home'));
+    Http::assertSentCount(1);
 });
 
 it('hides invisible sections and unknown slugs', function (): void {

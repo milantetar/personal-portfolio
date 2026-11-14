@@ -23,7 +23,7 @@ export function MediaUploadZone({
 }: MediaUploadZoneProps) {
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files ?? []);
-        if (multiple && files.length > 0 && onFilesSelected)
+        if (multiple && files.length > 1 && onFilesSelected)
             onFilesSelected(files);
         else if (files[0]) onFileSelected(files[0]);
         event.target.value = '';

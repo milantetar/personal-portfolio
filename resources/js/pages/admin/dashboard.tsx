@@ -21,72 +21,57 @@ import type { PageProps } from '@/types';
 const destinations = [
     {
         title: 'Homepage sections',
-        description: 'Edit content, visibility, and the order visitors see.',
+        description: 'Edit sections and publishing order.',
         href: '/dashboard/sections',
         icon: LayoutTemplate,
-        group: 'Content',
     },
     {
         title: 'Projects & case studies',
-        description:
-            'Manage portfolio showcase projects, tech stacks, and live demos.',
+        description: 'Update projects, tech stacks and live demos.',
         href: '/dashboard/projects',
         icon: FolderGit2,
-        group: 'Content',
     },
     {
         title: 'Articles & blog',
-        description:
-            'Publish engineering write-ups, architecture notes, and tutorials.',
+        description: 'Write and publish engineering articles.',
         href: '/dashboard/posts',
         icon: FileText,
-        group: 'Content',
     },
     {
         title: 'Certificates',
-        description:
-            'Import files, update details, and manage what is published.',
+        description: 'Manage certificates and their files.',
         href: '/dashboard/certificates',
         icon: Award,
-        group: 'Content',
     },
     {
         title: 'Contact inquiries',
-        description:
-            'Review client leads, recruiter outreach, and inbound messages.',
+        description: 'Read messages from visitors.',
         href: '/dashboard/messages',
         icon: Mail,
-        group: 'Communication',
     },
     {
         title: 'AI assistant logs',
-        description:
-            'Inspect visitor interactions and queries handled by the portfolio bot.',
+        description: 'Review visitor questions and answers.',
         href: '/dashboard/assistant-logs',
         icon: Bot,
-        group: 'Communication',
     },
     {
         title: 'Media library',
-        description: 'Upload files and assign your logo, backdrop, or resume.',
+        description: 'Upload and assign images or documents.',
         href: '/dashboard/media',
         icon: FolderOpen,
-        group: 'Assets',
     },
     {
         title: 'Site settings',
-        description:
-            'Edit site identity, contact links, appearance, and media slots.',
+        description: 'Update identity, links and appearance.',
         href: '/dashboard/settings',
         icon: Settings2,
-        group: 'Configuration',
     },
     {
         title: 'Traffic analytics',
-        description: 'Review privacy focused visits and the pages people open.',
+        description: 'See visits and page activity.',
         href: '/dashboard/analytics',
         icon: Activity,
-        group: 'Insights',
     },
 ];
 
@@ -104,84 +89,51 @@ export default function Dashboard() {
                 }
                 branding={branding}
             >
-                <div className="admin-page admin-overview mx-auto flex w-full max-w-7xl flex-col gap-7">
+                <div className="admin-page admin-overview flex w-full flex-col gap-4">
                     <AdminPageHeader
                         icon={<LayoutTemplate className="size-4" />}
                         title="Workspace"
                         description="Manage your public portfolio, its assets, and the details visitors see."
                         actions={
-                            <Button size="sm" asChild>
-                                <Link href="/" target="_blank" rel="noreferrer">
-                                    View portfolio{' '}
-                                    <ArrowUpRight className="size-3.5" />
-                                </Link>
-                            </Button>
+                            <div className="flex flex-wrap items-center gap-2">
+                                <Button size="sm" variant="outline" asChild>
+                                    <Link href="/dashboard/sections">
+                                        Edit homepage
+                                    </Link>
+                                </Button>
+                                <Button size="sm" asChild>
+                                    <Link
+                                        href="/"
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        View portfolio
+                                        <ArrowUpRight className="size-3.5" />
+                                    </Link>
+                                </Button>
+                            </div>
                         }
                     />
 
                     <section
-                        className="admin-overview-intro"
-                        aria-labelledby="overview-intro-title"
-                    >
-                        <div>
-                            <p className="eyebrow">Your portfolio workspace</p>
-                            <h2 id="overview-intro-title">
-                                What would you like to update?
-                            </h2>
-                            <p>
-                                Choose an area to work on. Changes to published
-                                content appear on the public portfolio.
-                            </p>
-                        </div>
-                        <Link
-                            href="/dashboard/sections"
-                            className="admin-overview-primary-link"
-                        >
-                            <span className="admin-overview-primary-icon">
-                                <LayoutTemplate
-                                    className="size-5"
-                                    aria-hidden="true"
-                                />
-                            </span>
-                            <span>
-                                <strong>Continue with homepage content</strong>
-                                <small>
-                                    Review sections and publishing order
-                                </small>
-                            </span>
-                            <ArrowRight
-                                className="ml-auto size-4"
-                                aria-hidden="true"
-                            />
-                        </Link>
-                    </section>
-
-                    <section
                         aria-labelledby="manage-heading"
-                        className="space-y-3"
+                        className="admin-manage-section space-y-3"
                     >
                         <div className="admin-section-heading">
                             <div>
-                                <h2 id="manage-heading">Manage</h2>
-                                <p>All backoffice areas</p>
+                                <h2 id="manage-heading">Manage portfolio</h2>
                             </div>
                             <span className="font-mono text-xs text-muted-foreground">
-                                {destinations.length} destinations
+                                {destinations.length} areas
                             </span>
                         </div>
                         <div className="admin-destination-grid">
                             {destinations.map(
-                                ({
-                                    title,
-                                    description,
-                                    href,
-                                    icon: Icon,
-                                    group,
-                                }) => (
+                                ({ title, description, href, icon: Icon }) => (
                                     <Link
                                         key={href}
                                         href={href}
-                                        className="admin-destination group"
+                                        className="admin-destination glass-card group"
                                     >
                                         <span className="admin-destination-icon">
                                             <Icon
@@ -189,10 +141,7 @@ export default function Dashboard() {
                                                 aria-hidden="true"
                                             />
                                         </span>
-                                        <span className="min-w-0 flex-1">
-                                            <span className="admin-destination-meta">
-                                                {group}
-                                            </span>
+                                        <span className="admin-destination-body min-w-0 flex-1">
                                             <strong>{title}</strong>
                                             <small>{description}</small>
                                         </span>

@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 
 import { AdminLayout } from '@/components/admin/admin-layout';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
+import { SafeMediaImage } from '@/components/safe-media-image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -73,10 +74,11 @@ function CertificatePreview({
         >
             <span className="flex size-10 items-center justify-center overflow-hidden rounded-lg border bg-muted/40">
                 {isImage ? (
-                    <img
-                        src={media.url}
+                    <SafeMediaImage
+                        source={media.url}
                         alt={title}
                         className="size-full object-contain p-1"
+                        displayWidth={80}
                     />
                 ) : (
                     <FileText className="size-5 text-muted-foreground" />
@@ -283,7 +285,7 @@ export default function CertificatesPage() {
                         }
                     />
 
-                    <section className="admin-import-panel rounded-lg border border-border/70 bg-card p-4">
+                    <section className="admin-import-panel glass-card rounded-lg border border-border/70 bg-card p-5">
                         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                             <div className="flex items-start gap-3">
                                 <span className="admin-import-icon">

@@ -42,6 +42,7 @@ class HomeController extends Controller
         $settings = SiteSetting::query()->with(['logoMedia', 'backgroundMedia', 'avatarMedia', 'resumeMedia'])->first();
         $githubUsername = config('services.github.username');
         $githubProfileUrl = $settings?->github_url ?: (filled($githubUsername) ? 'https://github.com/'.$githubUsername : null);
+        $isProjectsPage = $sections->firstWhere('slug', $activeSectionSlug)?->type === 'projects';
 
         return inertia('home', [
             'settings' => $settings,
@@ -50,7 +51,7 @@ class HomeController extends Controller
             'recentPosts' => Post::query()->published()->latest('published_at')->take(3)->get(['id', 'title', 'slug', 'excerpt', 'read_time_minutes', 'published_at']),
             'sections' => $sections,
             'activeSectionSlug' => $activeSectionSlug,
-            'projects' => $gitHubRepositoryService->publicRepositoriesForProfile($githubProfileUrl),
+            'projects' => $isProjectsPage ? $gitHubRepositoryService->publicRepositoriesForProfile($githubProfileUrl) : [],
             'githubProfileUrl' => $githubProfileUrl,
             'assistantEnabled' => filled(config('services.gemini.api_key')),
         ]);

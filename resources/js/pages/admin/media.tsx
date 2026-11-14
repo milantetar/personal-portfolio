@@ -26,7 +26,7 @@ export default function MediaLibrary() {
                 }
                 branding={branding}
             >
-                <div className="admin-page admin-media-page mx-auto flex w-full max-w-7xl flex-col gap-5">
+                <div className="admin-page admin-media-page flex w-full flex-col gap-4">
                     <AdminPageHeader
                         icon={<Images className="size-4" />}
                         title="Media library"

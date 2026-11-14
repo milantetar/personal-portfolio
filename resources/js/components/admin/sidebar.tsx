@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { OptimizedImage } from '@/components/optimized-image';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
     Activity,
@@ -328,12 +329,14 @@ export function Sidebar({ items }: SidebarProps) {
                                                 )}
                                             >
                                                 {item?.icon_media?.url ? (
-                                                    <img
+                                                    <OptimizedImage
                                                         src={
                                                             item.icon_media.url
                                                         }
                                                         alt=""
                                                         className="size-4 shrink-0 object-contain"
+                                                        width={16}
+                                                        height={16}
                                                     />
                                                 ) : (
                                                     <Icon

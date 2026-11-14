@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { ArrowUpRight, Home as HomeIcon, LogOut } from 'lucide-react';
 import { route } from 'ziggy-js';
 
+import { OptimizedImage } from '@/components/optimized-image';
 import type { PageProps } from '@/types';
 import { ThemeToggle } from '@/components/theme-toggle';
 import {
@@ -69,7 +70,7 @@ export function Navbar({
                             className="flex shrink-0 items-center gap-2 transition-opacity hover:opacity-75"
                         >
                             {branding?.logo ? (
-                                <img
+                                <OptimizedImage
                                     alt={
                                         branding.logo.alt_text ||
                                         branding.siteName ||
@@ -77,6 +78,8 @@ export function Navbar({
                                     }
                                     className="h-6 w-6 object-contain"
                                     src={branding.logo.url}
+                                    width={24}
+                                    height={24}
                                 />
                             ) : null}
                             <span className="font-display text-lg font-semibold tracking-tight">

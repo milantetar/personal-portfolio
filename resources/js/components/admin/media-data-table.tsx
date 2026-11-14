@@ -53,6 +53,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { MediaUploadZone } from '@/components/admin/media-upload-zone';
+import { SafeMediaImage } from '@/components/safe-media-image';
+import { OptimizedImage } from '@/components/optimized-image';
 import { useMediaUpload } from '@/hooks/use-media-upload';
 import { cn } from '@/lib/utils';
 import type { Branding, Media, MediaFilters, PaginatedMedia } from '@/types';
@@ -313,6 +315,7 @@ export function MediaDataTable({
             toast.success(`${files.length} media files uploaded.`, {
                 id: 'media-bulk-upload',
             });
+            router.flushAll();
             setIsAddOpen(false);
             resetCreateData();
             router.reload({ only: ['mediaItems', 'branding'] });
@@ -430,13 +433,14 @@ export function MediaDataTable({
                             {isPdf ? (
                                 <FileText className="h-6 w-6 text-destructive" />
                             ) : row.original.url ? (
-                                <img
+                                <SafeMediaImage
                                     alt={
                                         row.original.alt_text ||
                                         row.original.original_name
                                     }
                                     className="max-h-full max-w-full object-contain"
-                                    src={row.original.url}
+                                    source={row.original.url}
+                                    displayWidth={128}
                                 />
                             ) : (
                                 <ImageIcon className="h-5 w-5 text-foreground" />
@@ -647,7 +651,7 @@ export function MediaDataTable({
             )}
 
             {/* Pure Minimal Glass Data Table */}
-            <div className="overflow-hidden rounded-lg border border-border bg-card">
+            <div className="glass-card overflow-hidden rounded-lg border border-border bg-card">
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[46rem] text-left text-sm">
                         <thead className="sticky top-0 z-10 border-b border-border bg-muted text-muted-foreground">
@@ -975,13 +979,15 @@ export function MediaDataTable({
                                 }
                             />
                         ) : previewItem?.mime_type.startsWith('image/') ? (
-                            <img
+                            <OptimizedImage
                                 alt={
                                     previewItem.alt_text ||
                                     previewItem.original_name
                                 }
                                 className="max-h-[70vh] max-w-full object-contain"
                                 src={previewItem.url}
+                                width={1200}
+                                height={800}
                             />
                         ) : previewItem ? (
                             <div className="flex flex-col items-center gap-4 p-10 text-center">
@@ -1290,10 +1296,12 @@ export function MediaDataTable({
                             </Select>
                         </div>
                         {createPreviewUrl && (
-                            <img
+                            <OptimizedImage
                                 alt="Upload preview"
                                 className="max-h-40 w-full rounded-lg border border-border bg-card object-contain p-2"
                                 src={createPreviewUrl}
+                                width={400}
+                                height={160}
                             />
                         )}
                         <MediaUploadZone

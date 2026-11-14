@@ -392,7 +392,7 @@ export default function SectionsPage() {
                 backgroundUrl={branding?.backgroundImage?.url}
                 branding={branding}
             >
-                <div className="admin-page admin-sections-page mx-auto w-full max-w-7xl space-y-6 text-foreground">
+                <div className="admin-page admin-sections-page w-full space-y-4 text-foreground">
                     <AdminPageHeader
                         icon={<LayoutTemplate className="size-5" />}
                         title="Homepage sections"
@@ -549,7 +549,7 @@ export default function SectionsPage() {
                         ) : (
                             <div className="overflow-x-auto">
                                 <Table className="min-w-[760px]">
-                                    <TableHeader className="sticky top-0 z-10 bg-muted/80 backdrop-blur-sm">
+                                    <TableHeader className="sticky top-0 z-10 bg-muted/90">
                                         <TableRow>
                                             <TableHead className="w-[38%]">
                                                 Section

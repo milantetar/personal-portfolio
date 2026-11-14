@@ -1,6 +1,7 @@
 import { Navbar } from '@/components/navbar/navbar';
 import { motion, useReducedMotion } from 'motion/react';
 import { FALLBACK_BACKDROP } from '@/config/theme';
+import { ResponsiveBackdrop } from '@/components/responsive-backdrop';
 import { useFlash } from '@/hooks/use-flash';
 import type { Branding, SidebarItem } from '@/types';
 
@@ -27,10 +28,9 @@ export function AdminLayout({
 
     return (
         <div className="admin-ui app-shell relative isolate flex h-dvh min-h-0 flex-col overflow-hidden bg-transparent text-foreground">
-            <div
-                className="pointer-events-none fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: `url("${bgUrl}")` }}
-                aria-hidden="true"
+            <ResponsiveBackdrop
+                source={bgUrl}
+                className="admin-backdrop pointer-events-none fixed inset-0 -z-20 block overflow-hidden"
             />
             <div
                 className="admin-backdrop-scrim pointer-events-none fixed inset-0 -z-10 bg-background/80"

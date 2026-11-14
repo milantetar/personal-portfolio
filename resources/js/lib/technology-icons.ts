@@ -34,8 +34,8 @@ const technologyBrands: Record<string, TechnologyBrand> = {
     javaprogramming: { slug: 'java', color: 'ED8B00' },
     python: { slug: 'python', color: '3776AB' },
     git: { slug: 'git', color: 'F05032' },
-    github: { slug: 'github', color: '181717' },
-    githubdesktop: { slug: 'github', color: '181717' },
+    github: { slug: 'github', color: 'A1A1A6' },
+    githubdesktop: { slug: 'github', color: 'A1A1A6' },
     aws: { slug: 'amazonaws', color: 'FF9900' },
     amazonwebservices: { slug: 'amazonaws', color: '232F3E' },
     amazonwebservicesaws: { slug: 'amazonaws', color: 'FF9900' },
@@ -62,6 +62,6 @@ export function automaticTechnologyIconUrl(name: string): string | null {
     const brand = technologyBrands[key];
 
     return brand
-        ? `https://cdn.simpleicons.org/${brand.slug}/${brand.color}`
+        ? `/images/technology-icons/${brand.slug}-${brand.color}.svg`
         : null;
 }

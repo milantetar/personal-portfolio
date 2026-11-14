@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 
 import { AdminLayout } from '@/components/admin/admin-layout';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
+import { SafeMediaImage } from '@/components/safe-media-image';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -296,14 +297,17 @@ export default function PostsPage() {
                                                 <TableCell>
                                                     <div className="flex size-10 items-center justify-center overflow-hidden rounded border border-border bg-muted/40">
                                                         {p.cover_media?.url ? (
-                                                            <img
-                                                                src={
+                                                            <SafeMediaImage
+                                                                source={
                                                                     p
                                                                         .cover_media
                                                                         .url
                                                                 }
                                                                 alt={p.title}
                                                                 className="size-full object-cover"
+                                                                displayWidth={
+                                                                    80
+                                                                }
                                                             />
                                                         ) : (
                                                             <ImageIcon className="size-4 text-muted-foreground/60" />

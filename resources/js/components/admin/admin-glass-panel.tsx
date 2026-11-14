@@ -7,6 +7,9 @@ export function AdminGlassPanel({
     ...props
 }: HTMLAttributes<HTMLElement>) {
     return (
-        <section className={cn('admin-panel min-w-0', className)} {...props} />
+        <section
+            className={cn('admin-panel glass-card min-w-0', className)}
+            {...props}
+        />
     );
 }

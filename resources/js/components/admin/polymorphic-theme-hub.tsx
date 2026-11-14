@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { SafeMediaImage } from '@/components/safe-media-image';
 import {
     Dialog,
     DialogContent,
@@ -202,7 +203,7 @@ export function PolymorphicThemeHub({
     return (
         <section
             aria-label="Portfolio brand assets"
-            className="admin-branding-hub mb-6 rounded-lg border border-border bg-card p-4"
+            className="admin-branding-hub glass-card mb-6 rounded-lg border border-border bg-card p-5"
         >
             {/* Hidden file inputs */}
             <input
@@ -329,10 +330,11 @@ export function PolymorphicThemeHub({
                     >
                         {branding?.logo?.url ? (
                             <>
-                                <img
-                                    src={branding.logo.url}
+                                <SafeMediaImage
+                                    source={branding.logo.url}
                                     alt="Logo"
                                     className="size-full object-contain p-1"
+                                    displayWidth={96}
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center gap-1 bg-card opacity-0 transition-opacity group-hover:opacity-100">
                                     <button
@@ -388,10 +390,11 @@ export function PolymorphicThemeHub({
                     >
                         {branding?.backgroundImage?.url ? (
                             <>
-                                <img
-                                    src={branding.backgroundImage.url}
+                                <SafeMediaImage
+                                    source={branding.backgroundImage.url}
                                     alt="Backdrop"
                                     className="size-full object-cover"
+                                    displayWidth={160}
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center gap-1 bg-card opacity-0 transition-opacity group-hover:opacity-100">
                                     <button
@@ -449,10 +452,11 @@ export function PolymorphicThemeHub({
                     >
                         {branding?.avatar?.url ? (
                             <>
-                                <img
-                                    src={branding.avatar.url}
+                                <SafeMediaImage
+                                    source={branding.avatar.url}
                                     alt="Avatar"
                                     className="size-full object-cover"
+                                    displayWidth={96}
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center gap-1 bg-card opacity-0 transition-opacity group-hover:opacity-100">
                                     <button
@@ -510,10 +514,11 @@ export function PolymorphicThemeHub({
                     >
                         {branding?.favicon?.url ? (
                             <>
-                                <img
-                                    src={branding.favicon.url}
+                                <SafeMediaImage
+                                    source={branding.favicon.url}
                                     alt="Site favicon"
                                     className="size-5 object-contain"
+                                    displayWidth={64}
                                 />
                                 <div className="absolute inset-0 flex items-center justify-center gap-0.5 bg-card opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
                                     <button
@@ -628,13 +633,14 @@ export function PolymorphicThemeHub({
                                                 'image/x-icon' ? (
                                                     <AppWindow className="size-8 text-muted-foreground" />
                                                 ) : (
-                                                    <img
-                                                        src={item.url}
+                                                    <SafeMediaImage
+                                                        source={item.url}
                                                         alt={
                                                             item.alt_text ||
                                                             item.original_name
                                                         }
                                                         className="h-full w-full object-contain"
+                                                        displayWidth={240}
                                                     />
                                                 )}
                                             </div>

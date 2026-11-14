@@ -128,7 +128,7 @@ export default function AssistantLogsPage() {
 
                     {/* KPI Metrics Strip */}
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                        <div className="rounded-lg border border-border/70 bg-card p-4">
+                        <div className="glass-card rounded-lg border border-border/70 bg-card p-5">
                             <div className="flex items-center justify-between">
                                 <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
                                     Total Inquiries
@@ -143,7 +143,7 @@ export default function AssistantLogsPage() {
                             </p>
                         </div>
 
-                        <div className="rounded-lg border border-border/70 bg-card p-4">
+                        <div className="glass-card rounded-lg border border-border/70 bg-card p-5">
                             <div className="flex items-center justify-between">
                                 <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
                                     Today's Queries
@@ -158,7 +158,7 @@ export default function AssistantLogsPage() {
                             </p>
                         </div>
 
-                        <div className="rounded-lg border border-border/70 bg-card p-4">
+                        <div className="glass-card rounded-lg border border-border/70 bg-card p-5">
                             <div className="flex items-center justify-between">
                                 <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
                                     Unique Visitors

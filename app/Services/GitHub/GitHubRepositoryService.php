@@ -35,7 +35,7 @@ class GitHubRepositoryService
 
         return Cache::remember(
             'github.public-repositories.'.strtolower($username),
-            now()->addMinutes(30),
+            now()->addMinutes(5),
             fn (): array => $this->fetchRepositories($username),
         );
     }

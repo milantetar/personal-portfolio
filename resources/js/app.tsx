@@ -3,12 +3,21 @@ import '@fontsource-variable/geist';
 import '@fontsource-variable/newsreader/wght.css';
 import '@fontsource/ibm-plex-mono/400.css';
 
-import { createInertiaApp } from '@inertiajs/react';
+import { config, createInertiaApp, router } from '@inertiajs/react';
 import type { ComponentType } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from 'sonner';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+// Keep hover prefetches quick without holding mutable portfolio pages for long.
+config.set('prefetch.cacheFor', 5_000);
+
+// A saved edit must not be followed by a prefetched copy of an older page.
+const stopClearingPrefetch = router.on('finish', ({ detail: { visit } }) => {
+    if (visit.method !== 'get') router.flushAll();
+});
+import.meta.hot?.dispose(stopClearingPrefetch);
 
 void createInertiaApp({
     title: (title) => title || appName,

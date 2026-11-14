@@ -5,8 +5,6 @@ export interface ThemeOption {
     label: string;
     /** Hex swatch shown in the dropdown */
     swatch: string;
-    /** Optional second color for a gradient swatch */
-    swatchSecondary?: string;
 }
 
 export const THEMES: ThemeOption[] = [
@@ -24,7 +22,6 @@ export const THEMES: ThemeOption[] = [
         value: 'instagram',
         label: 'Instagram',
         swatch: '#EE2A7B',
-        swatchSecondary: '#6228D7',
     },
     {
         value: 'discord',
