@@ -13,12 +13,12 @@ export const THEMES: ThemeOption[] = [
     {
         value: 'light',
         label: 'Light',
-        swatch: '#F8FAFC',
+        swatch: '#F8F6F1',
     },
     {
         value: 'dark',
         label: 'Dark',
-        swatch: '#0B1120',
+        swatch: '#151C1A',
     },
     {
         value: 'instagram',
@@ -39,6 +39,20 @@ export const THEMES: ThemeOption[] = [
 ];
 
 export const THEME_STORAGE_KEY = 'portfolio-theme';
+
+/** Older portfolio presets resolve to the shared application palette. */
+export function portfolioDefaultTheme(preset: string | null | undefined): Theme {
+    switch (preset) {
+        case 'light':
+        case 'dark':
+        case 'instagram':
+        case 'discord':
+        case 'system':
+            return preset;
+        default:
+            return 'dark';
+    }
+}
 
 /**
  * Maps a theme choice to:

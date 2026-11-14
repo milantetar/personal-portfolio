@@ -7,10 +7,7 @@ import type { CSSProperties } from 'react';
 import { PortfolioAssistant } from '@/components/portfolio/portfolio-assistant';
 import { GitHubIcon, LinkedInIcon } from '@/components/portfolio/brand-icons';
 import { PortfolioSectionRenderer } from '@/components/portfolio/portfolio-section-renderer';
-import {
-    PortfolioThemePicker,
-    type PortfolioTheme,
-} from '@/components/portfolio/portfolio-theme-picker';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { FALLBACK_BACKDROP } from '@/config/theme';
 import {
     isInternalPortfolioHref,
@@ -43,15 +40,6 @@ function navigationLabel(label: string): string {
         .replace(/\bGithub\b/g, 'GitHub');
 }
 
-function isPortfolioTheme(value: string | null): value is PortfolioTheme {
-    return (
-        value === 'midnight' ||
-        value === 'forest' ||
-        value === 'ocean' ||
-        value === 'instagram'
-    );
-}
-
 export default function Home({
     settings,
     certificates,
@@ -73,11 +61,6 @@ export default function Home({
         (section) => section.slug === activeSectionSlug,
     );
     const site = settings ?? ({} as SiteSettings);
-    const initialTheme: PortfolioTheme = isPortfolioTheme(site.theme_preset)
-        ? site.theme_preset
-        : 'midnight';
-    const [portfolioTheme, setPortfolioTheme] =
-        useState<PortfolioTheme>(initialTheme);
 
     const siteUrl =
         page.props.seo?.siteUrl ||
@@ -167,17 +150,6 @@ export default function Home({
         sections.some((section) => section.slug === activeSectionSlug);
 
     useEffect(() => {
-        try {
-            const savedTheme = window.localStorage.getItem(
-                'portfolio-home-theme',
-            );
-            if (isPortfolioTheme(savedTheme)) setPortfolioTheme(savedTheme);
-        } catch {
-            // Keep the CMS theme when storage is unavailable.
-        }
-    }, [initialTheme]);
-
-    useEffect(() => {
         document.documentElement.classList.remove('portfolio-snap-page');
     }, []);
     const reduceMotion = useReducedMotion() ?? false;
@@ -191,15 +163,6 @@ export default function Home({
         0.68,
         0.34 + backdropIntensity * 0.002,
     );
-
-    const changePortfolioTheme = (theme: PortfolioTheme) => {
-        setPortfolioTheme(theme);
-        try {
-            window.localStorage.setItem('portfolio-home-theme', theme);
-        } catch {
-            // The selected theme still applies for this page when storage is unavailable.
-        }
-    };
 
     return (
         <>
@@ -286,7 +249,6 @@ export default function Home({
                 />
             </Head>
             <div
-                data-theme={portfolioTheme}
                 className="portfolio-site relative isolate min-h-screen overflow-clip bg-transparent text-foreground"
                 style={
                     {
@@ -360,10 +322,7 @@ export default function Home({
                         </div>
 
                         <div className="flex items-center gap-3 text-muted-foreground">
-                            <PortfolioThemePicker
-                                value={portfolioTheme}
-                                onChange={changePortfolioTheme}
-                            />
+                            <ThemeToggle />
                             <div className="hidden items-center gap-4 md:flex">
                                 {site.github_url ? (
                                     <a

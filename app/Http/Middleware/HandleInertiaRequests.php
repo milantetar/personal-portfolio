@@ -72,7 +72,7 @@ class HandleInertiaRequests extends Middleware
                 'backgroundImage' => $settings?->backgroundMedia?->only(['id', 'url', 'alt_text']),
                 'avatar' => $settings?->avatarMedia?->only(['id', 'url', 'alt_text']),
                 'favicon' => $settings?->faviconMedia?->only(['id', 'url', 'alt_text', 'mime_type']),
-                'themePreset' => $settings?->theme_preset ?: 'midnight',
+                'themePreset' => $settings?->theme_preset ?: 'dark',
                 'glassBlur' => $settings?->glass_blur ?: 'xl',
                 'glassOpacity' => $settings?->glass_opacity ?: '75',
             ];
@@ -83,7 +83,7 @@ class HandleInertiaRequests extends Middleware
                 'backgroundImage' => null,
                 'avatar' => null,
                 'favicon' => null,
-                'themePreset' => 'midnight',
+                'themePreset' => 'dark',
                 'glassBlur' => 'xl',
                 'glassOpacity' => '75',
             ];

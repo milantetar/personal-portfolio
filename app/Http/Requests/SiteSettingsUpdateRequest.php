@@ -22,7 +22,7 @@ class SiteSettingsUpdateRequest extends FormRequest
             'github_url' => ['nullable', 'url', 'max:255'],
             'linkedin_url' => ['nullable', 'url', 'max:255'],
             'is_available' => ['boolean'],
-            'theme_preset' => ['required', 'string', 'in:instagram,ocean,midnight,forest'],
+            'theme_preset' => ['required', 'string', 'in:light,dark,instagram,discord,system,midnight,forest,ocean'],
             'glass_blur' => ['required', 'string', 'in:none,sm,md,lg,xl'],
             'glass_opacity' => ['required', 'string', 'in:25,50,75,90'],
             'settings_icon_media_id' => ['nullable', 'integer', 'exists:media,id'],

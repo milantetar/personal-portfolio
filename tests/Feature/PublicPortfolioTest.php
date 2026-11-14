@@ -27,6 +27,13 @@ it('renders the homepage with the first visible section', function (): void {
             ->has('sections', 2));
 });
 
+it('uses the same configured default theme on public and sign-in pages', function (): void {
+    SiteSetting::query()->create(['site_name' => 'Theme Test', 'theme_preset' => 'light']);
+
+    $this->get('/')->assertOk()->assertSee('data-default-theme="light"', false);
+    $this->get('/login')->assertOk()->assertSee('data-default-theme="light"', false);
+});
+
 it('renders an empty portfolio when no sections are visible', function (): void {
     makePortfolioSection(['is_visible' => false]);
 

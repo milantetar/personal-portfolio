@@ -33,13 +33,11 @@ async function run(name, action) {
 }
 await run('Portfolio theme persists across navigation and reload', async () => {
     await page.goto(base);
-    await page
-        .getByRole('button', { name: 'Choose portfolio theme', exact: true })
-        .click();
-    await page.getByRole('menuitem', { name: 'Ocean', exact: true }).click();
-    await expect(page.locator('[data-theme="ocean"]')).toBeVisible();
+    await page.getByRole('button', { name: 'Change theme' }).click();
+    await page.getByRole('menuitem', { name: 'Discord' }).click();
+    await expect(page.locator('html[data-theme="discord"]')).toBeVisible();
     await page.reload();
-    await expect(page.locator('[data-theme="ocean"]')).toBeVisible();
+    await expect(page.locator('html[data-theme="discord"]')).toBeVisible();
 });
 await run('Sitemap, robots, missing page and guest API access', async () => {
     const sitemap = await context.request.get(`${base}/sitemap.xml`);

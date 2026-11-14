@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { type Theme, THEME_STORAGE_KEY, resolveTheme } from '@/lib/theme';
 
 interface ThemeProviderState {
@@ -29,21 +29,22 @@ export function ThemeProvider({
     defaultTheme = 'system',
 }: ThemeProviderProps) {
     const [theme, setThemeState] = useState<Theme>(() => {
-        // Keep the first render identical on the server and in the browser.
+        if (typeof window !== 'undefined') {
+            try {
+                const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
+                if (stored && VALID_THEMES.includes(stored as Theme)) {
+                    return stored as Theme;
+                }
+            } catch {
+                // Storage may be unavailable; use the site's default theme.
+            }
+            const siteDefault = document.documentElement.dataset.defaultTheme;
+            if (siteDefault && VALID_THEMES.includes(siteDefault as Theme)) {
+                return siteDefault as Theme;
+            }
+        }
         return defaultTheme;
     });
-
-    useEffect(() => {
-        try {
-            const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-
-            if (storedTheme && VALID_THEMES.includes(storedTheme as Theme)) {
-                setThemeState(storedTheme as Theme);
-            }
-        } catch {
-            // Storage may be unavailable; use the configured default theme.
-        }
-    }, []);
 
     // Apply theme whenever it changes
     useEffect(() => {
@@ -64,6 +65,10 @@ export function ThemeProvider({
             } else {
                 root.removeAttribute('data-theme');
             }
+
+            document
+                .querySelector('meta[name="theme-color"]')
+                ?.setAttribute('content', mode === 'dark' ? '#151c1a' : '#f8f6f1');
         };
 
         apply();
@@ -77,21 +82,20 @@ export function ThemeProvider({
         return () => mql.removeEventListener('change', apply);
     }, [theme]);
 
-    const value: ThemeProviderState = {
-        theme,
-        setTheme: (next) => {
-            // Update React state even if storage is unavailable
-            setThemeState(next);
+    const setTheme = useCallback((next: Theme) => {
+        // Update React state even if storage is unavailable.
+        setThemeState(next);
 
-            if (typeof window !== 'undefined') {
-                try {
-                    localStorage.setItem(THEME_STORAGE_KEY, next);
-                } catch {
-                    // Storage may be blocked or unavailable
-                }
+        if (typeof window !== 'undefined') {
+            try {
+                localStorage.setItem(THEME_STORAGE_KEY, next);
+            } catch {
+                // Storage may be blocked or unavailable.
             }
-        },
-    };
+        }
+    }, []);
+
+    const value: ThemeProviderState = { theme, setTheme };
 
     return (
         <ThemeProviderContext.Provider value={value}>

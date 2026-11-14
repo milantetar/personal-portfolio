@@ -4,9 +4,11 @@ import { type FormEvent, useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { AdminLayout } from '@/components/admin/admin-layout';
+import { useTheme } from '@/components/theme-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { portfolioDefaultTheme, THEMES, type Theme } from '@/lib/theme';
 import type {
     Media,
     PageProps,
@@ -44,6 +46,7 @@ export default function SiteSettingsPage() {
         sidebarItems,
         branding,
     } = usePage<SiteSettingsPageProps>().props;
+    const { setTheme } = useTheme();
     const { data, setData, put, processing, errors } =
         useForm<SiteSettingsForm>({
             site_name: settings.site_name || "Milan's Portfolio",
@@ -51,7 +54,7 @@ export default function SiteSettingsPage() {
             github_url: settings.github_url || '',
             linkedin_url: settings.linkedin_url || '',
             is_available: settings.is_available,
-            theme_preset: settings.theme_preset || 'midnight',
+            theme_preset: portfolioDefaultTheme(settings.theme_preset),
             glass_blur: settings.glass_blur || 'xl',
             glass_opacity: settings.glass_opacity || '75',
             settings_icon_media_id: settingsSidebarItem.icon_media_id,
@@ -353,34 +356,27 @@ export default function SiteSettingsPage() {
                                         Appearance
                                     </h2>
                                     <p className="mb-5 text-sm text-muted-foreground">
-                                        Control the visual language used by the
-                                        dashboard shell.
+                                        Set the public default and preview the
+                                        same palette used throughout the site.
                                     </p>
                                     <div className="grid gap-4 md:grid-cols-3">
                                         <div className="space-y-2">
-                                            <Label>Theme preset</Label>
+                                            <Label htmlFor="site-theme-preset">Default theme</Label>
                                             <select
+                                                id="site-theme-preset"
                                                 value={data.theme_preset}
-                                                onChange={(event) =>
-                                                    update(
-                                                        'theme_preset',
-                                                        event.target.value,
-                                                    )
-                                                }
+                                                onChange={(event) => {
+                                                    const theme = event.target.value as Theme;
+                                                    update('theme_preset', theme);
+                                                    setTheme(theme);
+                                                }}
                                                 className="h-8 w-full rounded-lg border border-input bg-background px-2 text-sm"
                                             >
-                                                <option value="instagram">
-                                                    Instagram
-                                                </option>
-                                                <option value="ocean">
-                                                    Ocean
-                                                </option>
-                                                <option value="midnight">
-                                                    Midnight
-                                                </option>
-                                                <option value="forest">
-                                                    Forest
-                                                </option>
+                                                {THEMES.map((theme) => (
+                                                    <option key={theme.value} value={theme.value}>
+                                                        {theme.label}
+                                                    </option>
+                                                ))}
                                             </select>
                                         </div>
                                         <div className="space-y-2">

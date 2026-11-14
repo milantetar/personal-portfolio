@@ -167,7 +167,7 @@
     --popover-foreground: 210 17% 88%;
 
     --primary: 235 86% 70%;
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 225 18% 12%;
 
     --secondary: 223 7% 25%;
     --secondary-foreground: 210 17% 88%;
@@ -191,59 +191,7 @@
     --glass-border-opacity: 0.2;
 }
 
-/* The public portfolio uses an Apple-inspired system palette independently of
-   the dashboard's selected theme. The user's uploaded backdrop remains visible
-   through the translucent page surfaces. */
-.portfolio-site {
-    --background: 222 24% 8%;
-    --foreground: 210 20% 98%;
-    --card: 220 22% 14%;
-    --card-foreground: 210 20% 98%;
-    --popover: 220 22% 12%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 211 100% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 18% 22%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 220 18% 20%;
-    --muted-foreground: 215 18% 88%;
-    --accent: 211 35% 24%;
-    --accent-foreground: 210 30% 98%;
-    --border: 220 16% 32%;
-    --input: 220 16% 38%;
-    --ring: 211 100% 60%;
-    --radius: 1rem;
-    --portfolio-system-font:
-        -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
-        'Segoe UI', sans-serif;
-    --font-sans: var(--portfolio-system-font);
-    --font-display: var(--portfolio-system-font);
-}
-
-.portfolio-site .font-display,
-.portfolio-site .eyebrow {
-    font-family: var(--portfolio-system-font);
-}
-
-:root:not(.dark) .portfolio-site {
-    --background: 220 22% 96%;
-    --foreground: 222 20% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 222 20% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 20% 10%;
-    --primary: 211 100% 48%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 18% 91%;
-    --secondary-foreground: 222 20% 14%;
-    --muted: 220 18% 92%;
-    --muted-foreground: 220 12% 28%;
-    --accent: 211 70% 94%;
-    --accent-foreground: 211 80% 30%;
-    --border: 220 12% 74%;
-    --input: 220 12% 68%;
-    --ring: 211 100% 45%;
-}
+/* Public pages inherit the same theme tokens as the dashboard. */
 
 @theme inline {
     --color-background: hsl(var(--background));
@@ -1699,59 +1647,54 @@ html {
     }
 }
 
-/* Product redesign: a mineral-and-graphite system shared by the portfolio and CMS. */
+/* Shared palette for public pages and the dashboard. */
 :root,
 .dark {
     color-scheme: dark;
-    --palette-graphite: #242a27;
-    --palette-mineral: #f2f3ef;
-    --palette-paper: #e2e5df;
-    --palette-sage: #748574;
-    --palette-rule: #434b45;
-    --background: 150 6% 12%;
-    --foreground: 90 13% 94%;
-    --card: 150 5% 16%;
-    --card-foreground: 90 13% 94%;
-    --popover: 150 5% 14%;
-    --popover-foreground: 90 13% 94%;
-    --primary: 120 8% 59%;
-    --primary-foreground: 150 6% 10%;
-    --secondary: 145 5% 22%;
-    --secondary-foreground: 90 13% 94%;
-    --muted: 145 5% 20%;
-    --muted-foreground: 105 7% 72%;
-    --accent: 130 8% 24%;
-    --accent-foreground: 90 13% 96%;
+    --background: 170 18% 9%;
+    --foreground: 46 28% 95%;
+    --card: 171 16% 14%;
+    --card-foreground: 46 28% 95%;
+    --popover: 171 17% 12%;
+    --popover-foreground: 46 28% 95%;
+    --primary: 160 36% 67%;
+    --primary-foreground: 170 25% 10%;
+    --secondary: 168 13% 21%;
+    --secondary-foreground: 46 28% 95%;
+    --muted: 168 11% 19%;
+    --muted-foreground: 160 8% 71%;
+    --accent: 164 19% 23%;
+    --accent-foreground: 48 24% 97%;
     --destructive: 4 63% 58%;
     --destructive-foreground: 0 0% 100%;
-    --border: 140 6% 29%;
-    --input: 140 6% 34%;
-    --ring: 120 8% 68%;
-    --radius: 0.5rem;
+    --border: 165 12% 30%;
+    --input: 165 12% 35%;
+    --ring: 160 36% 67%;
+    --radius: 0.75rem;
     --shadow-overlay: 0 18px 48px rgb(0 0 0 / 0.28);
 }
 
 html:not(.dark) {
     color-scheme: light;
-    --background: 90 13% 94%;
-    --foreground: 150 6% 13%;
-    --card: 90 13% 98%;
-    --card-foreground: 150 6% 13%;
-    --popover: 90 13% 98%;
-    --popover-foreground: 150 6% 13%;
-    --primary: 120 8% 37%;
-    --primary-foreground: 90 13% 98%;
-    --secondary: 100 8% 87%;
-    --secondary-foreground: 150 6% 17%;
-    --muted: 100 8% 89%;
-    --muted-foreground: 145 5% 32%;
-    --accent: 110 10% 85%;
-    --accent-foreground: 150 6% 15%;
+    --background: 44 30% 96%;
+    --foreground: 170 16% 14%;
+    --card: 45 33% 99%;
+    --card-foreground: 170 16% 14%;
+    --popover: 45 33% 99%;
+    --popover-foreground: 170 16% 14%;
+    --primary: 164 57% 29%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 155 17% 88%;
+    --secondary-foreground: 170 16% 17%;
+    --muted: 155 13% 90%;
+    --muted-foreground: 164 9% 36%;
+    --accent: 158 24% 85%;
+    --accent-foreground: 170 32% 20%;
     --destructive: 4 63% 48%;
     --destructive-foreground: 0 0% 100%;
-    --border: 140 6% 74%;
-    --input: 140 6% 68%;
-    --ring: 120 8% 37%;
+    --border: 158 14% 77%;
+    --input: 158 14% 69%;
+    --ring: 164 57% 29%;
 }
 
 html,
@@ -1779,57 +1722,6 @@ samp {
     --portfolio-scrim-opacity: 0.78;
     --radius: 0.5rem;
     color: hsl(var(--foreground));
-}
-
-.portfolio-site:not([data-theme]),
-.portfolio-site[data-theme='midnight'],
-.portfolio-site[data-theme='forest'],
-.portfolio-site[data-theme='ocean'],
-.portfolio-site[data-theme='instagram'] {
-    --background: 150 6% 16%;
-    --foreground: 90 13% 94%;
-    --card: 150 5% 20%;
-    --card-foreground: 90 13% 94%;
-    --popover: 150 5% 18%;
-    --popover-foreground: 90 13% 94%;
-    --primary: 120 8% 59%;
-    --primary-foreground: 150 6% 10%;
-    --secondary: 145 5% 26%;
-    --secondary-foreground: 90 13% 94%;
-    --muted: 145 5% 24%;
-    --muted-foreground: 105 7% 72%;
-    --accent: 130 8% 28%;
-    --accent-foreground: 90 13% 96%;
-    --border: 140 6% 29%;
-    --input: 140 6% 34%;
-    --ring: 120 8% 68%;
-}
-
-.portfolio-site[data-theme='forest'] {
-    --background: 150 9% 14%;
-    --card: 150 7% 18%;
-    --popover: 150 7% 16%;
-    --secondary: 145 7% 24%;
-    --muted: 145 7% 22%;
-    --accent: 130 10% 27%;
-}
-
-.portfolio-site[data-theme='ocean'] {
-    --background: 205 9% 15%;
-    --card: 205 8% 19%;
-    --popover: 205 8% 17%;
-    --secondary: 205 7% 25%;
-    --muted: 205 7% 23%;
-    --accent: 205 8% 28%;
-}
-
-.portfolio-site[data-theme='instagram'] {
-    --background: 25 5% 16%;
-    --card: 25 4% 20%;
-    --popover: 25 4% 18%;
-    --secondary: 25 4% 26%;
-    --muted: 25 4% 24%;
-    --accent: 25 5% 29%;
 }
 
 /* Keep custom imagery available as a page backdrop, while making every text
@@ -2256,13 +2148,6 @@ samp {
     max-width: none;
     margin-inline: 0;
     padding-inline: clamp(1.25rem, 5vw, 5rem);
-}
-
-.portfolio-site {
-    --portfolio-theme-midnight: #748574;
-    --portfolio-theme-forest: #58735d;
-    --portfolio-theme-ocean: #587783;
-    --portfolio-theme-warm: #8b7466;
 }
 
 .portfolio-site > main.portfolio-wrap {
@@ -3137,5 +3022,128 @@ samp {
     .portfolio-site .portfolio-copy-card:hover {
         border-color: hsl(var(--border) / 0.75);
         background: hsl(var(--card));
+    }
+}
+
+/* The same surfaces and accent color now shape both sides of the site. */
+.portfolio-site {
+    --portfolio-scrim-opacity: 0.83;
+}
+
+.portfolio-site .portfolio-nav-glass,
+.portfolio-site .portfolio-mobile-navigation {
+    border-bottom: 1px solid hsl(var(--border) / 0.75);
+    background: hsl(var(--card) / 0.98);
+}
+
+.portfolio-site .portfolio-nav-glass [aria-label='Main navigation'] a:hover,
+.portfolio-site .portfolio-mobile-navigation a:hover {
+    color: hsl(var(--primary));
+}
+
+.portfolio-site .portfolio-section--hero {
+    padding: clamp(1.25rem, 3vw, 3rem);
+}
+
+.portfolio-site .portfolio-section--hero .portfolio-section-inner {
+    position: relative;
+    display: grid;
+    width: min(100%, 92rem);
+    max-width: 92rem;
+    min-height: min(44rem, calc(100svh - var(--portfolio-nav-height) - 4rem));
+    grid-template-columns: minmax(0, 1.1fr) minmax(20rem, 0.9fr);
+    align-items: center;
+    gap: clamp(2rem, 5vw, 6rem);
+    margin-inline: auto;
+    overflow: hidden;
+    padding: clamp(2rem, 6vw, 6rem);
+    border: 1px solid hsl(var(--border) / 0.9);
+    border-radius: 1.5rem;
+    background: linear-gradient(125deg, hsl(var(--card)), hsl(var(--background)));
+    box-shadow: 0 28px 72px hsl(170 30% 5% / 0.18);
+}
+
+.portfolio-site .portfolio-section--hero .portfolio-section-inner::before {
+    position: absolute;
+    right: -8rem;
+    bottom: -15rem;
+    width: min(50vw, 40rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, hsl(var(--primary) / 0.2), transparent 70%);
+    content: '';
+    pointer-events: none;
+}
+
+.portfolio-site .portfolio-section--hero .portfolio-section-heading,
+.portfolio-site .portfolio-section--hero .portfolio-hero-content {
+    position: relative;
+    top: auto;
+    z-index: 1;
+    width: 100%;
+}
+
+.portfolio-site .portfolio-section--hero h1 {
+    max-width: 13ch;
+    font-size: clamp(3.2rem, 6.7vw, 7rem);
+    line-height: 0.98;
+}
+
+.portfolio-site .portfolio-hero-content {
+    max-width: 35rem;
+}
+
+.portfolio-site .portfolio-hero-role {
+    color: hsl(var(--primary));
+    font-weight: 650;
+}
+
+.portfolio-site .portfolio-editorial-section {
+    padding-inline: clamp(1.25rem, 4vw, 4rem);
+}
+
+.portfolio-site .portfolio-editorial-section .portfolio-section-inner {
+    max-width: 88rem;
+    margin-inline: auto;
+}
+
+.portfolio-site .portfolio-copy-card,
+.portfolio-site .portfolio-project-card,
+.portfolio-site .portfolio-skill-group,
+.portfolio-site .portfolio-certificate-card,
+.admin-ui .admin-panel,
+.admin-ui [data-slot='card'] {
+    border-radius: 1rem;
+    box-shadow: 0 12px 34px hsl(170 30% 5% / 0.08);
+}
+
+.portfolio-site .portfolio-project-card:hover,
+.portfolio-site .portfolio-skill-group:hover {
+    border-color: hsl(var(--primary) / 0.62);
+    box-shadow: 0 18px 42px hsl(170 30% 5% / 0.14);
+}
+
+@media (max-width: 900px) {
+    .portfolio-site .portfolio-section--hero .portfolio-section-inner {
+        min-height: min(42rem, calc(100svh - var(--portfolio-nav-height) - 2rem));
+        grid-template-columns: minmax(0, 1fr);
+        align-content: center;
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .portfolio-site .portfolio-section--hero {
+        padding: 1rem;
+    }
+
+    .portfolio-site .portfolio-section--hero .portfolio-section-inner {
+        min-height: calc(100svh - var(--portfolio-nav-height) - 2rem);
+        padding: 1.75rem;
+        border-radius: 1.125rem;
+    }
+
+    .portfolio-site .portfolio-section--hero h1 {
+        font-size: clamp(2.8rem, 12vw, 4.8rem);
     }
 }
