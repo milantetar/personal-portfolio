@@ -115,6 +115,32 @@ it('restores bundled files without reseeding edited database content', function 
     expect(SiteSetting::query()->sole()->site_name)->toBe('Edited on Neon');
 });
 
+it('moves only unchanged bundled document records to Cloudinary', function (): void {
+    Storage::fake('public');
+    config(['deployment-content.enabled' => true]);
+    SiteSetting::query()->create(['site_name' => 'Public portfolio']);
+    $snapshot = json_decode(file_get_contents(config('deployment-content.path')), true, 512, JSON_THROW_ON_ERROR);
+    $documents = array_values(array_filter($snapshot['tables']['media'],
+        static fn (array $row): bool => $row['mime_type'] === 'application/pdf'));
+
+    foreach (array_slice($documents, 0, 2) as $index => $document) {
+        $document['disk'] = 'public';
+        $document['path'] = $index === 0
+            ? $snapshot['migrated_documents'][$document['id']]
+            : 'media/user-edited.pdf';
+        $document['cloudinary_public_id'] = null;
+        $document['cloudinary_resource_type'] = null;
+        DB::table('media')->insert($document + ['created_at' => now(), 'updated_at' => now()]);
+    }
+
+    $this->artisan('portfolio:restore-deployment-assets')->assertSuccessful();
+
+    expect(Media::query()->findOrFail($documents[0]['id'])->path)->toBe($documents[0]['path'])
+        ->and(Media::query()->findOrFail($documents[0]['id'])->disk)->toBe('cloudinary')
+        ->and(Media::query()->findOrFail($documents[1]['id'])->path)->toBe('media/user-edited.pdf')
+        ->and(Media::query()->findOrFail($documents[1]['id'])->disk)->toBe('public');
+});
+
 it('refuses file-only startup when portfolio content is missing', function (): void {
     config(['deployment-content.enabled' => true]);
 
