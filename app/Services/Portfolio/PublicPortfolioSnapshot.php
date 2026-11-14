@@ -108,10 +108,12 @@ class PublicPortfolioSnapshot
             throw new RuntimeException('The deployment snapshot supports SQLite and PostgreSQL only.');
         }
         $snapshot = json_decode(File::get($path), true, 512, JSON_THROW_ON_ERROR);
-        if (($snapshot['version'] ?? null) !== 1 || ! is_array($snapshot['tables'] ?? null)
+        if (
+            ($snapshot['version'] ?? null) !== 1 || ! is_array($snapshot['tables'] ?? null)
             || array_diff(array_keys($snapshot['tables']), array_keys(self::COLUMNS)) !== []
             || array_diff(array_keys(self::COLUMNS), array_keys($snapshot['tables'])) !== []
-            || count($snapshot['tables']['site_settings']) !== 1) {
+            || count($snapshot['tables']['site_settings']) !== 1
+        ) {
             throw new RuntimeException('Invalid public portfolio snapshot.');
         }
         foreach (self::COLUMNS as $table => $columns) {
@@ -183,21 +185,29 @@ class PublicPortfolioSnapshot
         $this->restoreAssets($snapshot);
     }
 
-    /** Update only unchanged bundled PDF records after their files move to Cloudinary. */
+    /**
+     * Migrate bundled documents.
+     *
+     * @param  array<string, mixed>  $snapshot
+     */
     private function migrateBundledDocuments(array $snapshot): void
     {
         foreach ($snapshot['tables']['media'] ?? [] as $row) {
-            if (($row['mime_type'] ?? null) !== 'application/pdf'
+            if (
+                ($row['mime_type'] ?? null) !== 'application/pdf'
                 || ($row['disk'] ?? null) !== 'cloudinary'
                 || ($row['cloudinary_resource_type'] ?? null) === null
                 || parse_url((string) ($row['path'] ?? ''), PHP_URL_SCHEME) !== 'https'
-                || parse_url((string) ($row['path'] ?? ''), PHP_URL_HOST) !== 'res.cloudinary.com') {
+                || parse_url((string) ($row['path'] ?? ''), PHP_URL_HOST) !== 'res.cloudinary.com'
+            ) {
                 continue;
             }
 
             $originalPath = $snapshot['migrated_documents'][$row['id']] ?? null;
-            if (! is_string($originalPath)
-                || ! preg_match('/^media\/deployment\/[a-f0-9]{64}\.pdf$/', $originalPath)) {
+            if (
+                ! is_string($originalPath)
+                || ! preg_match('/^media\/deployment\/[a-f0-9]{64}\.pdf$/', $originalPath)
+            ) {
                 continue;
             }
             DB::table('media')
@@ -221,16 +231,20 @@ class PublicPortfolioSnapshot
             throw new RuntimeException('Invalid bundled public assets.');
         }
         foreach ($snapshot['assets'] as $destination => $filename) {
-            if (! preg_match('/^[a-f0-9]{64}\.(jpg|png|webp|gif|pdf|ico)$/', $filename)
-                || $destination !== 'media/deployment/'.$filename) {
+            if (
+                ! preg_match('/^[a-f0-9]{64}\.(jpg|png|webp|gif|pdf|ico)$/', $filename)
+                || $destination !== 'media/deployment/'.$filename
+            ) {
                 throw new RuntimeException('Invalid bundled public asset path.');
             }
             $source = database_path('seeders/assets/'.$filename);
             if (! is_file($source) || hash_file('sha256', $source) !== pathinfo($filename, PATHINFO_FILENAME)) {
                 throw new RuntimeException('Bundled public asset is missing or has changed.');
             }
-            if (! Storage::disk('public')->exists($destination)
-                && ! Storage::disk('public')->put($destination, File::get($source))) {
+            if (
+                ! Storage::disk('public')->exists($destination)
+                && ! Storage::disk('public')->put($destination, File::get($source))
+            ) {
                 throw new RuntimeException('Unable to restore a bundled public asset.');
             }
         }
