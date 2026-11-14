@@ -97,3 +97,27 @@ it('refuses to replace a partially populated portfolio', function (): void {
         ->and(SiteSetting::query()->count())->toBe(0)
         ->and(Media::query()->count())->toBe(0);
 });
+
+it('restores bundled files without reseeding edited database content', function (): void {
+    Storage::fake('public');
+    config(['admin.email' => 'deploy@example.test', 'admin.password' => 'deployment-password', 'deployment-content.enabled' => true]);
+    $this->artisan('portfolio:bootstrap-deployment')->assertSuccessful();
+
+    $settings = SiteSetting::query()->sole();
+    $settings->update(['site_name' => 'Edited on Neon']);
+    $snapshot = json_decode(file_get_contents(config('deployment-content.path')), true, 512, JSON_THROW_ON_ERROR);
+    $asset = array_key_first($snapshot['assets']);
+    Storage::disk('public')->delete($asset);
+
+    $this->artisan('portfolio:restore-deployment-assets')->assertSuccessful();
+
+    Storage::disk('public')->assertExists($asset);
+    expect(SiteSetting::query()->sole()->site_name)->toBe('Edited on Neon');
+});
+
+it('refuses file-only startup when portfolio content is missing', function (): void {
+    config(['deployment-content.enabled' => true]);
+
+    $this->artisan('portfolio:restore-deployment-assets')->assertFailed();
+    expect(SiteSetting::query()->count())->toBe(0);
+});

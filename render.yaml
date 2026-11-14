@@ -43,7 +43,7 @@ services:
           - key: MAIL_FROM_ADDRESS
             sync: false
           - key: SEED_ON_DEPLOY
-            value: 'true'
+            value: 'false'
           - key: DEPLOYMENT_CONTENT_SEED
             value: 'true'
           - key: FILESYSTEM_DISK

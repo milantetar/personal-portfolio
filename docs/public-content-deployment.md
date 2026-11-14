@@ -11,9 +11,9 @@ sessions, access tokens, drafts, hidden sections or unreferenced media are expor
 Media uploader account IDs are not restored. An explicit field allowlist prevents
 new database columns from being published automatically.
 
-## Deploy
+## Initial SQLite or empty-database deploy
 
-Keep these Render environment settings enabled:
+For an initial database without portfolio content, use:
 
 ```dotenv
 DB_CONNECTION=sqlite
@@ -47,14 +47,18 @@ uploads stay on Cloudinary. No private runtime data is copied from SQLite.
 Create a **fresh** Neon production database or branch. In the existing Render
 service's Environment page, set `DB_CONNECTION=pgsql`, set `DB_URL` to the
 private Neon connection string with `sslmode=require`, and clear `DB_DATABASE`.
-Keep `SEED_ON_DEPLOY=true` and `DEPLOYMENT_CONTENT_SEED=true`. Keep the existing
+Keep `SEED_ON_DEPLOY=true` for the first empty-database startup and
+`DEPLOYMENT_CONTENT_SEED=true`. After the site serves your portfolio from Neon,
+set `SEED_ON_DEPLOY=false`. Startup then restores only bundled public files and
+refuses to serve a database with no site settings. Keep the existing
 `APP_KEY`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, Cloudinary, Resend and Gemini values.
 Save and deploy after this code is live. The entrypoint migrates the fresh
 database and then imports the snapshot. Do not point this startup at a database
 containing test or production content: existing portfolio rows are intentionally
 preserved and will not be replaced by the snapshot.
 
-The Blueprint marks the three database variables `sync: false`, so future
+The Blueprint now sets `SEED_ON_DEPLOY=false` for the established Neon database.
+It marks the three database variables `sync: false`, so future
 Blueprint syncs leave their Render values alone. For a newly created Blueprint,
 set those variables in the Render dashboard during setup. Test an edit and a
 redeploy after the switch; the edit should remain. Keep a separate database

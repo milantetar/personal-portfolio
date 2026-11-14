@@ -18,6 +18,8 @@ php artisan migrate --force
 # Explicit opt-in bootstrap never resets an existing administrator or content.
 if [ "${SEED_ON_DEPLOY:-false}" = true ]; then
     php artisan portfolio:bootstrap-deployment
+else
+    php artisan portfolio:restore-deployment-assets
 fi
 
 php artisan config:cache

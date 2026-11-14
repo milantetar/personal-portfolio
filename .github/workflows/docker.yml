@@ -56,6 +56,10 @@ jobs:
                         foreach ($snapshot["assets"] as $path => $filename) {
                           if (! Illuminate\Support\Facades\Storage::disk("public")->exists($path)) exit(1);
                         }
+                        $firstAsset = array_key_first($snapshot["assets"]);
+                        Illuminate\Support\Facades\Storage::disk("public")->delete($firstAsset);
+                        if (Illuminate\Support\Facades\Artisan::call("portfolio:restore-deployment-assets") !== 0) exit(1);
+                        if (! Illuminate\Support\Facades\Storage::disk("public")->exists($firstAsset)) exit(1);
                       '
                       curl --fail --silent http://localhost:8080/ > /dev/null
                       exit 0
