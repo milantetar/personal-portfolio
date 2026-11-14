@@ -179,7 +179,39 @@ class PublicPortfolioSnapshot
     public function restoreBundledAssets(string $path): void
     {
         $snapshot = json_decode(File::get($path), true, 512, JSON_THROW_ON_ERROR);
+        $this->migrateBundledDocuments($snapshot);
         $this->restoreAssets($snapshot);
+    }
+
+    /** Update only unchanged bundled PDF records after their files move to Cloudinary. */
+    private function migrateBundledDocuments(array $snapshot): void
+    {
+        foreach ($snapshot['tables']['media'] ?? [] as $row) {
+            if (($row['mime_type'] ?? null) !== 'application/pdf'
+                || ($row['disk'] ?? null) !== 'cloudinary'
+                || ($row['cloudinary_resource_type'] ?? null) === null
+                || parse_url((string) ($row['path'] ?? ''), PHP_URL_SCHEME) !== 'https'
+                || parse_url((string) ($row['path'] ?? ''), PHP_URL_HOST) !== 'res.cloudinary.com') {
+                continue;
+            }
+
+            $originalPath = $snapshot['migrated_documents'][$row['id']] ?? null;
+            if (! is_string($originalPath)
+                || ! preg_match('/^media\/deployment\/[a-f0-9]{64}\.pdf$/', $originalPath)) {
+                continue;
+            }
+            DB::table('media')
+                ->where('id', $row['id'])
+                ->where('disk', 'public')
+                ->where('path', $originalPath)
+                ->update([
+                    'disk' => 'cloudinary',
+                    'path' => $row['path'],
+                    'cloudinary_public_id' => $row['cloudinary_public_id'],
+                    'cloudinary_resource_type' => $row['cloudinary_resource_type'],
+                    'updated_at' => now(),
+                ]);
+        }
     }
 
     /** @param array<string, mixed> $snapshot */

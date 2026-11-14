@@ -286,99 +286,99 @@
         "media": [
             {
                 "id": 16,
-                "disk": "public",
-                "path": "media/deployment/f868eb4f380eb21274dd2a7976d2c9d08b2d01345ee84a8cbf2cd605ce699f72.pdf",
+                "disk": "cloudinary",
+                "path": "https://res.cloudinary.com/lenlrm8y/image/upload/v1794662065/personal-portfolio/media/zv0vcesmgzu8co2qdy3y.pdf",
                 "original_name": "Milan_Tetar_Laravel_Backend_Developer_Resume.pdf",
                 "mime_type": "application/pdf",
                 "size": 289292,
                 "alt_text": "Current Resume",
                 "title": "Current Resume",
-                "cloudinary_public_id": null,
-                "cloudinary_resource_type": null
+                "cloudinary_public_id": "personal-portfolio/media/zv0vcesmgzu8co2qdy3y",
+                "cloudinary_resource_type": "image"
             },
             {
                 "id": 23,
-                "disk": "public",
-                "path": "media/deployment/b0327350a3b9dca6d03c1ed269a137801b3848fb0c38e2c413c0b09101672f7b.pdf",
+                "disk": "cloudinary",
+                "path": "https://res.cloudinary.com/lenlrm8y/image/upload/v1794662108/personal-portfolio/media/zympktl0p0fomawhvsel.pdf",
                 "original_name": "Android developer course.pdf",
                 "mime_type": "application/pdf",
                 "size": 121915,
                 "alt_text": "Android Developer Course",
                 "title": "Android Developer Course",
-                "cloudinary_public_id": null,
-                "cloudinary_resource_type": null
+                "cloudinary_public_id": "personal-portfolio/media/zympktl0p0fomawhvsel",
+                "cloudinary_resource_type": "image"
             },
             {
                 "id": 24,
-                "disk": "public",
-                "path": "media/deployment/737fc30b2a57189c5fb0f4b976e4f5930c7199054eb09339f5ea6e8b79a365f6.pdf",
+                "disk": "cloudinary",
+                "path": "https://res.cloudinary.com/lenlrm8y/image/upload/v1794662111/personal-portfolio/media/lpma8uooq4ekl5pkbkey.pdf",
                 "original_name": "AWS_milan certificate.pdf",
                 "mime_type": "application/pdf",
                 "size": 93361,
                 "alt_text": "AWS Milan",
                 "title": "AWS Milan",
-                "cloudinary_public_id": null,
-                "cloudinary_resource_type": null
+                "cloudinary_public_id": "personal-portfolio/media/lpma8uooq4ekl5pkbkey",
+                "cloudinary_resource_type": "image"
             },
             {
                 "id": 25,
-                "disk": "public",
-                "path": "media/deployment/344071d8cf558d2eaed70c5180a4582f14e6649b9815288e076dc100995d3301.pdf",
+                "disk": "cloudinary",
+                "path": "https://res.cloudinary.com/lenlrm8y/image/upload/v1794662115/personal-portfolio/media/hbdeja64kw4xbp566arb.pdf",
                 "original_name": "Cloud_Milan_Tetar.pdf",
                 "mime_type": "application/pdf",
                 "size": 321990,
                 "alt_text": "Cloud Milan Tetar",
                 "title": "Cloud Milan Tetar",
-                "cloudinary_public_id": null,
-                "cloudinary_resource_type": null
+                "cloudinary_public_id": "personal-portfolio/media/hbdeja64kw4xbp566arb",
+                "cloudinary_resource_type": "image"
             },
             {
                 "id": 26,
-                "disk": "public",
-                "path": "media/deployment/ad39fbad50e4d5d54be2edfc41de8ad21b091f2b2dcfa939e1177e0758ea2dee.pdf",
+                "disk": "cloudinary",
+                "path": "https://res.cloudinary.com/lenlrm8y/image/upload/v1794662118/personal-portfolio/media/wrnkxkauszarrbltm9zg.pdf",
                 "original_name": "Explore Machine Learning with python.pdf",
                 "mime_type": "application/pdf",
                 "size": 121510,
                 "alt_text": "Explore Machine Learning With Python",
                 "title": "Explore Machine Learning With Python",
-                "cloudinary_public_id": null,
-                "cloudinary_resource_type": null
+                "cloudinary_public_id": "personal-portfolio/media/wrnkxkauszarrbltm9zg",
+                "cloudinary_resource_type": "image"
             },
             {
                 "id": 27,
-                "disk": "public",
-                "path": "media/deployment/eebf90740c9dd80e3e32feef12dce88c9b2275547dd991331b49989467b4ba2c.pdf",
+                "disk": "cloudinary",
+                "path": "https://res.cloudinary.com/lenlrm8y/image/upload/v1794662121/personal-portfolio/media/lrcmzqszr4eei9mokdgu.pdf",
                 "original_name": "Machine Learning certificate with Sci-kit.pdf",
                 "mime_type": "application/pdf",
                 "size": 121690,
                 "alt_text": "Machine Learning  With Sci Kit",
                 "title": "Machine Learning  With Sci Kit",
-                "cloudinary_public_id": null,
-                "cloudinary_resource_type": null
+                "cloudinary_public_id": "personal-portfolio/media/lrcmzqszr4eei9mokdgu",
+                "cloudinary_resource_type": "image"
             },
             {
                 "id": 28,
-                "disk": "public",
-                "path": "media/deployment/14a39454c58f68c3e1049828d272c0ba672ad26813dbbed32b15f3ea033a34e3.pdf",
+                "disk": "cloudinary",
+                "path": "https://res.cloudinary.com/lenlrm8y/image/upload/v1794662126/personal-portfolio/media/erhl3y4hljmq4vld7les.pdf",
                 "original_name": "Php certificate.pdf",
                 "mime_type": "application/pdf",
                 "size": 238655,
                 "alt_text": "Php",
                 "title": "Php",
-                "cloudinary_public_id": null,
-                "cloudinary_resource_type": null
+                "cloudinary_public_id": "personal-portfolio/media/erhl3y4hljmq4vld7les",
+                "cloudinary_resource_type": "image"
             },
             {
                 "id": 29,
-                "disk": "public",
-                "path": "media/deployment/05642ed84e6a28def38efa059a4fe77ad41e724eb6242be3d79aea84ca39d3ad.pdf",
+                "disk": "cloudinary",
+                "path": "https://res.cloudinary.com/lenlrm8y/image/upload/v1794662129/personal-portfolio/media/i2tsnvmazhnwicc5bcb1.pdf",
                 "original_name": "tss certificate .pdf",
                 "mime_type": "application/pdf",
                 "size": 157158,
                 "alt_text": "Tss",
                 "title": "Tss",
-                "cloudinary_public_id": null,
-                "cloudinary_resource_type": null
+                "cloudinary_public_id": "personal-portfolio/media/i2tsnvmazhnwicc5bcb1",
+                "cloudinary_resource_type": "image"
             },
             {
                 "id": 30,
@@ -429,5 +429,15 @@
         "media/deployment/05642ed84e6a28def38efa059a4fe77ad41e724eb6242be3d79aea84ca39d3ad.pdf": "05642ed84e6a28def38efa059a4fe77ad41e724eb6242be3d79aea84ca39d3ad.pdf",
         "media/deployment/a26e94c63fdfcd23d8044399c91a79ec405a94344badfd96be09682e7bcd8492.jpg": "a26e94c63fdfcd23d8044399c91a79ec405a94344badfd96be09682e7bcd8492.jpg",
         "media/deployment/6e4b7b74412d4bdb842935cc9e5e52474f91c150f59b7ea503c86dc1a4f2e129.png": "6e4b7b74412d4bdb842935cc9e5e52474f91c150f59b7ea503c86dc1a4f2e129.png"
+    },
+    "migrated_documents": {
+        "16": "media/deployment/f868eb4f380eb21274dd2a7976d2c9d08b2d01345ee84a8cbf2cd605ce699f72.pdf",
+        "23": "media/deployment/b0327350a3b9dca6d03c1ed269a137801b3848fb0c38e2c413c0b09101672f7b.pdf",
+        "24": "media/deployment/737fc30b2a57189c5fb0f4b976e4f5930c7199054eb09339f5ea6e8b79a365f6.pdf",
+        "25": "media/deployment/344071d8cf558d2eaed70c5180a4582f14e6649b9815288e076dc100995d3301.pdf",
+        "26": "media/deployment/ad39fbad50e4d5d54be2edfc41de8ad21b091f2b2dcfa939e1177e0758ea2dee.pdf",
+        "27": "media/deployment/eebf90740c9dd80e3e32feef12dce88c9b2275547dd991331b49989467b4ba2c.pdf",
+        "28": "media/deployment/14a39454c58f68c3e1049828d272c0ba672ad26813dbbed32b15f3ea033a34e3.pdf",
+        "29": "media/deployment/05642ed84e6a28def38efa059a4fe77ad41e724eb6242be3d79aea84ca39d3ad.pdf"
     }
 }
