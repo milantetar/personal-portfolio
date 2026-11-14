@@ -361,19 +361,28 @@ export default function SiteSettingsPage() {
                                     </p>
                                     <div className="grid gap-4 md:grid-cols-3">
                                         <div className="space-y-2">
-                                            <Label htmlFor="site-theme-preset">Default theme</Label>
+                                            <Label htmlFor="site-theme-preset">
+                                                Default theme
+                                            </Label>
                                             <select
                                                 id="site-theme-preset"
                                                 value={data.theme_preset}
                                                 onChange={(event) => {
-                                                    const theme = event.target.value as Theme;
-                                                    update('theme_preset', theme);
+                                                    const theme = event.target
+                                                        .value as Theme;
+                                                    update(
+                                                        'theme_preset',
+                                                        theme,
+                                                    );
                                                     setTheme(theme);
                                                 }}
                                                 className="h-8 w-full rounded-lg border border-input bg-background px-2 text-sm"
                                             >
                                                 {THEMES.map((theme) => (
-                                                    <option key={theme.value} value={theme.value}>
+                                                    <option
+                                                        key={theme.value}
+                                                        value={theme.value}
+                                                    >
                                                         {theme.label}
                                                     </option>
                                                 ))}

@@ -1,4 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import {
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from 'react';
 import { type Theme, THEME_STORAGE_KEY, resolveTheme } from '@/lib/theme';
 
 interface ThemeProviderState {
@@ -68,7 +74,10 @@ export function ThemeProvider({
 
             document
                 .querySelector('meta[name="theme-color"]')
-                ?.setAttribute('content', mode === 'dark' ? '#151c1a' : '#f8f6f1');
+                ?.setAttribute(
+                    'content',
+                    mode === 'dark' ? '#151c1a' : '#f8f6f1',
+                );
         };
 
         apply();

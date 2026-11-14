@@ -41,7 +41,9 @@ export const THEMES: ThemeOption[] = [
 export const THEME_STORAGE_KEY = 'portfolio-theme';
 
 /** Older portfolio presets resolve to the shared application palette. */
-export function portfolioDefaultTheme(preset: string | null | undefined): Theme {
+export function portfolioDefaultTheme(
+    preset: string | null | undefined,
+): Theme {
     switch (preset) {
         case 'light':
         case 'dark':

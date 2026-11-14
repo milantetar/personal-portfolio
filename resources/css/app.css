@@ -3059,7 +3059,11 @@ samp {
     padding: clamp(2rem, 6vw, 6rem);
     border: 1px solid hsl(var(--border) / 0.9);
     border-radius: 1.5rem;
-    background: linear-gradient(125deg, hsl(var(--card)), hsl(var(--background)));
+    background: linear-gradient(
+        125deg,
+        hsl(var(--card)),
+        hsl(var(--background))
+    );
     box-shadow: 0 28px 72px hsl(170 30% 5% / 0.18);
 }
 
@@ -3070,7 +3074,11 @@ samp {
     width: min(50vw, 40rem);
     aspect-ratio: 1;
     border-radius: 50%;
-    background: radial-gradient(circle, hsl(var(--primary) / 0.2), transparent 70%);
+    background: radial-gradient(
+        circle,
+        hsl(var(--primary) / 0.2),
+        transparent 70%
+    );
     content: '';
     pointer-events: none;
 }
@@ -3125,7 +3133,10 @@ samp {
 
 @media (max-width: 900px) {
     .portfolio-site .portfolio-section--hero .portfolio-section-inner {
-        min-height: min(42rem, calc(100svh - var(--portfolio-nav-height) - 2rem));
+        min-height: min(
+            42rem,
+            calc(100svh - var(--portfolio-nav-height) - 2rem)
+        );
         grid-template-columns: minmax(0, 1fr);
         align-content: center;
         gap: 1.5rem;
