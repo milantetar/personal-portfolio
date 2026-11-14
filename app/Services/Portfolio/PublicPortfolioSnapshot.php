@@ -100,11 +100,12 @@ class PublicPortfolioSnapshot
         return ['version' => 1, 'tables' => $tables, 'assets' => $assets];
     }
 
-    /** Restore only a fresh SQLite portfolio; runtime data is never imported or deleted. */
+    /** Restore only a fresh portfolio; runtime data is never imported or deleted. */
     public function restore(string $path): void
     {
-        if (DB::getDriverName() !== 'sqlite') {
-            throw new RuntimeException('The deployment snapshot currently supports SQLite only.');
+        $driver = DB::getDriverName();
+        if (! in_array($driver, ['sqlite', 'pgsql'], true)) {
+            throw new RuntimeException('The deployment snapshot supports SQLite and PostgreSQL only.');
         }
         $snapshot = json_decode(File::get($path), true, 512, JSON_THROW_ON_ERROR);
         if (($snapshot['version'] ?? null) !== 1 || ! is_array($snapshot['tables'] ?? null)
@@ -120,25 +121,11 @@ class PublicPortfolioSnapshot
                 }
             }
         }
-        foreach ($snapshot['assets'] ?? [] as $destination => $filename) {
-            if (! preg_match('/^[a-f0-9]{64}\.(jpg|png|webp|gif|pdf|ico)$/', $filename)
-                || $destination !== 'media/deployment/'.$filename) {
-                throw new RuntimeException('Invalid bundled public asset path.');
-            }
-            $source = database_path('seeders/assets/'.$filename);
-            if (! is_file($source) || hash_file('sha256', $source) !== pathinfo($filename, PATHINFO_FILENAME)) {
-                throw new RuntimeException('Bundled public asset is missing or has changed.');
-            }
-        }
-        DB::transaction(function () use ($snapshot): void {
+        $this->restoreAssets($snapshot);
+        DB::transaction(function () use ($snapshot, $driver): void {
             foreach (array_keys(self::COLUMNS) as $table) {
                 if (! in_array($table, ['navbars', 'navbar_items'], true) && DB::table($table)->exists()) {
                     throw new RuntimeException('Refusing to replace existing portfolio content: '.$table);
-                }
-            }
-            foreach ($snapshot['assets'] ?? [] as $destination => $filename) {
-                if (! Storage::disk('public')->put($destination, File::get(database_path('seeders/assets/'.$filename)))) {
-                    throw new RuntimeException('Unable to restore a bundled public asset.');
                 }
             }
             foreach (array_keys(self::COLUMNS) as $table) {
@@ -148,6 +135,13 @@ class PublicPortfolioSnapshot
                 foreach ($snapshot['tables'][$table] as $row) {
                     if ($table === 'media') {
                         $row['uploaded_by'] = null;
+                    }
+                    if ($driver === 'pgsql') {
+                        foreach (['is_visible', 'is_available', 'is_featured', 'is_published'] as $boolean) {
+                            if (array_key_exists($boolean, $row)) {
+                                $row[$boolean] = (bool) $row[$boolean];
+                            }
+                        }
                     }
                     DB::table($table)->insert($row + ['created_at' => now(), 'updated_at' => now()]);
                 }
@@ -170,9 +164,43 @@ class PublicPortfolioSnapshot
                     }
                 }
             }
-            if (DB::select('PRAGMA foreign_key_check') !== []) {
+            if ($driver === 'sqlite' && DB::select('PRAGMA foreign_key_check') !== []) {
                 throw new RuntimeException('Public snapshot foreign key verification failed.');
             }
+            if ($driver === 'pgsql') {
+                foreach (array_keys(self::COLUMNS) as $table) {
+                    DB::select("SELECT setval(pg_get_serial_sequence('{$table}', 'id'), COALESCE(MAX(id), 1), MAX(id) IS NOT NULL) FROM \"{$table}\"");
+                }
+            }
         });
+    }
+
+    /** Restore the public files after every rebuild, including when database rows persist. */
+    public function restoreBundledAssets(string $path): void
+    {
+        $snapshot = json_decode(File::get($path), true, 512, JSON_THROW_ON_ERROR);
+        $this->restoreAssets($snapshot);
+    }
+
+    /** @param array<string, mixed> $snapshot */
+    private function restoreAssets(array $snapshot): void
+    {
+        if (! is_array($snapshot['assets'] ?? null)) {
+            throw new RuntimeException('Invalid bundled public assets.');
+        }
+        foreach ($snapshot['assets'] as $destination => $filename) {
+            if (! preg_match('/^[a-f0-9]{64}\.(jpg|png|webp|gif|pdf|ico)$/', $filename)
+                || $destination !== 'media/deployment/'.$filename) {
+                throw new RuntimeException('Invalid bundled public asset path.');
+            }
+            $source = database_path('seeders/assets/'.$filename);
+            if (! is_file($source) || hash_file('sha256', $source) !== pathinfo($filename, PATHINFO_FILENAME)) {
+                throw new RuntimeException('Bundled public asset is missing or has changed.');
+            }
+            if (! Storage::disk('public')->exists($destination)
+                && ! Storage::disk('public')->put($destination, File::get($source))) {
+                throw new RuntimeException('Unable to restore a bundled public asset.');
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Services\Portfolio\PublicPortfolioSnapshot;
 use Database\Seeders\PortfolioSeeder;
 use Database\Seeders\PublicPortfolioSeeder;
 use Database\Seeders\User\UserDataSeeder;
@@ -28,12 +29,17 @@ class BootstrapDeployment extends Command
         }
 
         if (! SiteSetting::query()->exists()) {
-            $seeder = config('deployment-content.enabled') && DB::getDriverName() === 'sqlite' && is_file((string) config('deployment-content.path'))
+            $seeder = config('deployment-content.enabled') && is_file((string) config('deployment-content.path'))
+                && in_array(DB::getDriverName(), ['sqlite', 'pgsql'], true)
                 ? PublicPortfolioSeeder::class
                 : PortfolioSeeder::class;
             if ($this->call('db:seed', ['--class' => $seeder, '--force' => true]) !== self::SUCCESS) {
                 return self::FAILURE;
             }
+        }
+
+        if (config('deployment-content.enabled') && is_file((string) config('deployment-content.path'))) {
+            app(PublicPortfolioSnapshot::class)->restoreBundledAssets((string) config('deployment-content.path'));
         }
 
         if (! User::query()->where('email_hash', hash('sha256', $email))->exists()) {

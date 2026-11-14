@@ -2,7 +2,7 @@ services:
     - type: web
       name: personal-portfolio
       runtime: docker
-      # Free SQLite is ephemeral: database changes can disappear on restart.
+      # Keep the free web service; set its database connection in Render.
       plan: free
       dockerfilePath: Dockerfile
       dockerContext: .
@@ -17,11 +17,11 @@ services:
           - key: APP_KEY
             sync: false
           - key: DB_CONNECTION
-            value: sqlite
+            sync: false
           - key: DB_DATABASE
-            value: /app/storage/app/database/portfolio.sqlite
+            sync: false
           - key: DB_URL
-            value: ''
+            sync: false
           - key: SESSION_DRIVER
             value: database
           - key: CACHE_STORE

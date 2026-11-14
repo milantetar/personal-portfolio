@@ -40,10 +40,23 @@ jobs:
                     --env DB_URL=postgresql://portfolio:testing-only@127.0.0.1:5432/portfolio \
                     --env SESSION_DRIVER=database --env CACHE_STORE=database \
                     --env QUEUE_CONNECTION=sync --env MAIL_MAILER=log \
-                    --env SEED_ON_DEPLOY=true --env ADMIN_EMAIL=admin@example.test \
+                    --env SEED_ON_DEPLOY=true --env DEPLOYMENT_CONTENT_SEED=true \
+                    --env ADMIN_EMAIL=admin@example.test \
                     --env ADMIN_PASSWORD=ci-only-long-password portfolio:ci
                   for attempt in $(seq 1 60); do
                     if curl --fail --silent http://localhost:8080/up; then
+                      docker exec portfolio-ci php -r '
+                        require "vendor/autoload.php";
+                        $app = require "bootstrap/app.php";
+                        $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+                        $snapshot = json_decode(file_get_contents(config("deployment-content.path")), true, 512, JSON_THROW_ON_ERROR);
+                        foreach (["site_settings", "certificates", "portfolio_sections", "media"] as $table) {
+                          if (Illuminate\Support\Facades\DB::table($table)->count() !== count($snapshot["tables"][$table])) exit(1);
+                        }
+                        foreach ($snapshot["assets"] as $path => $filename) {
+                          if (! Illuminate\Support\Facades\Storage::disk("public")->exists($path)) exit(1);
+                        }
+                      '
                       curl --fail --silent http://localhost:8080/ > /dev/null
                       exit 0
                     fi

@@ -39,10 +39,13 @@ it('restores the real deployment content and files without importing analytics o
 
     SiteSetting::query()->first()->update(['site_name' => 'Edited after deploy']);
     AnalyticsVisit::query()->create(['visitor_hash' => str_repeat('a', 64), 'path' => '/', 'device_type' => 'desktop', 'viewed_at' => now()]);
+    $bundledFile = array_key_first($snapshot['assets']);
+    Storage::disk('public')->delete($bundledFile);
     $this->artisan('portfolio:bootstrap-deployment')->assertSuccessful();
     expect(SiteSetting::query()->sole()->site_name)->toBe('Edited after deploy')
         ->and(AnalyticsVisit::query()->count())->toBe(1)
         ->and(User::query()->count())->toBe(1);
+    Storage::disk('public')->assertExists($bundledFile);
     $navbar = DB::table('navbars')->where('location', 'homepage-header')->value('id');
     expect(DB::table('navbar_items')->where('navbar_id', $navbar)->count())->toBe(count($snapshot['tables']['navbar_items']));
 

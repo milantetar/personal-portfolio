@@ -1,4 +1,4 @@
-# Public portfolio content on free Render
+# Public portfolio content on Render
 
 The deployed image includes a reviewed, content-only snapshot at
 `database/seeders/data/public-portfolio.json` and its referenced local images and
@@ -36,6 +36,29 @@ No raw SQL is executed and no database import HTTP endpoint is exposed.
 Render Free loses SQLite on restart, redeploy or idle spin-down. The snapshot
 restores the baseline content each time, but later dashboard edits, password
 changes, enquiries and analytics can disappear. The snapshot is not a live backup.
+
+## Move the existing service to Neon PostgreSQL
+
+The same public snapshot now restores into an empty PostgreSQL database on the
+first startup. Later startups preserve database rows and restore the bundled
+public images and PDFs to the free service's temporary filesystem. Cloudinary
+uploads stay on Cloudinary. No private runtime data is copied from SQLite.
+
+Create a **fresh** Neon production database or branch. In the existing Render
+service's Environment page, set `DB_CONNECTION=pgsql`, set `DB_URL` to the
+private Neon connection string with `sslmode=require`, and clear `DB_DATABASE`.
+Keep `SEED_ON_DEPLOY=true` and `DEPLOYMENT_CONTENT_SEED=true`. Keep the existing
+`APP_KEY`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, Cloudinary, Resend and Gemini values.
+Save and deploy after this code is live. The entrypoint migrates the fresh
+database and then imports the snapshot. Do not point this startup at a database
+containing test or production content: existing portfolio rows are intentionally
+preserved and will not be replaced by the snapshot.
+
+The Blueprint marks the three database variables `sync: false`, so future
+Blueprint syncs leave their Render values alone. For a newly created Blueprint,
+set those variables in the Render dashboard during setup. Test an edit and a
+redeploy after the switch; the edit should remain. Keep a separate database
+backup, because the bundled snapshot is only the original baseline.
 
 ## Update the baseline
 
