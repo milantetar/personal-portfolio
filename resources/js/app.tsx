@@ -6,6 +6,7 @@ import '@fontsource/ibm-plex-mono/400.css';
 import { config, createInertiaApp, router } from '@inertiajs/react';
 import type { ComponentType } from 'react';
 import { ThemeProvider } from '@/components/theme-provider';
+import { NavigationLoading } from '@/components/navigation-loading';
 import { Toaster } from 'sonner';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
@@ -37,10 +38,13 @@ void createInertiaApp({
     withApp: (app) => (
         <ThemeProvider defaultTheme="dark">
             {app}
+            <NavigationLoading />
             <Toaster position="bottom-right" richColors closeButton />
         </ThemeProvider>
     ),
     progress: {
-        color: '#4B5563',
+        color: '#7c9f97',
+        delay: 100,
+        showSpinner: false,
     },
 });

@@ -200,6 +200,8 @@ await run('Section create, edit, hide, publish and delete', async () => {
             exact: true,
         })
         .click();
+    // Check the persisted state and clear the transient publish notification.
+    await page.reload();
     await expect(
         page.getByRole('button', {
             name: `Hide Edited section ${stamp}`,

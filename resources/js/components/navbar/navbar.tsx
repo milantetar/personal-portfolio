@@ -67,7 +67,7 @@ export function Navbar({
                         <Link
                             href="/"
                             prefetch="hover"
-                            className="flex shrink-0 items-center gap-2 transition-opacity hover:opacity-75"
+                            className="flex min-w-0 items-center gap-2 transition-opacity hover:opacity-75"
                         >
                             {branding?.logo ? (
                                 <OptimizedImage
@@ -82,7 +82,7 @@ export function Navbar({
                                     height={24}
                                 />
                             ) : null}
-                            <span className="font-display text-lg font-semibold tracking-tight">
+                            <span className="truncate font-display text-lg font-semibold tracking-tight">
                                 {activeNavbar?.brand_title?.trim() ||
                                     branding?.siteName ||
                                     'Portfolio'}

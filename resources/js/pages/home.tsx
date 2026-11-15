@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { useReducedMotion } from 'motion/react';
-import { Mail, Menu, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ArrowUpRight, Mail, Menu, X } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 
 import { PortfolioAssistant } from '@/components/portfolio/portfolio-assistant';
@@ -59,6 +59,38 @@ export default function Home({
         (navbar) => navbar.name === 'Homepage Navbar',
     );
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const headerRef = useRef<HTMLElement>(null);
+    const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (!isMenuOpen) return;
+        const dismissOutside = (event: PointerEvent) => {
+            if (
+                event.target instanceof Node &&
+                !headerRef.current?.contains(event.target)
+            ) {
+                setIsMenuOpen(false);
+            }
+        };
+        const dismissOnEscape = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setIsMenuOpen(false);
+                menuButtonRef.current?.focus();
+            }
+        };
+        const desktop = window.matchMedia('(min-width: 768px)');
+        const dismissOnDesktop = () => {
+            if (desktop.matches) setIsMenuOpen(false);
+        };
+        document.addEventListener('pointerdown', dismissOutside);
+        document.addEventListener('keydown', dismissOnEscape);
+        desktop.addEventListener('change', dismissOnDesktop);
+        return () => {
+            document.removeEventListener('pointerdown', dismissOutside);
+            document.removeEventListener('keydown', dismissOnEscape);
+            desktop.removeEventListener('change', dismissOnDesktop);
+        };
+    }, [isMenuOpen]);
     const activeSection = sections.find(
         (section) => section.slug === activeSectionSlug,
     );
@@ -267,7 +299,10 @@ export default function Home({
                     aria-hidden="true"
                 />
 
-                <header className="portfolio-nav-glass sticky top-0 z-40">
+                <header
+                    ref={headerRef}
+                    className="portfolio-nav-glass sticky top-0 z-40"
+                >
                     <nav
                         className="portfolio-wrap flex min-h-16 items-center justify-between gap-5"
                         aria-label="Main navigation"
@@ -405,6 +440,7 @@ export default function Home({
                                 ) : null}
                             </div>
                             <button
+                                ref={menuButtonRef}
                                 type="button"
                                 aria-label={
                                     isMenuOpen
@@ -428,39 +464,65 @@ export default function Home({
                         <nav
                             id="portfolio-mobile-navigation"
                             aria-label="Portfolio navigation"
-                            className="portfolio-mobile-navigation portfolio-wrap grid gap-1 border-t border-border py-2 md:hidden"
+                            className="portfolio-mobile-navigation md:hidden"
                         >
-                            {homepageNavbar?.items.map((item) => {
-                                const href = portfolioHref(
-                                    item.url,
-                                    sections,
-                                    item.label,
-                                );
-                                const className =
-                                    'rounded-lg px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground';
-                                const closeMenu = () => setIsMenuOpen(false);
+                            <div className="portfolio-mobile-navigation-heading">
+                                <span>Explore portfolio</span>
+                            </div>
+                            <div className="portfolio-mobile-navigation-links">
+                                {homepageNavbar?.items.map((item) => {
+                                    const href = portfolioHref(
+                                        item.url,
+                                        sections,
+                                        item.label,
+                                    );
+                                    const isActive =
+                                        href.split(/[?#]/)[0] ===
+                                        page.url.split(/[?#]/)[0];
+                                    const className =
+                                        'portfolio-mobile-navigation-link';
+                                    const closeMenu = () =>
+                                        setIsMenuOpen(false);
 
-                                return isInternalPortfolioHref(href) ? (
-                                    <Link
-                                        key={item.id}
-                                        href={href}
-                                        prefetch="hover"
-                                        onClick={closeMenu}
-                                        className={className}
-                                    >
-                                        {navigationLabel(item.label)}
-                                    </Link>
-                                ) : (
-                                    <a
-                                        key={item.id}
-                                        href={href}
-                                        onClick={closeMenu}
-                                        className={className}
-                                    >
-                                        {navigationLabel(item.label)}
-                                    </a>
-                                );
-                            })}
+                                    return isInternalPortfolioHref(href) ? (
+                                        <Link
+                                            key={item.id}
+                                            href={href}
+                                            prefetch="hover"
+                                            onClick={closeMenu}
+                                            className={className}
+                                            aria-current={
+                                                isActive ? 'page' : undefined
+                                            }
+                                        >
+                                            <span>
+                                                {navigationLabel(item.label)}
+                                            </span>
+                                            {isActive ? (
+                                                <span
+                                                    className="portfolio-mobile-current"
+                                                    aria-hidden="true"
+                                                />
+                                            ) : null}
+                                        </Link>
+                                    ) : (
+                                        <a
+                                            key={item.id}
+                                            href={href}
+                                            onClick={closeMenu}
+                                            className={className}
+                                        >
+                                            <span>
+                                                {navigationLabel(item.label)}
+                                            </span>
+                                            <ArrowUpRight
+                                                className="size-3.5 shrink-0"
+                                                aria-hidden="true"
+                                            />
+                                        </a>
+                                    );
+                                })}
+                            </div>
                         </nav>
                     ) : null}
                 </header>

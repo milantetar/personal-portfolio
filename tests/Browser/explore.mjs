@@ -55,7 +55,43 @@ async function inspect(path) {
             .map((el) => `${el.tagName.toLowerCase()}.${el.className}`),
         overflow: document.documentElement.scrollWidth > innerWidth,
     }));
-    pages.push({ path, status: response.status(), ...details });
+    const layouts = [];
+    for (const viewport of [
+        { width: 320, height: 640 },
+        { width: 390, height: 844 },
+        { width: 768, height: 1024 },
+        { width: 1024, height: 768 },
+        { width: 1440, height: 900 },
+    ]) {
+        await page.setViewportSize(viewport);
+        await page.waitForTimeout(100);
+        layouts.push(
+            await page.evaluate(() => ({
+                width: innerWidth,
+                overflow: document.documentElement.scrollWidth > innerWidth + 1,
+                clippedControls: [
+                    ...document.querySelectorAll(
+                        'main button, main input, main textarea, main select',
+                    ),
+                ]
+                    .filter((el) => {
+                        const rect = el.getBoundingClientRect();
+                        if (!rect.width || !rect.height) return false;
+                        // Data tables deliberately scroll horizontally inside their own container.
+                        if (el.closest('table, [aria-hidden="true"]'))
+                            return false;
+                        return rect.left < -1 || rect.right > innerWidth + 1;
+                    })
+                    .map(
+                        (el) =>
+                            el.getAttribute('aria-label') ||
+                            el.textContent?.trim() ||
+                            el.tagName,
+                    ),
+            })),
+        );
+    }
+    pages.push({ path, status: response.status(), ...details, layouts });
     await page.screenshot({
         path: `${root}/${path.replaceAll('/', '-') || 'home'}.png`,
         fullPage: true,
@@ -118,6 +154,10 @@ process.exitCode =
     errors.length ||
     pages.some(
         (entry) =>
+            entry.layouts.some(
+                (layout) =>
+                    layout.overflow || layout.clippedControls.length > 0,
+            ) ||
             entry.status !== 200 ||
             entry.brokenImages.length > 0 ||
             entry.imagesWithoutDimensions.length > 0 ||

@@ -22,7 +22,7 @@ export function AdminPageHeader({
                 >
                     {icon}
                 </div>
-                <div>
+                <div className="min-w-0">
                     <h1 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
                         {title}
                     </h1>
@@ -32,9 +32,7 @@ export function AdminPageHeader({
                 </div>
             </div>
             {actions ? (
-                <div className="flex flex-wrap gap-2 sm:shrink-0">
-                    {actions}
-                </div>
+                <div className="flex min-w-0 flex-wrap gap-2">{actions}</div>
             ) : null}
         </header>
     );

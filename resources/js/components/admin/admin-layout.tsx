@@ -37,14 +37,14 @@ export function AdminLayout({
                 aria-hidden="true"
             />
             <Navbar />
-            <div className="admin-workspace flex min-h-0 flex-1 flex-col md:flex-row">
+            <div className="admin-workspace flex min-h-0 min-w-0 flex-1 flex-col md:flex-row">
                 <Sidebar items={sidebarItems} />
                 <main className="admin-main min-w-0 flex-1 overflow-y-auto overscroll-contain">
                     <motion.div
                         initial={reduceMotion ? false : { opacity: 0, y: 7 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.2, ease: 'easeOut' }}
-                        className="admin-main-content min-h-full px-4 py-6 sm:px-6 lg:px-9 lg:py-8"
+                        className="admin-main-content min-h-full min-w-0 px-4 py-6 sm:px-6 lg:px-9 lg:py-8"
                     >
                         {children}
                     </motion.div>

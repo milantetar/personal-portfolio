@@ -2088,20 +2088,6 @@ samp {
 }
 
 @media (min-width: 768px) and (max-width: 900px) {
-    .portfolio-nav-glass [aria-label='Main navigation'] > div {
-        display: none !important;
-    }
-
-    .portfolio-nav-glass [aria-label='Main navigation'] > button {
-        display: inline-flex !important;
-    }
-
-    #portfolio-mobile-navigation {
-        display: grid !important;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 900px) {
     .admin-ui .admin-overview-intro {
         grid-template-columns: minmax(0, 1fr);
     }
@@ -3522,6 +3508,158 @@ html:not(.dark) .glass-card {
 .portfolio-site .portfolio-assistant-message--user p {
     border-radius: 12px;
     background: hsl(var(--card) / 0.7);
+}
+
+.portfolio-site .portfolio-nav-glass .portfolio-mobile-navigation {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    inset-inline: 0.75rem;
+    width: auto;
+    max-height: calc(100dvh - var(--portfolio-nav-height) - 1.5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0.75rem;
+    border: 1px solid hsl(var(--foreground) / 0.18);
+    border-radius: 12px;
+    background: hsl(var(--card) / 0.98);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.1);
+    animation: portfolio-menu-enter 160ms ease-out;
+}
+
+.portfolio-mobile-navigation-heading {
+    padding: 0.25rem 0.5rem 0.75rem;
+    color: hsl(var(--muted-foreground));
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.portfolio-mobile-navigation-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+}
+
+.portfolio-site .portfolio-mobile-navigation-link {
+    display: flex;
+    min-width: 0;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: hsl(var(--foreground));
+    font-size: 0.875rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+    transition: background-color 150ms ease;
+}
+
+.portfolio-site .portfolio-mobile-navigation-link:hover,
+.portfolio-site .portfolio-mobile-navigation-link[aria-current='page'] {
+    background: hsl(var(--foreground) / 0.08);
+}
+
+.portfolio-site .portfolio-mobile-navigation-link:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: -2px;
+}
+
+.portfolio-mobile-current {
+    width: 0.375rem;
+    height: 0.375rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: hsl(var(--primary));
+}
+
+@keyframes portfolio-menu-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Reflow editorial sections before their label column crowds the content. */
+@media (max-width: 900px) {
+    .portfolio-site .portfolio-editorial-section .portfolio-section-inner {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.25rem;
+    }
+
+    .admin-ui .admin-page-header {
+        flex-wrap: wrap;
+    }
+}
+
+.portfolio-site .portfolio-section-inner,
+.admin-ui .admin-page,
+.admin-ui .admin-panel,
+[data-slot='dialog-content'] > * {
+    min-width: 0;
+}
+
+.portfolio-site h1,
+.portfolio-site h2,
+.portfolio-site p,
+.portfolio-site .portfolio-skill-chip,
+.admin-ui .admin-page-header,
+[data-slot='dialog-content'] {
+    overflow-wrap: anywhere;
+}
+
+[data-slot='dialog-content'] {
+    max-width: calc(100vw - 2rem);
+    max-height: calc(100dvh - 2rem);
+}
+
+@media (max-width: 639px) {
+    .portfolio-site .portfolio-section--hero .portfolio-section-inner {
+        min-height: 0;
+        padding: 1.25rem;
+    }
+
+    .portfolio-site .portfolio-skill-chip {
+        max-width: 100%;
+        white-space: normal;
+    }
+
+    .portfolio-site .portfolio-skill-icon,
+    .portfolio-site .portfolio-assistant-send {
+        flex-shrink: 0;
+    }
+
+    .portfolio-site .portfolio-assistant-composer-footer {
+        gap: 0.75rem;
+    }
+
+    .admin-ui .app-topbar-inner {
+        gap: 0.5rem;
+        padding-inline: 0.75rem;
+    }
+
+    .admin-ui .admin-main-content {
+        padding: 1rem 0.75rem;
+    }
+
+    .admin-ui .admin-page {
+        height: auto;
+        min-height: 100%;
+        overflow: visible;
+    }
+
+    .admin-ui input,
+    .admin-ui textarea,
+    .admin-ui select,
+    .portfolio-site input,
+    .portfolio-site textarea {
+        font-size: 1rem;
+    }
 }
 
 /* Fit the skill index into two desktop rows without shrinking its labels. */

@@ -86,6 +86,7 @@ try {
         );
     for (const script of [
         'explore.mjs',
+        'navigation.mjs',
         'audit.mjs',
         'audit-more.mjs',
         'audit-edge.mjs',

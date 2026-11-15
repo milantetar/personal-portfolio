@@ -55,6 +55,27 @@ await run(
         ).toBe('same-document');
     },
 );
+await run(
+    'Slow navigation shows loading feedback and clears on completion',
+    async () => {
+        await page.goto(base);
+        const slowAbout = async (route) => {
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+            await route.continue();
+        };
+        await page.route('**/about', slowAbout);
+        try {
+            await page
+                .locator('nav[aria-label="Main navigation"] a[href="/about"]')
+                .click();
+            await expect(page.getByText(/^Loading/)).toBeVisible();
+            await expect(page).toHaveURL(`${base}/about`);
+            await expect(page.getByText(/^Loading/)).toHaveCount(0);
+        } finally {
+            await page.unroute('**/about', slowAbout);
+        }
+    },
+);
 await run('Sitemap, robots, missing page and guest API access', async () => {
     const sitemap = await context.request.get(`${base}/sitemap.xml`);
     expect(sitemap.status()).toBe(200);
