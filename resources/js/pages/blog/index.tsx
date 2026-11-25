@@ -79,8 +79,8 @@ export default function BlogIndex({ settings, posts }: BlogIndexProps) {
     const siteUrl = seo?.siteUrl || 'https://mtportfolio.tech';
     const title =
         posts.current_page > 1
-            ? `Writing — ${siteName} (Page ${posts.current_page})`
-            : `Writing — ${siteName}`;
+            ? `Writing (Page ${posts.current_page}) | ${siteName}`
+            : `Writing | ${siteName}`;
     const description = metaDescription(
         `Articles on PHP, Laravel, backend engineering, and software projects by ${siteName}.`,
         `Writing and project notes from ${siteName}.`,

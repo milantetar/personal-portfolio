@@ -106,7 +106,7 @@ export default function Home({
         activeSection?.title ||
         (activeSectionSlug === 'assistant' ? 'Ask about my work' : siteName);
     const documentTitle =
-        pageTitle === siteName ? siteName : `${pageTitle} — ${siteName}`;
+        pageTitle === siteName ? siteName : `${pageTitle} | ${siteName}`;
     const isAssistantPage = activeSectionSlug === 'assistant';
     const sectionContent = activeSection?.content;
     const cmsDescription = [
