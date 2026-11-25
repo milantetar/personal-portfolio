@@ -53,6 +53,12 @@ class User extends Authenticatable
      */
     protected static function booted(): void
     {
+        static::updated(function (User $user): void {
+            if ($user->wasChanged('password')) {
+                $user->tokens()->delete();
+            }
+        });
+
         static::saving(function (User $user): void {
             if ($user->isDirty('email')) {
                 // Generate a deterministic SHA-256 hash for secure database lookups

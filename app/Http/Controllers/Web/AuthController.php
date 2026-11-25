@@ -69,15 +69,10 @@ class AuthController extends Controller
             'email' => ['required', 'string', 'email'],
         ]);
 
-        $status = Password::sendResetLink($request->only('email'));
+        Password::sendResetLink($request->only('email'));
+        Log::info('Password reset link requested.');
 
-        if ($status === Password::RESET_LINK_SENT) {
-            Log::info('Password reset link requested.');
-
-            return back()->with('success', __($status));
-        }
-
-        return back()->withErrors(['email' => __($status)]);
+        return back()->with('success', 'If an account exists for that email, a password reset link has been sent.');
     }
 
     public function showResetPassword(Request $request, string $token): Response

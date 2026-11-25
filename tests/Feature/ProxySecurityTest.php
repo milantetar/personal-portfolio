@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\TrustConfiguredProxies;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Http\Request;
@@ -73,4 +74,21 @@ it('rejects an unconfigured host in production host validation', function (): vo
 
     expect(fn () => $middleware->handle($request, fn (Request $request) => response($request->getHost())))
         ->toThrow(SuspiciousOperationException::class);
+});
+
+it('sets transport and document boundary policies only in production', function (): void {
+    app()->detectEnvironment(fn (): string => 'production');
+    $response = (new SecurityHeaders)->handle(
+        Request::create('https://portfolio.test/'),
+        fn () => response('ok'),
+    );
+    expect($response->headers->get('Strict-Transport-Security'))->toBe('max-age=31536000')
+        ->and($response->headers->get('Content-Security-Policy'))->toBe("base-uri 'self'; frame-ancestors 'none'; form-action 'self'");
+
+    app()->detectEnvironment(fn (): string => 'testing');
+    $local = (new SecurityHeaders)->handle(
+        Request::create('http://localhost/'),
+        fn () => response('ok'),
+    );
+    expect($local->headers->has('Strict-Transport-Security'))->toBeFalse();
 });

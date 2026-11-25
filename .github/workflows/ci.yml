@@ -39,6 +39,9 @@ jobs:
             - name: Install Composer dependencies
               run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
 
+            - name: Audit PHP dependencies
+              run: composer audit --locked
+
             - name: Generate application key
               run: php artisan key:generate
 
@@ -52,6 +55,9 @@ jobs:
 
             - name: Install pnpm dependencies
               run: pnpm install --frozen-lockfile
+
+            - name: Audit JavaScript dependencies
+              run: pnpm audit
 
             - name: Generate Wayfinder routes and actions
               run: php artisan wayfinder:generate --with-form

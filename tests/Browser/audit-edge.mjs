@@ -104,7 +104,7 @@ await run(
             .getByRole('button', { name: 'Send reset link', exact: true })
             .click();
         await expect(
-            page.getByText(/emailed your password reset link/i),
+            page.getByText(/If an account exists for that email/i),
         ).toBeVisible({ timeout: 20000 });
         await page.goto(
             `${base}/reset-password/invalid-token?email=browser-audit%40example.test`,

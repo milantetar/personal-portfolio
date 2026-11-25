@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\User;
+use App\Services\Auth\AuthService;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -83,6 +84,7 @@ it('sends a password reset link for registered emails', function (): void {
 
 it('resets a password with a valid token', function (): void {
     $user = User::factory()->create(['email' => 'admin@example.com']);
+    $user->createToken('existing-client');
     $token = Password::broker()->createToken($user);
 
     $this->post('/reset-password', [
@@ -92,7 +94,8 @@ it('resets a password with a valid token', function (): void {
         'password_confirmation' => 'new-password-123',
     ])->assertRedirect(route('login'));
 
-    expect(Hash::check('new-password-123', $user->fresh()->password))->toBeTrue();
+    expect(Hash::check('new-password-123', $user->fresh()->password))->toBeTrue()
+        ->and($user->tokens()->count())->toBe(0);
 });
 
 it('rejects password resets with invalid tokens', function (): void {
@@ -111,6 +114,7 @@ it('rejects password resets with invalid tokens', function (): void {
 
 it('changes the password of the signed-in user', function (): void {
     $user = User::factory()->create();
+    $user->createToken('existing-client');
 
     $this->actingAs($user)
         ->put('/password', [
@@ -120,7 +124,8 @@ it('changes the password of the signed-in user', function (): void {
         ])
         ->assertSessionHasNoErrors();
 
-    expect(Hash::check('new-password-123', $user->fresh()->password))->toBeTrue();
+    expect(Hash::check('new-password-123', $user->fresh()->password))->toBeTrue()
+        ->and($user->tokens()->count())->toBe(0);
 });
 
 it('requires the current password to change it', function (): void {
@@ -135,4 +140,39 @@ it('requires the current password to change it', function (): void {
         ->assertSessionHasErrors('current_password');
 
     expect(Hash::check('password', $user->fresh()->password))->toBeTrue();
+});
+
+it('does not disclose whether a password reset account exists', function (): void {
+    Notification::fake();
+    $user = User::factory()->create(['email' => 'admin@example.com']);
+    $message = 'If an account exists for that email, a password reset link has been sent.';
+
+    foreach (['missing@example.com', 'admin@example.com', 'admin@example.com'] as $email) {
+        $this->from('/forgot-password')->post('/forgot-password', ['email' => $email])
+            ->assertRedirect('/forgot-password')
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('success', $message);
+    }
+
+    Notification::assertSentToTimes($user, ResetPassword::class, 1);
+});
+
+it('issues API tokens with a one day lifetime', function (): void {
+    $user = User::factory()->create();
+    app(AuthService::class)->createApiToken($user);
+    expect($user->tokens()->sole()->expires_at->timestamp)->toBe(now()->addDay()->timestamp);
+});
+
+it('rejects legacy API tokens older than one day', function (): void {
+    $admin = adminUser();
+    $token = $admin->createToken('legacy-client');
+    $token->accessToken->forceFill(['created_at' => now()->subDays(2)])->save();
+
+    $this->withToken($token->plainTextToken)->getJson('/api/users')->assertUnauthorized();
+});
+
+it('accepts an unexpired administrator API token', function (): void {
+    $admin = adminUser();
+    $token = app(AuthService::class)->createApiToken($admin);
+    $this->withToken($token)->getJson('/api/users')->assertOk();
 });

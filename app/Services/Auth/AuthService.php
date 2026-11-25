@@ -32,7 +32,7 @@ class AuthService
 
     public function createApiToken(User $user): string
     {
-        return $user->createToken('api-token')->plainTextToken;
+        return $user->createToken('api-token', ['*'], now()->addDay())->plainTextToken;
     }
 
     public function logoutWeb(): void
